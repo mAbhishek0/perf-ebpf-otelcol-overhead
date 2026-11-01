@@ -101,8 +101,9 @@ host_setup() {
   # The kernel lowers max_sample_rate by itself when a perf interrupt runs long
   # (smoke 2026-11-01: 100000 -> 14000 mid-run). 0 disables that throttle so
   # the pinned rate holds for the whole run; each run records the rate at end.
-  sysw /proc/sys/kernel/perf_cpu_time_max_percent 0 || die "cannot disable perf_cpu_time_max_percent"
+  # Rate FIRST: the kernel rejects max_sample_rate writes while the percent is 0.
   sysw /proc/sys/kernel/perf_event_max_sample_rate "$PERF_MAX_SAMPLE_RATE" || die "cannot pin perf_event_max_sample_rate"
+  sysw /proc/sys/kernel/perf_cpu_time_max_percent 0 || die "cannot disable perf_cpu_time_max_percent"
   sysw /proc/sys/kernel/bpf_stats_enabled 0 || die "cannot set bpf_stats_enabled=0"
 
   # 5. OS onto OS_CPUS: slices and IRQs. The harness and containers live in
