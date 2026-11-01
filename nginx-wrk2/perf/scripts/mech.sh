@@ -82,7 +82,10 @@ mech_stats() {
   tlost=0
   if [[ -f "$b/perf_trace.out" || -f "$b/perf_trace.log" ]]; then
     tlost=$(cat "$b"/perf_trace.out "$b"/perf_trace.log 2>/dev/null \
-            | grep -oE 'LOST [0-9]+ events' | awk '{s+=$2} END{print s+0}')
+            | awk '{ while (match($0, /LOST [0-9]+ events/)) { split(substr($0, RSTART, RLENGTH), w, " "); s += w[2]; $0 = substr($0, RSTART + RLENGTH) } }
+                    END { print s + 0 }')
+    # awk alone, no grep: a grep with no match exits 1, which under pipefail
+    # killed the full run on its first loss-free perf trace (2026-11-01).
     (( tlost > 0 )) && notes+="perf_trace_lost=$tlost;"
   fi
   (( lostsmp > 0 )) && notes+="lost_samples=$lostsmp;"
