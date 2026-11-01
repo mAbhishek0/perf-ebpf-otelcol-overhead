@@ -52,13 +52,17 @@ host_setup() {
   done
   # 2. boost off — before SMT.
   sysw $CPU/cpufreq/boost 0 || die "boost write failed"
-  # 2b. lock the clock: ceiling and floor both at base, so idle workload cores
-  #     do not drop to 1.1 GHz between requests (pilot: FREQ_MIN 1.11 GHz at
-  #     5k-10k) and every request is served at the same clock. Ceiling first.
+  # 2b. Ceiling at base is the hard requirement (boost off already gives it;
+  #     this makes it explicit). The floor is a best-effort REQUEST: on
+  #     amd-pstate-epp it is a hint to firmware (CPPC min_perf), which may
+  #     clamp or ignore it, and idle cores still sleep. So a refused floor warns,
+  #     never aborts. Ceiling first.
+  local floor_ok=1
   for c in $CPU/cpu[0-9]*/cpufreq; do
     sysw "$c/scaling_max_freq" "$CLOCK_BASE_KHZ" || die "scaling_max_freq write failed on $c"
-    sysw "$c/scaling_min_freq" "$CLOCK_BASE_KHZ" || die "scaling_min_freq write failed on $c"
+    sysw "$c/scaling_min_freq" "$CLOCK_BASE_KHZ" || floor_ok=0
   done
+  (( floor_ok )) && log "clock floor requested at ${CLOCK_BASE_KHZ} kHz"     || warn "clock floor not accepted on some CPUs — ceiling still at base; idle cores may downclock"
   # 3. SMT off, verified by the online set, not the control file.
   if [[ "$(cat $CPU/smt/control)" != off ]]; then
     echo off > $CPU/smt/control || die "SMT write failed"
