@@ -118,7 +118,8 @@ _pctl() {  # _pctl FILE 99.000  — first occurrence (the Latency Distribution b
 }
 
 wl_parse() {
-  local b=$1 o="$b/workload.out" e="$b/wl.env" tp p50 p99 p999 sock non2xx
+  local b=$1
+  local o="$b/workload.out" e="$b/wl.env" tp p50 p99 p999 sock non2xx
   tp=$(awk '/^Requests\/sec:/{print $2; exit}' "$o")
   p50=$(_pctl "$o" 50.000); p99=$(_pctl "$o" 99.000); p999=$(_pctl "$o" 99.900)
   [[ -n $tp && -n $p50 && -n $p99 && -n $p999 ]] || die "cannot parse wrk2 output $o"

@@ -99,7 +99,8 @@ sample_start() {
 }
 
 sample_stop() {
-  local b=$1 pid i st s="$b/samples/samples.tsv" e="$b/samples/summary.env"
+  local b=$1
+  local pid i st s="$b/samples/samples.tsv" e="$b/samples/summary.env"
   local n out k v clk wrap lo hi fmin fmax hastr=0
   pid=$(cat "$b/pids.sampler" 2>/dev/null) || die "no $b/pids.sampler"
   kill "$pid" 2>/dev/null || true

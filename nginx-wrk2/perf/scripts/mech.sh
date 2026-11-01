@@ -72,7 +72,8 @@ mech_detach() {
 # line means 0. Whole-field matches so LOST never matches LOST_SAMPLES; the
 # first SAMPLE line only (it repeats per event selector).
 mech_stats() {
-  local b=$1 r="$b/perf_report_stats.txt" s="$b/mech.stats" samples lost lostsmp tlost notes=""
+  local b=$1
+  local r="$b/perf_report_stats.txt" s="$b/mech.stats" samples lost lostsmp tlost notes=""
   perf report --stats -i "$b/perf.data" > "$r" 2>&1 || die "perf report --stats failed (see $r)"
   samples=$(awk '$1=="SAMPLE" && $2=="events:" {print $3; exit}' "$r")
   [[ -n $samples ]] || die "no SAMPLE line in $r — unparseable"
