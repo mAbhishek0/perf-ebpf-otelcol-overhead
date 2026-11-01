@@ -1,8 +1,14 @@
 PLATFORM L (LAPTOP) - HOW TO RUN THE BENCHMARKS
 ================================================
 Status (2026-11-01): one-time setup, unit tests, nginx pilot, smoke cell and
-the full nginx x perf matrix (8 cells) are DONE. Next step is decided in chat
-(stall diagnostic, or nginx x eBPF); its scripts do not exist yet.
+the full nginx x perf matrix (8 cells) are DONE.
+
+NEXT: stall diagnostic (about 65 min, untraced, 20 runs):
+
+    git pull
+    sudo bash diag_stall.sh
+
+It prints a table at the end; the report is in nginx-wrk2/diag/<time>/report.txt.
 
 Everything below runs from the cloned folder:
 
@@ -49,7 +55,7 @@ IF SOMETHING GOES WRONG
 -----------------------
 Stop a run cleanly (still reverts the host and restores the desktop):
 
-    sudo systemctl stop bench-nginx          (bench-pilot for the pilot)
+    sudo systemctl stop bench-nginx          (bench-pilot / bench-diag)
 
 After a crash or power loss:
 
