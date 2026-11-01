@@ -42,4 +42,5 @@ cooldown_wait() {
   kv_put "$b/cooldown.env" TEMP_START_C "$t"
   kv_put "$b/cooldown.env" COOLDOWN_S "$waited"
   kv_put "$b/cooldown.env" COOLDOWN_TIMED_OUT "$timed_out"
+  log "cooldown ${waited}s -> start at ${t} C (limit ${limit} C, idle ${idle} C)"
 }

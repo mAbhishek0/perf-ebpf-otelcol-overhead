@@ -41,8 +41,10 @@ preflight_common() {
   else
     if (( t > TEMP_MAX_START_C )); then
       log "  package ${t} °C > ${TEMP_MAX_START_C} °C — waiting up to ${TEMP_START_WAIT_S}s to cool"
+      local w0=$SECONDS
       wait_for "$TEMP_START_WAIT_S" cool _temp_ok || true
       t=$(pkg_temp_c)
+      log "  cooled for $(( SECONDS - w0 ))s, now ${t} °C"
     fi
     (( t <= TEMP_MAX_START_C )) && pf_ok "package ${t} °C"       || pf_fail "package still ${t} °C > ${TEMP_MAX_START_C} °C after ${TEMP_START_WAIT_S}s (blocked vents? hot room?)"
   fi

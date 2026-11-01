@@ -21,6 +21,8 @@ host_save_prior() {
   kv_put "$p" BOOST "$(cat $CPU/cpufreq/boost)"
   kv_put "$p" GOVERNOR "$(tr -d ' \n' < $CPU/cpu0/cpufreq/scaling_governor)"
   kv_put "$p" EPP "$(tr -d ' \n' < $CPU/cpu0/cpufreq/energy_performance_preference)"
+  kv_put "$p" SCALING_MIN "$(cat $CPU/cpu0/cpufreq/scaling_min_freq)"
+  kv_put "$p" SCALING_MAX "$(cat $CPU/cpu0/cpufreq/scaling_max_freq)"
   kv_put "$p" PLATFORM_PROFILE "$(cat /sys/firmware/acpi/platform_profile)"
   kv_put "$p" PERF_PARANOID "$(cat /proc/sys/kernel/perf_event_paranoid)"
   kv_put "$p" PERF_MAX_SAMPLE_RATE "$(cat /proc/sys/kernel/perf_event_max_sample_rate)"
@@ -50,6 +52,13 @@ host_setup() {
   done
   # 2. boost off — before SMT.
   sysw $CPU/cpufreq/boost 0 || die "boost write failed"
+  # 2b. lock the clock: ceiling and floor both at base, so idle workload cores
+  #     do not drop to 1.1 GHz between requests (pilot: FREQ_MIN 1.11 GHz at
+  #     5k-10k) and every request is served at the same clock. Ceiling first.
+  for c in $CPU/cpu[0-9]*/cpufreq; do
+    sysw "$c/scaling_max_freq" "$CLOCK_BASE_KHZ" || die "scaling_max_freq write failed on $c"
+    sysw "$c/scaling_min_freq" "$CLOCK_BASE_KHZ" || die "scaling_min_freq write failed on $c"
+  done
   # 3. SMT off, verified by the online set, not the control file.
   if [[ "$(cat $CPU/smt/control)" != off ]]; then
     echo off > $CPU/smt/control || die "SMT write failed"
@@ -119,11 +128,14 @@ host_revert() {
   step bash -c "echo $(kv_get "$PRIOR" IRQ_DEFAULT) > /proc/irq/default_smp_affinity"
   step _irqs
   [[ "$(kv_get "$PRIOR" IRQBALANCE)" == active ]] && step systemctl start irqbalance
+  # Boost before the ceiling: a ceiling above base is rejected while boost is off.
+  step sysw $CPU/cpufreq/boost "$(kv_get "$PRIOR" BOOST)"
   for c in $CPU/cpu[0-9]*/cpufreq; do
     step sysw "$c/scaling_governor" "$(kv_get "$PRIOR" GOVERNOR)"
     step sysw "$c/energy_performance_preference" "$(kv_get "$PRIOR" EPP)"
+    step sysw "$c/scaling_max_freq" "$(kv_get "$PRIOR" SCALING_MAX)"
+    step sysw "$c/scaling_min_freq" "$(kv_get "$PRIOR" SCALING_MIN)"
   done
-  step sysw $CPU/cpufreq/boost "$(kv_get "$PRIOR" BOOST)"
   step sysw /sys/firmware/acpi/platform_profile "$(kv_get "$PRIOR" PLATFORM_PROFILE)"
   step sysw /proc/sys/kernel/perf_event_paranoid "$(kv_get "$PRIOR" PERF_PARANOID)"
   step sysw /proc/sys/kernel/perf_event_max_sample_rate "$(kv_get "$PRIOR" PERF_MAX_SAMPLE_RATE)"
