@@ -1,0 +1,67 @@
+13:20:46 [pilot|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd gdm ], apps closed
+13:20:46 [pilot|preflight] preflight
+13:20:46 [pilot|preflight]   [ok]   on AC power
+13:20:46 [pilot|preflight]   [ok]   platform profile performance
+13:20:46 [pilot|preflight]   [ok]   TLP not active
+13:20:46 [pilot|preflight]   [ok]   unattended-upgrades not active
+13:20:46 [pilot|preflight]   [ok]   no noisy processes
+13:20:46 [pilot|preflight]   [ok]   no graphical session
+13:20:46 [pilot|preflight]   [ok]   package 71 °C
+13:20:46 [pilot|preflight]   [ok]   60180 MB free
+13:20:46 [pilot|preflight]   [ok]   BPF JIT on
+13:20:47 [pilot|preflight]   [ok]   docker reachable
+13:20:47 [pilot|preflight]   [ok]   wrk2 with -R
+13:20:47 [pilot|preflight]   [ok]   nginx:1.24 id matches
+13:20:47 [pilot|preflight]   [ok]   port 8080 free
+13:20:47 [pilot|preflight] preflight passed
+13:20:47 [pilot|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+13:20:47 [pilot|host setup] IRQs moved to 12,14: 33 (unmovable, e.g. per-CPU timers: 11)
+13:20:51 [pilot|host setup] clock under load: 2893899 kHz (ok)
+13:20:51 [pilot|host setup] host configured
+13:21:21 [pilot|host setup] idle package temp 42 C (min of 15 samples over 30 s)
+13:21:21 [pilot|host setup] pilot 5000:120: rate 5000 for 120s
+13:23:52 [pilot|pilot 5000:120 measure] pilot 5000:60: rate 5000 for 60s
+13:25:23 [pilot|pilot 5000:60 measure] pilot 10000:120: rate 10000 for 120s
+13:27:56 [pilot|pilot 10000:120 measure] pilot 10000:60: rate 10000 for 60s
+13:30:48 [pilot|pilot 10000:60 measure] pilot 20000:120: rate 20000 for 120s
+13:35:08 [pilot|pilot 20000:120 measure] pilot 20000:60: rate 20000 for 60s
+13:40:50 [pilot|pilot 20000:60 measure] pilot 40000:120: rate 40000 for 120s
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 117: echo: write error: Broken pipe
+13:45:26 [pilot|pilot 40000:120 measure] pilot 40000:60: rate 40000 for 60s
+13:47:01 [pilot|pilot 40000:60 measure] pilot 80000:120: rate 80000 for 120s
+13:49:34 [pilot|pilot 80000:120 measure] pilot 80000:60: rate 80000 for 60s
+13:51:07 [pilot|pilot 80000:60 measure] pilot 120000:120: rate 120000 for 120s
+13:53:39 [pilot|pilot 120000:120 measure] pilot 120000:60: rate 120000 for 60s
+pilot nginx  threads=2 conns=100  ramp=30s  kernel=7.0.0-38-generic  2026-11-01T13:55:12+05:30
+
+120 s windows (untraced)
+    rate   achieved   p50_ms   p99_ms  p999_ms errors  ngx_cpu  gen_cpu   busy%
+    5000    4995.14    1.340    3.210   13.460      0    0.357    0.703     7.8
+   10000    9989.95    1.780    3.510    4.820      0    0.572    0.947    10.6
+   20000   19979.77    1.740    2.800    3.770      0    1.050    0.822    24.4
+   40000   39958.19    1.730    4.880    7.280      0    1.854    1.534    43.0
+   80000   79666.92    1.410   32.830   54.080      0    3.218    1.919    79.1
+  120000   96069.14 11930.000 29180.000 31130.000      0    3.691    1.926    93.3
+
+Gate 1: 60 s vs 120 s (p99 and throughput each within DRIFT_PCT=5%)
+    rate    p99_120     p99_60 p99_diff%  tp_diff%   tp_120    tp_60 verdict
+    5000      3.210      2.810   13.2890    0.0943  4995.14  4990.43 FAIL
+   10000      3.510      3.470    1.1461    0.1001  9989.95  9979.96 PASS
+   20000      2.800    837.120  198.6665    0.8426 19979.77 19812.12 FAIL
+   40000      4.880      4.830    1.0299    0.1024 39958.19 39917.28 PASS
+   80000     32.830     33.340    1.5415    0.2107 79666.92 79834.99 PASS
+  120000  29180.000  20070.000   36.9949    0.3143 96069.14 95767.63 FAIL
+Gate 1 overall: FAIL (judge it on the rates you intend to freeze; a saturated rate may fail for other reasons)
+
+Highest usable rate (p99 < 10x p99@5000=3.210000 ms, errors 0, achieved >= 99%): 40000
+Suggested (NOT written):
+  LADDER="1:10000 2:20000 3:30000 4:40000"
+  WRK2_THREADS=2
+  WRK2_CONNS=100
+Review the table, then write nginx-wrk2/pilot.env by hand: freezing the ladder is a human decision.
+Generator check: max loadgen CPU 1.9278 cores >= 0.6 — keep both GEN CPUs.
+13:55:12 [pilot|pilot 120000:60 measure] report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/pilot/pilot_report.txt
+13:55:13 [pilot|pilot 120000:60 measure] no machine-state drift
+13:55:13 [pilot|host revert] host reverted
+13:55:14 [pilot|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd gdm 
+13:55:14 [pilot|restore services] done
