@@ -1,0 +1,673 @@
+ab@ab:~/Downloads/PE-4credit$ sudo ./install_build.sh 
+[sudo: authenticate] Password:          
+sudo: Authentication failed, try again.
+[sudo: authenticate] Password:           
+PANIC: unprotected error in call to Lua API (attempt to index a nil value)
+
+=== building wrk2
+Cloning into '/tmp/tmp.fZjbVHD3wz/wrk2'...
+remote: Enumerating objects: 253, done.
+remote: Counting objects: 100% (253/253), done.
+remote: Compressing objects: 100% (238/238), done.
+remote: Total 253 (delta 12), reused 52 (delta 12), pack-reused 0 (from 0)
+Receiving objects: 100% (253/253), 1.05 MiB | 5.63 MiB/s, done.
+Resolving deltas: 100% (12/12), done.
+wrk2 commit: 44a94c17d8e6a0bac8559b53da76848e430cb7a7
+make: Entering directory '/tmp/tmp.fZjbVHD3wz/wrk2'
+Building LuaJIT...
+make[1]: Entering directory '/tmp/tmp.fZjbVHD3wz/wrk2/deps/luajit/src'
+HOSTCC    host/minilua.o
+HOSTCC    host/buildvm_asm.o
+HOSTCC    host/buildvm_peobj.o
+HOSTCC    host/buildvm_lib.o
+HOSTCC    host/buildvm_fold.o
+CC        lj_gc.o
+CC        lj_char.o
+CC        lj_obj.o
+CC        lj_str.o
+CC        lj_tab.o
+CC        lj_func.o
+CC        lj_udata.o
+CC        lj_meta.o
+CC        lj_debug.o
+CC        lj_state.o
+CC        lj_vmevent.o
+CC        lj_vmmath.o
+CC        lj_strscan.o
+CC        lj_api.o
+CC        lj_lex.o
+CC        lj_parse.o
+CC        lj_bcread.o
+CC        lj_bcwrite.o
+CC        lj_load.o
+CC        lj_ir.o
+CC        lj_opt_mem.o
+CC        lj_opt_narrow.o
+CC        lj_opt_dce.o
+CC        lj_opt_loop.o
+CC        lj_opt_split.o
+CC        lj_opt_sink.o
+CC        lj_mcode.o
+CC        lj_snap.o
+CC        lj_asm.o
+CC        lj_trace.o
+CC        lj_gdbjit.o
+CC        lj_ctype.o
+CC        lj_cdata.o
+CC        lj_cconv.o
+CC        lj_ccall.o
+CC        lj_ccallback.o
+CC        lj_carith.o
+CC        lj_clib.o
+CC        lj_cparse.o
+lj_clib.c: In function ‘clib_check_lds’:
+lj_clib.c:85:10: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+   85 |       (p = strchr(buf, '('))) {
+      |          ^
+CC        lj_lib.o
+lj_cparse.c: In function ‘cp_next_’:
+lj_cparse.c:313:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  313 |       if (cp_get(cp) != '|') return '|'; cp_get(cp); return CTOK_OROR;
+      |       ^~
+lj_cparse.c:313:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  313 |       if (cp_get(cp) != '|') return '|'; cp_get(cp); return CTOK_OROR;
+      |                                          ^~~~~~
+lj_cparse.c:315:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  315 |       if (cp_get(cp) != '&') return '&'; cp_get(cp); return CTOK_ANDAND;
+      |       ^~
+lj_cparse.c:315:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  315 |       if (cp_get(cp) != '&') return '&'; cp_get(cp); return CTOK_ANDAND;
+      |                                          ^~~~~~
+lj_cparse.c:317:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  317 |       if (cp_get(cp) != '=') return '='; cp_get(cp); return CTOK_EQ;
+      |       ^~
+lj_cparse.c:317:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  317 |       if (cp_get(cp) != '=') return '='; cp_get(cp); return CTOK_EQ;
+      |                                          ^~~~~~
+lj_cparse.c:319:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  319 |       if (cp_get(cp) != '=') return '!'; cp_get(cp); return CTOK_NE;
+      |       ^~
+lj_cparse.c:319:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  319 |       if (cp_get(cp) != '=') return '!'; cp_get(cp); return CTOK_NE;
+      |                                          ^~~~~~
+lj_cparse.c:329:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  329 |       if (cp_get(cp) != '>') return '-'; cp_get(cp); return CTOK_DEREF;
+      |       ^~
+lj_cparse.c:329:42: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  329 |       if (cp_get(cp) != '>') return '-'; cp_get(cp); return CTOK_DEREF;
+      |                                          ^~~~~~
+CC        lj_alloc.o
+CC        lib_aux.o
+CC        lib_package.o
+CC        lib_init.o
+CC        luajit.o
+HOSTLINK  host/minilua
+DYNASM    host/buildvm_arch.h
+HOSTCC    host/buildvm.o
+In file included from host/buildvm.c:59:
+./../dynasm/dasm_x86.h: In function ‘dasm_put’:
+./../dynasm/dasm_x86.h:207:9: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  207 |         if (*p++ == 1 && *p == DASM_DISP) mrm = n; continue;
+      |         ^~
+./../dynasm/dasm_x86.h:207:52: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  207 |         if (*p++ == 1 && *p == DASM_DISP) mrm = n; continue;
+      |                                                    ^~~~~~~~
+HOSTLINK  host/buildvm
+BUILDVM   lj_vm.s
+BUILDVM   lj_ffdef.h
+BUILDVM   lj_folddef.h
+BUILDVM   lj_bcdef.h
+BUILDVM   lj_recdef.h
+BUILDVM   lj_libdef.h
+BUILDVM   jit/vmdef.lua
+CC        lj_err.o
+CC        lj_dispatch.o
+CC        lj_record.o
+CC        lj_crecord.o
+CC        lj_ffrecord.o
+CC        lib_base.o
+CC        lib_math.o
+CC        lib_bit.o
+CC        lib_string.o
+CC        lib_table.o
+CC        lib_io.o
+CC        lib_os.o
+CC        lib_debug.o
+CC        lib_ffi.o
+CC        lib_jit.o
+ASM       lj_vm.o
+CC        lj_bc.o
+CC        lj_opt_fold.o
+AR        libluajit.a
+ar: `u' modifier ignored since `D' is the default (see `U')
+LINK      luajit
+OK        Successfully built LuaJIT
+make[1]: Leaving directory '/tmp/tmp.fZjbVHD3wz/wrk2/deps/luajit/src'
+CC src/net.c
+CC src/wrk.c
+CC src/stats.c
+CC src/aprintf.c
+CC src/ssl.c
+CC src/script.c
+CC src/units.c
+CC src/ae.c
+CC src/zmalloc.c
+CC src/tinymt64.c
+CC src/http_parser.c
+LUAJIT src/wrk.lua
+CC src/hdr_histogram.c
+In file included from /usr/include/errno.h:25,
+                 from src/net.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/pthread.h:21,
+                 from src/ssl.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/pthread.h:21,
+                 from src/wrk.h:5,
+                 from src/wrk.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdlib.h:26,
+                 from src/aprintf.c:4:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdlib.h:26,
+                 from src/units.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/inttypes.h:25,
+                 from src/stats.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdlib.h:26,
+                 from src/script.c:3:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdio.h:28,
+                 from src/ae.c:33:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdio.h:28,
+                 from src/zmalloc.c:31:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/sys/types.h:25,
+                 from src/http_parser.h:32,
+                 from src/http_parser.c:24:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdint.h:26,
+                 from /usr/lib/gcc/x86_64-linux-gnu/15/include/stdint.h:11,
+                 from src/tinymt64.h:19,
+                 from src/tinymt64.c:16:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /usr/include/stdlib.h:26,
+                 from src/hdr_histogram.c:7:
+/usr/include/features.h:205:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+  205 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^~~~~~~
+In file included from src/net.h:4,
+                 from src/net.c:7:
+src/config.h:8:9: warning: ‘_POSIX_C_SOURCE’ redefined
+    8 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+In file included from src/zmalloc.c:35:
+src/config.h:8:9: warning: ‘_POSIX_C_SOURCE’ redefined
+    8 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+In file included from src/ae.c:45:
+src/config.h:8:9: warning: ‘_POSIX_C_SOURCE’ redefined
+    8 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+In file included from src/wrk.h:4,
+                 from src/script.h:10,
+                 from src/script.c:5:
+src/config.h:8:9: warning: ‘_POSIX_C_SOURCE’ redefined
+    8 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+In file included from src/net.h:4,
+                 from src/ssl.h:4,
+                 from src/ssl.c:9:
+src/config.h:8:9: warning: ‘_POSIX_C_SOURCE’ redefined
+    8 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+src/ssl.c:22:22: warning: ‘ssl_id’ defined but not used [-Wunused-function]
+   22 | static unsigned long ssl_id() {
+      |                      ^~~~~~
+src/ssl.c:13:13: warning: ‘ssl_lock’ defined but not used [-Wunused-function]
+   13 | static void ssl_lock(int mode, int n, const char *file, int line) {
+      |             ^~~~~~~~
+src/wrk.c: In function ‘response_complete’:
+src/wrk.c:529:48: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘int64_t’ {aka ‘long int’} [-Wformat=]
+  529 |         printf("  expected_latency_timing = %lld\n", expected_latency_timing);
+      |                                             ~~~^     ~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                |     |
+      |                                                |     int64_t {aka long int}
+      |                                                long long int
+      |                                             %ld
+src/wrk.c:530:28: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  530 |         printf("  now = %lld\n", now);
+      |                         ~~~^     ~~~
+      |                            |     |
+      |                            |     uint64_t {aka long unsigned int}
+      |                            long long int
+      |                         %ld
+src/wrk.c:531:47: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  531 |         printf("  expected_latency_start = %lld\n", expected_latency_start);
+      |                                            ~~~^     ~~~~~~~~~~~~~~~~~~~~~~
+      |                                               |     |
+      |                                               |     uint64_t {aka long unsigned int}
+      |                                               long long int
+      |                                            %ld
+src/wrk.c:532:40: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  532 |         printf("  c->thread_start = %lld\n", c->thread_start);
+      |                                     ~~~^     ~~~~~~~~~~~~~~~
+      |                                        |      |
+      |                                        |      uint64_t {aka long unsigned int}
+      |                                        long long int
+      |                                     %ld
+src/wrk.c:533:36: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  533 |         printf("  c->complete = %lld\n", c->complete);
+      |                                 ~~~^     ~~~~~~~~~~~
+      |                                    |      |
+      |                                    |      uint64_t {aka long unsigned int}
+      |                                    long long int
+      |                                 %ld
+src/wrk.c:535:48: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  535 |         printf("  latest_should_send_time = %lld\n", c->latest_should_send_time);
+      |                                             ~~~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                |      |
+      |                                                |      uint64_t {aka long unsigned int}
+      |                                                long long int
+      |                                             %ld
+src/wrk.c:536:46: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  536 |         printf("  latest_expected_start = %lld\n", c->latest_expected_start);
+      |                                           ~~~^     ~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                              |      |
+      |                                              |      uint64_t {aka long unsigned int}
+      |                                              long long int
+      |                                           %ld
+src/wrk.c:537:39: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  537 |         printf("  latest_connect = %lld\n", c->latest_connect);
+      |                                    ~~~^     ~~~~~~~~~~~~~~~~~
+      |                                       |      |
+      |                                       |      uint64_t {aka long unsigned int}
+      |                                       long long int
+      |                                    %ld
+src/wrk.c:538:37: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  538 |         printf("  latest_write = %lld\n", c->latest_write);
+      |                                  ~~~^     ~~~~~~~~~~~~~~~
+      |                                     |      |
+      |                                     |      uint64_t {aka long unsigned int}
+      |                                     long long int
+      |                                  %ld
+src/wrk.c:542:52: warning: format ‘%lld’ expects argument of type ‘long long int’, but argument 2 has type ‘uint64_t’ {aka ‘long unsigned int’} [-Wformat=]
+  542 |         printf("  next expected_latency_start = %lld\n", expected_latency_start);
+      |                                                 ~~~^     ~~~~~~~~~~~~~~~~~~~~~~
+      |                                                    |     |
+      |                                                    |     uint64_t {aka long unsigned int}
+      |                                                    long long int
+      |                                                 %ld
+src/wrk.c: At top level:
+src/wrk.c:834:13: warning: ‘print_stats_latency’ defined but not used [-Wunused-function]
+  834 | static void print_stats_latency(stats *stats) {
+      |             ^~~~~~~~~~~~~~~~~~~
+LINK wrk
+/usr/bin/x86_64-linux-gnu-ld.bfd: obj/bytecode.o: string table [3] is corrupt
+make: Leaving directory '/tmp/tmp.fZjbVHD3wz/wrk2'
+PANIC: unprotected error in call to Lua API (attempt to index a nil value)
+
+=== wrk2 built but does not run; regenerating bytecode.o via C source
+make: Entering directory '/tmp/tmp.fZjbVHD3wz/wrk2'
+LINK wrk
+make: Leaving directory '/tmp/tmp.fZjbVHD3wz/wrk2'
+wrk2 OK (/usr/local/bin/wrk2): constant-rate test request succeeded
+
+=== building memtier_benchmark
+memtier tag: 2.5.2
+Cloning into '/tmp/tmp.fZjbVHD3wz/memtier'...
+remote: Enumerating objects: 713, done.
+remote: Counting objects: 100% (713/713), done.
+remote: Compressing objects: 100% (323/323), done.
+remote: Total 713 (delta 340), reused 636 (delta 334), pack-reused 0 (from 0)
+Receiving objects: 100% (713/713), 1.01 MiB | 1.02 MiB/s, done.
+Resolving deltas: 100% (340/340), done.
+Note: switching to 'f3ff1793d39bf19077957e986f966206eb349de7'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal --force 
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in '.'.
+libtoolize: copying file './ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: aclocal --force 
+autoreconf: running: /usr/bin/autoconf --force
+configure.ac:21: warning: The macro 'AC_CONFIG_HEADER' is obsolete.
+configure.ac:21: You should run autoupdate.
+./lib/autoconf/status.m4:719: AC_CONFIG_HEADER is expanded from...
+configure.ac:21: the top level
+configure.ac:45: warning: The macro 'AC_HEADER_STDC' is obsolete.
+configure.ac:45: You should run autoupdate.
+./lib/autoconf/headers.m4:663: AC_HEADER_STDC is expanded from...
+configure.ac:45: the top level
+autoreconf: running: /usr/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:25: installing './compile'
+configure.ac:25: installing './config.guess'
+configure.ac:25: installing './config.sub'
+configure.ac:22: installing './install-sh'
+configure.ac:22: installing './missing'
+Makefile.am: installing './depcomp'
+parallel-tests: installing './test-driver'
+autoreconf: Leaving directory '.'
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether sleep supports fractional seconds... yes
+checking filesystem timestamp resolution... 0.01
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking xargs -n works... yes
+checking whether UID '0' is supported by ustar format... yes
+checking whether GID '0' is supported by ustar format... yes
+checking how to create a ustar tar archive... gnutar
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking how to print strings... printf
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to enable C11 features... none needed
+checking whether gcc understands -c and -o together... yes
+checking dependency style of gcc... gcc3
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by gcc... /usr/bin/x86_64-linux-gnu-ld
+checking if the linker (/usr/bin/x86_64-linux-gnu-ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/x86_64-linux-gnu-ld option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ranlib... ranlib
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking command to parse /usr/bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... mt
+checking if mt is a manifest tool... no
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/x86_64-linux-gnu-ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for a Python interpreter with version >= 3.6... python3
+checking for python3... /usr/bin/python3
+checking for python3 version... 3.14
+checking for python3 platform... linux
+checking for GNU default python3 prefix... ${prefix}
+checking for GNU default python3 exec_prefix... ${exec_prefix}
+checking for python3 script directory (pythondir)... ${PYTHON_PREFIX}/lib/python3.14/site-packages
+checking for python3 extension module directory (pyexecdir)... ${PYTHON_EXEC_PREFIX}/lib/python3.14/site-packages
+checking for g++... g++
+checking whether the compiler supports GNU C++... yes
+checking whether g++ accepts -g... yes
+checking for g++ option to enable C++11 features... none needed
+checking dependency style of g++... gcc3
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/bin/x86_64-linux-gnu-ld -m elf_x86_64
+checking if the linker (/usr/bin/x86_64-linux-gnu-ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/usr/bin/x86_64-linux-gnu-ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... yes
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/bin/x86_64-linux-gnu-ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether to build with code coverage support... no
+checking for egrep... (cached) /usr/bin/grep -E
+checking for dirent.h that defines DIR... yes
+checking for library containing opendir... none required
+checking for stdlib.h... (cached) yes
+checking for string.h... (cached) yes
+checking for sys/time.h... yes
+checking for getopt.h... yes
+checking for limits.h... yes
+checking for malloc.h... yes
+checking for stdlib.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking for utime.h... yes
+checking for assert.h... yes
+checking for sys/socket.h... yes
+checking for sys/types.h... (cached) yes
+checking for fcntl.h... yes
+checking for netinet/tcp.h... yes
+checking for execinfo.h... yes
+checking for pthread.h... yes
+checking for zlib.h... yes
+checking for event2/event.h... yes
+checking whether stat file-mode macros are broken... no
+checking for size_t... yes
+checking for GNU libc compatible malloc... yes
+checking for working memcmp... yes
+checking for gettimeofday... yes
+checking for memchr... yes
+checking for memset... yes
+checking for socket... yes
+checking for strerror... yes
+checking for random_r... yes
+checking for drand48... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for libevent_openssl >= 2.0.10... yes
+checking for libssl... yes
+checking for libcrypto... yes
+checking for library containing clock_gettime... none required
+checking for deflateInit_ in -lz... yes
+checking for pthread_create in -lpthread... yes
+checking for gai_strerror in -lsocket... no
+checking for libevent >= 2.0.10... yes
+checking for libevent_pthreads >= 2.0.10... yes
+checking for libevent_extra >= 2.1.1... yes
+checking whether libevent evhttp is usable (evhttp_request_set_on_complete_cb)... yes
+checking for bash-completion >= 2.0... yes
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+/bin/bash ./version.sh
+make  all-am
+make[1]: Entering directory '/tmp/tmp.fZjbVHD3wz/memtier'
+  CXX      memtier_benchmark-memtier_benchmark.o
+  CXX      memtier_benchmark-cluster_client.o
+  CXX      memtier_benchmark-shard_connection.o
+  CXX      memtier_benchmark-run_stats_types.o
+  CXX      memtier_benchmark-client.o
+  CXX      memtier_benchmark-run_stats.o
+  CXX      memtier_benchmark-JSON_handler.o
+  CXX      memtier_benchmark-obj_gen.o
+  CXX      memtier_benchmark-protocol.o
+  CXX      memtier_benchmark-item.o
+  CXX      memtier_benchmark-file_io.o
+  CXX      memtier_benchmark-config_types.o
+  CXX      memtier_benchmark-command_meta.o
+  CXX      memtier_benchmark-statsd.o
+  CXX      memtier_benchmark-prometheus_metrics.o
+  CXX      memtier_benchmark-prometheus_exporter.o
+  CXX      memtier_benchmark-retry_policy.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_histogram_log.o
+statsd.cpp: In member function ‘bool statsd_client::init(const char*, short unsigned int, const char*, const char*)’:
+statsd.cpp:107:50: warning: ‘%s’ directive output may be truncated writing up to 127 bytes into a region of size between 0 and 255 [-Wformat-truncation=]
+  107 |         snprintf(m_prefix, sizeof(m_prefix), "%s.%s.", sanitized_prefix, m_run_label);
+      |                                                  ^~
+In file included from /usr/include/stdio.h:974,
+                 from statsd.cpp:23:
+In function ‘int snprintf(char*, size_t, const char*, ...)’,
+    inlined from ‘bool statsd_client::init(const char*, short unsigned int, const char*, const char*)’ at statsd.cpp:107:17:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:68:35: note: ‘__builtin___snprintf_chk’ output between 3 and 385 bytes into a destination of size 256
+   68 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   69 |                                    __glibc_objsize (__s), __fmt,
+      |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   70 |                                    __va_arg_pack ());
+      |                                    ~~~~~~~~~~~~~~~~~
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_histogram.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_time.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_encoding.o
+  CXXLD    memtier_benchmark
+make[1]: Leaving directory '/tmp/tmp.fZjbVHD3wz/memtier'
+make  install-am
+make[1]: Entering directory '/tmp/tmp.fZjbVHD3wz/memtier'
+make[2]: Entering directory '/tmp/tmp.fZjbVHD3wz/memtier'
+ /usr/bin/mkdir -p '/usr/local/bin'
+  /bin/bash ./libtool   --mode=install /usr/bin/install -c memtier_benchmark '/usr/local/bin'
+libtool: install: /usr/bin/install -c memtier_benchmark /usr/local/bin/memtier_benchmark
+ /usr/bin/mkdir -p '/usr/share/bash-completion/completions'
+ /usr/bin/install -c -m 644 bash-completion/memtier_benchmark '/usr/share/bash-completion/completions'
+ /usr/bin/mkdir -p '/usr/local/share/man/man1'
+ /usr/bin/install -c -m 644 memtier_benchmark.1 '/usr/local/share/man/man1'
+make[2]: Leaving directory '/tmp/tmp.fZjbVHD3wz/memtier'
+make[1]: Leaving directory '/tmp/tmp.fZjbVHD3wz/memtier'
+memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+
+=== installing otelcol-contrib 0.161.0 into /opt/otelcol
+curl: (22) The requested URL returned error: 404
+WARNING: no checksums file at https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.161.0/opentelemetry-collector-releases_otelcol-contrib_checksums.txt; tarball not verified
+otelcol-contrib version 0.161.0
+
+=== pulling docker images
+1.24: Pulling from library/nginx
+5ac1ebd8aebe: Pull complete 
+6989106bacf0: Pull complete 
+c00d1142b331: Pull complete 
+cb49393af980: Pull complete 
+57a1056ea484: Pull complete 
+04e7578caeaa: Pull complete 
+54247e67c145: Download complete 
+2f39813903ff: Download complete 
+Digest: sha256:f6daac2445b0ce70e64d77442ccf62839f3f1b4c24bf6746a857eff014e798c8
+Status: Downloaded newer image for nginx:1.24
+docker.io/library/nginx:1.24
+7.4: Pulling from library/redis
+88b125c05b23: Pull complete 
+faaaf6ba362b: Pull complete 
+ec5b838b30d5: Pull complete 
+c1162fec059b: Pull complete 
+6988465984f0: Pull complete 
+7fd1ebe418b5: Pull complete 
+4f4fb700ef54: Pull complete 
+db062982bd98: Download complete 
+7f940e7da078: Download complete 
+Digest: sha256:4fa24486b8bcca8eec45ee0eb166edc674795e53a2b53d1a9ef263eecebaac85
+Status: Downloaded newer image for redis:7.4
+docker.io/library/redis:7.4
+[nginx:1.24] sha256:f6daac2445b0ce70e64d77442ccf62839f3f1b4c24bf6746a857eff014e798c8
+[redis:7.4] sha256:4fa24486b8bcca8eec45ee0eb166edc674795e53a2b53d1a9ef263eecebaac85
+
+=== done. re-run: sudo bash ./probe_laptop.sh
+

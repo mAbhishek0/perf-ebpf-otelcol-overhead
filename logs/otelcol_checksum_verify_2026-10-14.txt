@@ -1,0 +1,26 @@
+# Transcribed from the chat session (2026-10-14): manual verification of the
+# otelcol-contrib 0.161.0 tarball installed by install_build.sh run 3.
+
+## 1. Release asset listing (filtered to the linux_amd64 tar.gz entries; the
+##    full listing had ~170 entries for every OS/arch/package type)
+$ curl -s https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.161.0 \
+    | grep -oE '"name": *"[^"]*"' | grep -iE 'contrib.*(sum|sig|pem|sbom)|checksum'
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sbom.json"
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sbom.json.sha256"
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sbom.json.sha256.sigstore.json"
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sbom.json.sigstore.json"
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sha256.sigstore.json"
+"name": "otelcol-contrib_0.161.0_linux_amd64.tar.gz.sigstore.json"
+Finding: no combined checksums file exists in this release; each artifact has
+its own <artifact>.sha256 (the grep filter above did not match that plain name)
+plus sigstore bundles.
+
+## 2. Published per-artifact checksum
+$ curl -fsSL https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.161.0/otelcol-contrib_0.161.0_linux_amd64.tar.gz.sha256
+778c689efa681ff6e4722ce9f66b9b7f57c3ba009ab2e2b43dc2e0315862c731
+(bare hash, no filename, no trailing newline)
+
+## 3. Hash of the tarball actually installed (install_build.sh run 3 log)
+778c689efa681ff6e4722ce9f66b9b7f57c3ba009ab2e2b43dc2e0315862c731  otelcol-contrib_0.161.0_linux_amd64.tar.gz
+
+Result: MATCH. /opt/otelcol/otelcol-contrib (0.161.0) is verified.

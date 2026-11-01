@@ -1,0 +1,124 @@
+# lib.sh — shared helpers. Sourced, never executed. Callers run under
+# `set -euo pipefail`, so every helper here is written to be safe under it.
+
+log()  { printf '%s [%s|%s] %s\n' "$(date +%H:%M:%S)" "${LOG_TAG:-bench}" "${STAGE:--}" "$*" >&2; }
+warn() { log "WARN: $*"; }
+die()  {
+  log "FAIL: $*"
+  printf '%s die stage=%s: %s (in %s)\n' "$(date +%T)" "${STAGE:-?}" "$*" "${FUNCNAME[1]:-main}" \
+    >> "${CRASH_ERRFILE:-/dev/null}" 2>/dev/null || true
+  exit 1
+}
+# stage NAME — where the script is; carried by every log line, kept in state/stage.
+stage() {
+  STAGE="$*"
+  echo "$(date +%T) $STAGE" > "${STATE_DIR:-/tmp}/stage" 2>/dev/null || true
+}
+need_root() { [[ $EUID -eq 0 ]] || die "run as root: sudo bash $0"; }
+
+# cap VAR cmd...  — capture stdout+stderr into VAR, ignoring the exit status.
+# Never pipe a command into `grep -q` under pipefail: a non-zero exit (wrk2's
+# usage, SIGPIPE) fails the pipeline even when the text matched.
+cap() { local __v=$1; shift; printf -v "$__v" '%s' "$("$@" 2>&1 || true)"; }
+
+# kv_put FILE KEY VALUE / kv_get FILE KEY  — KEY='value' files, single-quoted
+# so sourcing never expands them. kv_get fails on a missing key: a missing key
+# is a defect, never zero.
+kv_put() { local v="${3//\'/}"; printf "%s='%s'\n" "$2" "$v" >> "$1"; }
+kv_get() {
+  local line
+  line="$(grep -m1 "^$2=" "$1" 2>/dev/null)" || die "missing key $2 in $1"
+  line="${line#*=}"; line="${line#\'}"; printf '%s' "${line%\'}"
+}
+kv_has() { grep -q "^$2=" "$1" 2>/dev/null; }
+
+# wait_for TIMEOUT_S DESCRIPTION cmd...  — bounded poll, 0.2 s steps.
+wait_for() {
+  local t=$1 what=$2; shift 2
+  local end=$(( $(date +%s) + t ))
+  until "$@" >/dev/null 2>&1; do
+    (( $(date +%s) < end )) || return 1
+    sleep 0.2
+  done
+}
+
+# sysw PATH VALUE  — write a sysfs/procfs value and read it back.
+sysw() {
+  echo "$2" > "$1" 2>/dev/null || return 1
+  [[ "$(tr -d ' \n' < "$1")" == "$(tr -d ' \n' <<<"$2")" ]]
+}
+
+# Arithmetic on decimals (bash has none).
+calc() { awk "BEGIN{ printf \"%.6f\", $* }"; }
+pct_diff() { awk -v a="$1" -v b="$2" 'BEGIN{ m=(a+b)/2; if (m==0) {print 0; exit} d=a-b; if (d<0) d=-d; printf "%.4f", 100*d/m }'; }
+# rel_spread v1 v2 ...  — (max - min) / mean x 100; 0 when the mean is 0.
+rel_spread() { printf '%s\n' "$@" | awk 'NR==1{mn=mx=$1} {s+=$1; if($1<mn)mn=$1; if($1>mx)mx=$1} END{m=s/NR; printf "%.4f", (m ? 100*(mx-mn)/m : 0)}'; }
+gt() { awk -v a="$1" -v b="$2" 'BEGIN{ exit !(a>b) }'; }
+
+# run_id WL MECH SCOPE LEVEL TRY ROLE  — deterministic, so a rerun collides
+# instead of duplicating rows.
+run_id() { printf '%s_%s_%s_%s_E%s_try%s_%s' "$PLATFORM" "$1" "$2" "$3" "$4" "$5" "$6"; }
+
+# level_rate LEVEL  — ladder lookup from the frozen pilot file; "R<n>" is a
+# literal rate (pilot only).
+level_rate() {
+  if [[ "$1" == R* ]]; then printf '%s' "${1#R}"; return; fi
+  local pair
+  for pair in ${LADDER:?no LADDER — run pilot.sh first}; do
+    [[ "${pair%%:*}" == "$1" ]] && { printf '%s' "${pair#*:}"; return; }
+  done
+  die "level $1 not in LADDER='$LADDER'"
+}
+
+# seeded_shuffle SEED item...  — reproducible order; printed one per line.
+seeded_shuffle() {
+  local seed=$1; shift
+  printf '%s\n' "$@" | awk -v s="$seed" 'BEGIN{srand(s)} {printf "%.12f\t%s\n", rand(), $0}' | sort -n | cut -f2
+}
+
+# cgroup_usec CGROUP_DIR  — usage_usec from cpu.stat.
+cgroup_usec() { awk '$1=="usage_usec"{print $2}' "$1/cpu.stat"; }
+
+# bench_detach UNIT script args...  — re-run the entry script as a transient
+# systemd service in BENCH_SLICE. Two reasons: (1) it must live outside the
+# slices host.sh restricts to OS_CPUS, or taskset onto workload/tracer CPUs is
+# refused; (2) quiesce stops gdm, which would kill a script started from a
+# desktop terminal. The launcher follows the log until the service exits; if
+# the launcher dies with the desktop, the run continues.
+bench_detach() {
+  local unit=$1; shift
+  [[ ${BENCH_DETACHED:-0} == 1 ]] && return 0
+  local logf="$LAPTOP_ROOT/logs/${unit}_$(date +%Y%m%d-%H%M%S).log"
+  mkdir -p "$LAPTOP_ROOT/logs"
+  if [[ ${QUIESCE:-1} == 1 ]]; then
+    source "$LAPTOP_ROOT/common/quiesce.sh"; quiesce_preview
+    log "starting in 10 s — Ctrl+C to cancel"; sleep 10
+  fi
+  systemd-run --unit="$unit" --slice="$BENCH_SLICE" --collect --quiet \
+    -E BENCH_DETACHED=1 -E PATH="$PATH" -E QUIESCE="${QUIESCE:-1}" -E ALLOW_GUI="${ALLOW_GUI:-0}" \
+    -E BENCH_TRACE="${BENCH_TRACE:-0}" -E BENCH_LOG="$logf" -E BENCH_UNIT="$unit" \
+    -p KillMode=mixed -p TimeoutStopSec=300 \
+    -p WorkingDirectory="$PWD" -p StandardOutput="append:$logf" -p StandardError="append:$logf" \
+    bash "$@" || die "could not start unit $unit (already running? systemctl status $unit)"
+  log "running as unit $unit — log: $logf"
+  log "stop: sudo systemctl stop $unit    after a crash: sudo bash $LAPTOP_ROOT/revert.sh"
+  sleep 1
+  tail -n +1 -F "$logf" --pid="$(systemctl show -p MainPID --value "$unit")" 2>/dev/null || true
+  exit 0
+}
+
+# pkg_temp_c — CPU die temperature, integer °C. AMD exposes it as hwmon
+# k10temp (Tctl); ACPI thermal zones are board sensors that lag the die, so
+# they are only the fallback (hottest zone).
+pkg_temp_c() {
+  local h t m=0 z
+  for h in /sys/class/hwmon/hwmon*; do
+    if [[ "$(cat "$h/name" 2>/dev/null)" == k10temp && -r $h/temp1_input ]]; then
+      echo $(( $(cat "$h/temp1_input") / 1000 )); return
+    fi
+  done
+  for z in /sys/class/thermal/thermal_zone*/temp; do
+    t=$(cat "$z" 2>/dev/null || echo 0); (( t > m )) && m=$t
+  done
+  echo $(( m / 1000 ))
+}

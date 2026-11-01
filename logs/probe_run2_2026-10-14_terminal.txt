@@ -1,0 +1,167 @@
+ab@ab:~/Downloads/PE-4credit$ sudo systemctl stop tlp && sudo systemctl disable --now smartmontoolssystemctl stop tlp && sudo systemctl disable --now smartmontools
+echo performance | sudo tee /sys/firmware/acpi/platform_profile
+sudo bash ./probe_laptop.sh
+Synchronizing state of smartmontools.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install disable smartmontools
+performance
+Platform L probe — 2026-10-14T08:36:34+05:30 — host ab — root=true
+
+===== 1. identity and OS =====
+  OS Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, x86_64
+  [PASS] (base) bare metal
+
+===== 2. CPU topology =====
+  AMD Ryzen 7 4800H with Radeon Graphics — 1 socket, 8 physical cores, 16 logical online (0-15), 1 NUMA node(s)
+  [PASS] (base) homogeneous cores
+  CPU CORE SOCKET NODE    MAXMHZ ONLINE
+    0    0      0    0 4300.9019    yes
+    1    0      0    0 4300.9019    yes
+    2    1      0    0 4300.9019    yes
+    3    1      0    0 4300.9019    yes
+    4    2      0    0 4300.9019    yes
+    5    2      0    0 4300.9019    yes
+    6    3      0    0 4300.9019    yes
+    7    3      0    0 4300.9019    yes
+    8    4      0    0 4300.9019    yes
+    9    4      0    0 4300.9019    yes
+   10    5      0    0 4300.9019    yes
+   11    5      0    0 4300.9019    yes
+   12    6      0    0 4300.9019    yes
+   13    6      0    0 4300.9019    yes
+   14    7      0    0 4300.9019    yes
+   15    7      0    0 4300.9019    yes
+  L3 sharing groups: 0-7 8-15 
+  [PASS] (base) SMT control writable (now on, active=1)
+  [PASS] (base) 8 physical cores >= 8 needed (4 workload + 2 aggregator + 2 generator)
+
+===== 3. frequency, boost, power, thermals =====
+  driver amd-pstate-epp, governor powersave (available: performance powersave), EPP balance_performance
+  [PASS] (base) performance governor available
+  [PASS] (base) boost control at /sys/devices/system/cpu/cpufreq/boost (boost=1)
+  [PASS] (base) on AC power
+  platform profile: performance (choices: quiet balanced performance)
+  hottest thermal zone now: 65 C
+  [WARN] (base) TLP installed — it rewrites governor/boost on AC events; stop it during runs
+
+===== 4. memory =====
+  RAM 14 GiB, swap 3 GiB, THP always [madvise] never
+  [PASS] (base) RAM >= 8 GiB
+
+===== 5. background load =====
+  loadavg 0.18 0.19 0.25
+  top CPU consumers:
+    %CPU COMMAND
+    23.7 localsearch-ext
+     6.5 bash
+     5.0 firefox
+     2.1 gnome-shell
+     1.0 Isolated Web Co
+
+===== 6. kernel config =====
+  CONFIG_BPF_SYSCALL=y
+  CONFIG_BPF_JIT=y
+  CONFIG_BPF_EVENTS=y
+  CONFIG_KPROBES=y
+  CONFIG_UPROBES=y
+  CONFIG_UPROBE_EVENTS=y
+  CONFIG_FTRACE_SYSCALLS=y
+  CONFIG_DEBUG_INFO_BTF=y
+  CONFIG_PERF_EVENTS=y
+  CONFIG_CGROUP_BPF=y
+  CONFIG_IKHEADERS=m
+  [PASS] (ebpf) kernel headers present (/lib/modules/7.0.0-38-generic/build)
+  [PASS] (ebpf) kernel lockdown none/unknown ([none] integrity confidentiality)
+
+===== 7. perf =====
+  perf_event_paranoid=4 kptr_restrict=1
+  [PASS] (perf) perf version 7.0.14 (kernel 7.0)
+  [PASS] (perf) cycles/instructions counters work
+  [PASS] (perf) perf record -g works
+  tracepoint ok: syscalls/sys_enter_accept4
+  tracepoint ok: syscalls/sys_enter_epoll_wait
+  tracepoint ok: syscalls/sys_enter_io_uring_enter
+  tracepoint ok: syscalls/sys_enter_pwrite64
+  tracepoint ok: block/block_rq_issue
+  tracepoint ok: block/block_rq_complete
+  tracepoint ok: sched/sched_switch
+  [PASS] (perf) 367 syscall tracepoints in /sys/kernel/tracing
+
+===== 8. eBPF =====
+  [PASS] (ebpf) python3 bcc 0.35.0 importable
+  [PASS] (ebpf) BCC compiled and loaded a tracepoint program
+  bpftrace: bpftrace v0.25.0; bpftool: present
+
+===== 9. containers and cgroups =====
+  [PASS] (base) cgroup v2 with cpuset controller
+  [PASS] (base) taskset present
+  [PASS] (base) docker daemon reachable (29.1.3)
+  image cached: nginx:1.24
+  image cached: redis:7.4
+
+===== 10. workload tools =====
+  [PASS] (nginx) wrk2 (with -R) at /usr/local/bin/wrk2
+  [PASS] (fio) fio fio-3.41 with libaio
+  fio io_uring engine available
+  [WARN] (redis) redis-server not on host (fine if run from the redis docker image)
+  [PASS] (redis) memtier_benchmark present
+  [PASS] (collector) otelcol-contrib at /opt/otelcol/otelcol-contrib (otelcol-contrib version 0.161.0)
+  port 8080 free
+  port 6379 free
+  port 18888 free
+
+===== 11. storage (fio target /var/tmp) =====
+  NAME    MODEL                 SIZE ROTA TRAN   TYPE
+  loop0                           4K    0        loop
+  loop1                       181.1M    0        loop
+  loop2                       185.4M    0        loop
+  loop3                        63.8M    0        loop
+  loop4                        63.8M    0        loop
+  loop5                          74M    0        loop
+  loop6                          74M    0        loop
+  loop7                        66.8M    0        loop
+  loop8                        66.8M    0        loop
+  loop9                        60.6M    0        loop
+  loop10                       47.9M    0        loop
+  loop11                       50.7M    0        loop
+  loop12                       14.2M    0        loop
+  loop13                       14.2M    0        loop
+  loop14                      261.3M    0        loop
+  loop15                      262.3M    0        loop
+  loop16                       16.5M    0        loop
+  loop17                       12.7M    0        loop
+  loop18                      614.5M    0        loop
+  loop19                      615.3M    0        loop
+  loop20                       91.7M    0        loop
+  loop21                       13.5M    0        loop
+  loop22                       13.4M    0        loop
+  loop23                        395M    0        loop
+  loop24                        402M    0        loop
+  loop25                       18.8M    0        loop
+  loop26                       18.4M    0        loop
+  loop27                       15.7M    0        loop
+  loop28                       50.3M    0        loop
+  loop29                       11.8M    0        loop
+  loop30                       44.7M    0        loop
+  loop31                        828K    0        loop
+  loop32                        828K    0        loop
+  nvme0n1 INTEL SSDPEKNU512GZ 476.9G    0 nvme   disk
+  /var/tmp on /dev/nvme0n1p6 (ext4), device nvme0n1, 60 GB free, scheduler [none] mq-deadline 
+  [PASS] (fio) 60 GB free >= 20 GB
+  [PASS] (fio) O_DIRECT writes work on /var/tmp
+
+===== 12. raw dump -> /home/ab/Downloads/PE-4credit/probe/laptop_raw_ab.txt =====
+  64 raw blocks written
+
+===== 13. readiness matrix (base + mechanism + workload) =====
+  READY = runs now; INSTALL-FIRST = only missing programs; NOT-READY = hardware/kernel blocker
+  workload       perf             ebpf             collector       
+  nginx          READY            READY            READY           
+  fio            READY            READY            READY           
+  redis          READY            READY            READY           
+
+
+profile: /home/ab/Downloads/PE-4credit/probe/laptop_profile_ab.env
+report:  /home/ab/Downloads/PE-4credit/probe/laptop_readiness_ab.txt
+raw:     /home/ab/Downloads/PE-4credit/probe/laptop_raw_ab.txt
+ab@ab:~/Downloads/PE-4credit$ 
+

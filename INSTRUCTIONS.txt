@@ -1,0 +1,113 @@
+PLATFORM L (LAPTOP) - HOW TO RUN THE BENCHMARKS
+================================================
+Status: the scripts are syntax-checked only and have never run. Expect the
+first runs to find bugs. Send back the newest logs/bench-*.log whenever
+anything fails.
+
+Steps 1-3 are done once. From step 4 on, each step is one command.
+
+
+1. COPY AND PREPARE (once)
+--------------------------
+Copy the whole laptop/ folder, including its subfolders, to
+~/Downloads/PE-4credit/laptop/ on the laptop. Then:
+
+    cd ~/Downloads/PE-4credit/laptop
+    find . -name '*.sh' -o -name '*.env' -o -name '*.txt' | xargs sed -i 's/\r$//'
+
+
+2. ONE-TIME HOST SETUP (once)
+-----------------------------
+    sudo systemctl disable --now unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+    sudo apt-mark hold linux-image-generic-hwe-26.04 linux-headers-generic-hwe-26.04 linux-image-$(uname -r) linux-headers-$(uname -r)
+    sudo snap refresh --hold
+    sudo systemctl disable --now tlp smartmontools fwupd fwupd-refresh.timer
+    systemctl --user list-units --all | grep -iE 'localsearch|tracker'
+    systemctl --user mask --now <each unit the previous command listed>
+
+Undo after the study with: systemctl enable, apt-mark unhold, and
+systemctl --user unmask.
+
+
+3. UNIT TESTS (about 1 min; no root needed, changes nothing)
+------------------------------------------------------------
+    bash common/tests/run_tests.sh
+
+If anything fails, send back the output.
+
+
+4. PILOT (about 30-40 min)
+--------------------------
+Plug into AC power, then:
+
+    echo performance | sudo tee /sys/firmware/acpi/platform_profile
+    sudo bash pilot.sh nginx
+
+What happens:
+- It lists what it will close and stop, then waits 10 s. Ctrl+C cancels.
+- The desktop goes away. That is expected. Browsers and Telegram are closed
+  and NOT reopened; unsaved work in them is lost.
+- It runs nginx untraced at 6 rates (5k to 120k), each twice: once for
+  120 s and once for 60 s.
+- When it finishes, the desktop comes back. Log in again.
+
+To watch while the desktop is off: switch to a text console with
+Ctrl+Alt+F3, log in, and run:
+
+    tail -f ~/Downloads/PE-4credit/laptop/logs/bench-pilot_*.log
+
+Output: nginx-wrk2/pilot/pilot_report.txt
+
+
+5. SEND THE PILOT RESULTS BACK
+------------------------------
+Copy these into laptop/ in the Windows checkout:
+  - nginx-wrk2/pilot/pilot_report.txt
+  - logs/bench-pilot_*.log
+  - nginx-wrk2/pilot/raw/R10000/workload.out   (real wrk2 output)
+
+Then, together:
+  - check the 60 s gate;
+  - replace the made-up test fixture with the real wrk2 output;
+  - write nginx-wrk2/pilot.env (three lines):
+        LADDER="1:... 2:... 3:... 4:..."
+        WRK2_THREADS=2
+        WRK2_CONNS=100
+
+
+6. SMOKE-TEST CELL (about 35 min; only after pilot.env exists)
+--------------------------------------------------------------
+    sudo bash nginx-wrk2/perf/scripts/run.sh --smoke
+
+Send back nginx-wrk2/perf/results/smoke/ (the nginx_perf.csv file and the
+raw/ folder) and the newest logs/bench-nginx_*.log. Every column and the
+warm-up gate get checked by hand before the full run.
+
+
+7. FULL NGINX x PERF RUN (about 3.5 h)
+--------------------------------------
+    sudo bash nginx-wrk2/perf/scripts/run.sh
+
+
+IF SOMETHING BREAKS
+-------------------
+Stop a run cleanly. It still reverts the host and brings the desktop back:
+
+    sudo systemctl stop bench-pilot      (or bench-nginx)
+
+After a crash or power loss:
+
+    sudo bash revert.sh
+
+Either way, send back:
+  - the newest logs/bench-*.log
+  - the newest logs/crash_*.txt (written automatically on any failure:
+    where it stopped, the error, container log, dmesg, clocks, processes)
+
+To get a full command-by-command trace on a rerun, prefix the command:
+
+    sudo BENCH_TRACE=1 bash pilot.sh nginx      (writes logs/trace_*.txt)
+
+Only for debugging: the trace writes to disk every second (bad for fio) and
+adds CPU work on the generator cores. Do not use it for runs whose numbers
+will be reported; each run records BENCH_TRACE in run_meta.env.

@@ -1,0 +1,145 @@
+# Transcribed from the chat session (2026-10-13): terminal output of the FIRST
+# probe_laptop.sh run, before the virt-detection and fs-type fixes. Its three
+# output files were overwritten by run 2, so this is the only record of run 1.
+# The NOT-READY matrix below is a probe bug (systemd-detect-virt prints "none"
+# and exits 1, so the fallback appended a second "none"), not a machine fact.
+# The loop-device lines of the lsblk table are elided.
+
+ab@ab:~/Downloads/PE-4credit$ chmod +x probe_laptop.sh
+ab@ab:~/Downloads/PE-4credit$ sudo ./probe_laptop.sh
+Platform L probe — 2026-10-13T20:46:08+05:30 — host ab — root=true
+
+===== 1. identity and OS =====
+  OS Ubuntu 26.04.1 LTS, kernel 7.0.0-38-generic, x86_64
+  [FAIL] (base) virtualised (none
+none) — measurements would describe the hypervisor, not the laptop
+
+===== 2. CPU topology =====
+  AMD Ryzen 7 4800H with Radeon Graphics — 1 socket, 8 physical cores, 16 logical online (0-15), 1 NUMA node(s)
+  [PASS] (base) homogeneous cores
+  CPU CORE SOCKET NODE    MAXMHZ ONLINE
+    0    0      0    0 2901.0000    yes
+    1    0      0    0 2901.0000    yes
+    2    1      0    0 2901.0000    yes
+    3    1      0    0 2901.0000    yes
+    4    2      0    0 2901.0000    yes
+    5    2      0    0 2901.0000    yes
+    6    3      0    0 2901.0000    yes
+    7    3      0    0 2901.0000    yes
+    8    4      0    0 2901.0000    yes
+    9    4      0    0 2901.0000    yes
+   10    5      0    0 2901.0000    yes
+   11    5      0    0 2901.0000    yes
+   12    6      0    0 2901.0000    yes
+   13    6      0    0 2901.0000    yes
+   14    7      0    0 2901.0000    yes
+   15    7      0    0 2901.0000    yes
+  L3 sharing groups: 0-7 8-15
+  [PASS] (base) SMT control writable (now on, active=1)
+  [PASS] (base) 8 physical cores >= 8 needed (4 workload + 2 aggregator + 2 generator)
+
+===== 3. frequency, boost, power, thermals =====
+  driver amd-pstate-epp, governor powersave (available: performance powersave), EPP balance_performance
+  [PASS] (base) performance governor available
+  [PASS] (base) boost control at /sys/devices/system/cpu/cpufreq/boost (boost=0)
+  [PASS] (base) on AC power
+  platform profile: quiet (choices: quiet balanced performance)
+  hottest thermal zone now: 43 C
+  [WARN] (base) TLP installed — it rewrites governor/boost on AC events; stop it during runs
+
+===== 4. memory =====
+  RAM 14 GiB, swap 3 GiB, THP always [madvise] never
+  [PASS] (base) RAM >= 8 GiB
+
+===== 5. background load =====
+  loadavg 0.07 0.28 0.35
+  top CPU consumers:
+    %CPU COMMAND
+     8.5 bash
+     6.1 gnome-shell
+     4.5 localsearch-ext
+     3.4 gnome-software
+     3.2 Telegram
+  service active: tlp
+
+===== 6. kernel config =====
+  CONFIG_BPF_SYSCALL=y
+  CONFIG_BPF_JIT=y
+  CONFIG_BPF_EVENTS=y
+  CONFIG_KPROBES=y
+  CONFIG_UPROBES=y
+  CONFIG_UPROBE_EVENTS=y
+  CONFIG_FTRACE_SYSCALLS=y
+  CONFIG_DEBUG_INFO_BTF=y
+  CONFIG_PERF_EVENTS=y
+  CONFIG_CGROUP_BPF=y
+  CONFIG_IKHEADERS=m
+  [PASS] (ebpf) kernel headers present (/lib/modules/7.0.0-38-generic/build)
+  [PASS] (ebpf) kernel lockdown none/unknown ([none] integrity confidentiality)
+
+===== 7. perf =====
+  perf_event_paranoid=4 kptr_restrict=1
+  [PASS] (perf) perf version 7.0.14 (kernel 7.0)
+  [PASS] (perf) cycles/instructions counters work
+  [PASS] (perf) perf record -g works
+  tracepoint ok: syscalls/sys_enter_accept4
+  tracepoint ok: syscalls/sys_enter_epoll_wait
+  tracepoint ok: syscalls/sys_enter_io_uring_enter
+  tracepoint ok: syscalls/sys_enter_pwrite64
+  tracepoint ok: block/block_rq_issue
+  tracepoint ok: block/block_rq_complete
+  tracepoint ok: sched/sched_switch
+  [PASS] (perf) 367 syscall tracepoints in /sys/kernel/tracing
+
+===== 8. eBPF =====
+  [PASS] (ebpf) python3 bcc 0.35.0 importable
+  [PASS] (ebpf) BCC compiled and loaded a tracepoint program
+  bpftrace: bpftrace v0.25.0; bpftool: present
+
+===== 9. containers and cgroups =====
+  [PASS] (base) cgroup v2 with cpuset controller
+  [PASS] (base) taskset present
+  [PASS] (base) docker daemon reachable (29.1.3)
+  image not cached: nginx:1.24
+  image not cached: redis:7
+  image not cached: otel/opentelemetry-collector-contrib
+
+===== 10. workload tools =====
+  [INSTALL] (nginx) wrk2 with -R not found (plain wrk cannot hold a fixed rate; build giltene/wrk2)
+  [INSTALL] (fio) fio missing (apt install fio)
+  [WARN] (redis) redis-server not on host (fine if run from the redis docker image)
+  [INSTALL] (redis) memtier_benchmark missing (apt install memtier-benchmark or build from RedisLabs/memtier_benchmark)
+  [INSTALL] (collector) otelcol-contrib missing (server uses /opt/otelcol/otelcol-contrib 0.161.0)
+  helper missing: stress-ng
+  port 8080 free
+  port 6379 free
+  port 18888 free
+
+===== 11. storage (fio target /var/tmp) =====
+  NAME    MODEL                 SIZE ROTA TRAN   TYPE
+  loop0..loop32  (snap loop devices, elided)
+  nvme0n1 INTEL SSDPEKNU512GZ 476.9G    0 nvme   disk
+  /var/tmp on /dev/nvme0n1p6 (ext2/ext3), device nvme0n1, 61 GB free, scheduler [none] mq-deadline
+  [PASS] (fio) 61 GB free >= 20 GB
+  [PASS] (fio) O_DIRECT writes work on /var/tmp
+
+===== 12. raw dump -> /home/ab/Downloads/PE-4credit/probe/laptop_raw_ab.txt =====
+  64 raw blocks written
+
+===== 13. readiness matrix (base + mechanism + workload) =====
+  READY = runs now; INSTALL-FIRST = only missing programs; NOT-READY = hardware/kernel blocker
+  workload       perf             ebpf             collector
+  nginx          NOT-READY        NOT-READY        NOT-READY
+  fio            NOT-READY        NOT-READY        NOT-READY
+  redis          NOT-READY        NOT-READY        NOT-READY
+
+  blocking (base): virtualised (none
+none) — measurements would describe the hypervisor, not the laptop;
+  to install (collector): otelcol-contrib missing (server uses /opt/otelcol/otelcol-contrib 0.161.0);
+  to install (nginx): wrk2 with -R not found (plain wrk cannot hold a fixed rate; build giltene/wrk2);
+  to install (fio): fio missing (apt install fio);
+  to install (redis): memtier_benchmark missing (apt install memtier-benchmark or build from RedisLabs/memtier_benchmark);
+
+profile: /home/ab/Downloads/PE-4credit/probe/laptop_profile_ab.env
+report:  /home/ab/Downloads/PE-4credit/probe/laptop_readiness_ab.txt
+raw:     /home/ab/Downloads/PE-4credit/probe/laptop_raw_ab.txt
