@@ -77,6 +77,7 @@ on_exit() {
   run_abort_cleanup
   if (( HOST_SET )); then host_snapshot post; host_snapshot_diff pre post; host_revert; fi
   (( QUIESCED )) && quiesce_restore
+  give_back
   (( rc == 0 )) && log "done" || log "exited with status $rc — host reverted; partial runs are marked INCOMPLETE"
   exit "$rc"
 }

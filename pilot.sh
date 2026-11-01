@@ -66,6 +66,7 @@ on_exit() {
   fi
   if (( HOST_SET )); then host_snapshot post; host_snapshot_diff pre post; host_revert; fi
   (( QUIESCED )) && quiesce_restore
+  give_back
   (( rc == 0 )) && log "done" || log "exited with status $rc — host reverted"
   exit "$rc"
 }

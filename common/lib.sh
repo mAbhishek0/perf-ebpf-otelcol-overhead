@@ -96,7 +96,7 @@ bench_detach() {
   fi
   systemd-run --unit="$unit" --slice="$BENCH_SLICE" --collect --quiet \
     -E BENCH_DETACHED=1 -E PATH="$PATH" -E QUIESCE="${QUIESCE:-1}" -E ALLOW_GUI="${ALLOW_GUI:-0}" \
-    -E BENCH_TRACE="${BENCH_TRACE:-0}" -E BENCH_LOG="$logf" -E BENCH_UNIT="$unit" \
+    -E BENCH_TRACE="${BENCH_TRACE:-0}" -E BENCH_LOG="$logf" -E BENCH_UNIT="$unit" -E SUDO_USER="${SUDO_USER:-}" \
     -p KillMode=mixed -p TimeoutStopSec=300 \
     -p WorkingDirectory="$PWD" -p StandardOutput="append:$logf" -p StandardError="append:$logf" \
     bash "$@" || die "could not start unit $unit (already running? systemctl status $unit)"
@@ -110,6 +110,13 @@ bench_detach() {
 # pkg_temp_c — CPU die temperature, integer °C. AMD exposes it as hwmon
 # k10temp (Tctl); ACPI thermal zones are board sensors that lag the die, so
 # they are only the fallback (hottest zone).
+# give_back — the harness runs as root; hand everything it wrote in the repo
+# back to the invoking user, so git (run as that user) can move and pull it.
+give_back() {
+  [[ -n ${SUDO_USER:-} && $SUDO_USER != root ]] || return 0
+  chown -R "$SUDO_USER:" "$LAPTOP_ROOT" 2>/dev/null || warn "could not chown $LAPTOP_ROOT to $SUDO_USER"
+}
+
 pkg_temp_c() {
   local h t m=0 z
   for h in /sys/class/hwmon/hwmon*; do

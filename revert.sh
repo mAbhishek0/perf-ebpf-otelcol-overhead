@@ -11,4 +11,5 @@ LOG_TAG=revert
 need_root
 docker rm -f "$NGINX_CONTAINER" >/dev/null 2>&1 || true
 host_revert
+give_back
 quiesce_restore   # restarts only the services quiesce stopped (desktop last); apps stay closed
