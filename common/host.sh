@@ -23,7 +23,7 @@ host_save_prior() {
   kv_put "$p" EPP "$(tr -d ' \n' < $CPU/cpu0/cpufreq/energy_performance_preference)"
   kv_put "$p" SCALING_MIN "$(cat $CPU/cpu0/cpufreq/scaling_min_freq)"
   kv_put "$p" SCALING_MAX "$(cat $CPU/cpu0/cpufreq/scaling_max_freq)"
-  kv_put "$p" FAN_PWM_ENABLE "$(f=$(_fan_ctl) && cat "$f" || echo none)"
+  kv_put "$p" FAN_CURVE_ENABLE "$(_fan_enable_state)"
   kv_put "$p" PLATFORM_PROFILE "$(cat /sys/firmware/acpi/platform_profile)"
   kv_put "$p" PERF_PARANOID "$(cat /proc/sys/kernel/perf_event_paranoid)"
   kv_put "$p" PERF_MAX_SAMPLE_RATE "$(cat /proc/sys/kernel/perf_event_max_sample_rate)"
@@ -43,13 +43,46 @@ host_save_prior() {
   log "prior state saved to $PRIOR"
 }
 
-# _fan_ctl — path of the ASUS fan-mode control, or fail if this machine has none.
-_fan_ctl() {
-  local h
+# Fan control via the asus-wmi custom fan curve (method from g-helper-linux,
+# LinuxAsusWmi.cs SetFanCurve): hwmon named asus_custom_fan_curve, per fan N
+# (1 CPU, 2 GPU, 3 mid) 8 points pwmN_auto_point{1..8}_{temp,pwm}, temp in plain
+# degrees C (ascending), pwm 0-255; then pwmN_enable=1 applies the curve.
+# pwmN_enable=2 returns to firmware defaults. There is no "max" mode: a flat
+# 255 curve is full speed. Curves are per platform profile, so this must run
+# AFTER the profile is set.
+_fan_dir() {
+  local h n
   for h in /sys/class/hwmon/hwmon*; do
-    [[ "$(cat "$h/name" 2>/dev/null)" == asus && -w $h/pwm1_enable ]] && { echo "$h/pwm1_enable"; return 0; }
+    n=$(tr 'A-Z-' 'a-z_' < "$h/name" 2>/dev/null)
+    [[ $n == asus_custom_fan_curve && -w $h/pwm1_enable ]] && { echo "$h"; return 0; }
   done
   return 1
+}
+_fan_nums() { local d=$1 n; for n in 1 2 3; do [[ -w $d/pwm${n}_enable ]] && printf '%s ' "$n"; done; }
+# "N=v,N=v" of the current pwmN_enable values, or "none".
+_fan_enable_state() {
+  local d n out=""
+  d=$(_fan_dir) || { echo none; return; }
+  for n in $(_fan_nums "$d"); do out+="${out:+,}$n=$(cat "$d/pwm${n}_enable")"; done
+  echo "${out:-none}"
+}
+fans_max() {
+  local d n i
+  d=$(_fan_dir) || return 1
+  for n in $(_fan_nums "$d"); do
+    for i in 1 2 3 4 5 6 7 8; do
+      echo $(( 20 + 10*i )) > "$d/pwm${n}_auto_point${i}_temp" || return 1
+      echo 255 > "$d/pwm${n}_auto_point${i}_pwm" || return 1
+    done
+    sysw "$d/pwm${n}_enable" 1 || return 1
+  done
+  echo "$d ($(_fan_nums "$d"))"
+}
+fans_restore() {
+  local v d pair
+  v=$(kv_get "$PRIOR" FAN_CURVE_ENABLE); [[ $v == none ]] && return 0
+  d=$(_fan_dir) || return 1
+  for pair in ${v//,/ }; do sysw "$d/pwm${pair%%=*}_enable" "${pair#*=}" || return 1; done
 }
 
 host_setup() {
@@ -78,11 +111,11 @@ host_setup() {
   done
   (( floor_ok )) && log "clock floor requested at ${CLOCK_BASE_KHZ} kHz"     || warn "clock floor not accepted on some CPUs — ceiling still at base; idle cores may downclock"
 
-  # 2c. Fans at full speed (asus-wmi: pwm1_enable 0 = full, 2 = auto). A fixed
-  #     fan speed removes fan-curve ramping as a source of run-to-run thermal
-  #     variation and shortens cooldowns. Best effort: warn if unsupported.
-  local fan; if fan=$(_fan_ctl) && sysw "$fan" 0; then log "fans at full speed ($fan)"
-  else warn "could not set fans to full speed (no asus pwm1_enable or write refused) — fans stay automatic"; fi
+  # 2c. Fans at full speed: a fixed fan speed removes fan-curve ramping as a
+  #     source of run-to-run thermal variation and shortens cooldowns. After
+  #     the platform profile (curves are per profile). Best effort.
+  local fan; if fan=$(fans_max); then log "fans at full speed: flat 255 curve on $fan"
+  else warn "no asus_custom_fan_curve hwmon (or write refused) — fans follow the performance profile curve"; fi
   # 3. SMT off, verified by the online set, not the control file.
   if [[ "$(cat $CPU/smt/control)" != off ]]; then
     echo off > $CPU/smt/control || die "SMT write failed"
@@ -159,8 +192,7 @@ host_revert() {
   [[ "$(kv_get "$PRIOR" IRQBALANCE)" == active ]] && step systemctl start irqbalance
   # Boost before the ceiling: a ceiling above base is rejected while boost is off.
   step sysw $CPU/cpufreq/boost "$(kv_get "$PRIOR" BOOST)"
-  _fan() { local v f; v=$(kv_get "$PRIOR" FAN_PWM_ENABLE); [[ $v == none ]] && return 0; f=$(_fan_ctl) && sysw "$f" "$v"; }
-  step _fan
+  step fans_restore
   for c in $CPU/cpu[0-9]*/cpufreq; do
     step sysw "$c/scaling_governor" "$(kv_get "$PRIOR" GOVERNOR)"
     step sysw "$c/energy_performance_preference" "$(kv_get "$PRIOR" EPP)"
