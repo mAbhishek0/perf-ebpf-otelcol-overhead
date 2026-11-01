@@ -6,10 +6,12 @@
 # verdict is ok, and only bundles with DONE, become rows. A missing key fails
 # the collect: a blank column is not a data point.
 #
-# COLUMNS: name:file:key. file is run_meta | wl | samples | mech.
+# CSV_COLUMNS: name:file:key. (Not "COLUMNS": bash overwrites that with the
+# terminal width after every external command when run from a terminal.)
+# Entry format: file is run_meta | wl | samples | mech.
 # mech columns are NA on untraced runs; everything else is required.
 
-COLUMNS=(
+CSV_COLUMNS=(
   run_id:run_meta:RUN_ID platform:run_meta:PLATFORM workload:run_meta:WORKLOAD
   mechanism:run_meta:MECHANISM scope:run_meta:SCOPE level:run_meta:LEVEL
   rate_target:run_meta:RATE_TARGET try:run_meta:TRY role:run_meta:ROLE traced:run_meta:TRACED
@@ -38,7 +40,7 @@ collect() {
   local wl=$1 mech=$2 rdir=$3
   local csv="$rdir/${wl}_${mech}.csv" tmp v b try col name src key f val line traced n=0
   tmp="$csv.partial"
-  line=""; for col in "${COLUMNS[@]}"; do line+="${line:+,}$(_csvq "${col%%:*}")"; done
+  line=""; for col in "${CSV_COLUMNS[@]}"; do line+="${line:+,}$(_csvq "${col%%:*}")"; done
   echo "$line" > "$tmp"
   for v in "$rdir"/raw/*.verdict; do
     [[ -f $v ]] || continue
@@ -50,7 +52,7 @@ collect() {
       traced=$(kv_get "$b/run_meta.env" TRACED)
       [[ "$(kv_get "$b/run_meta.env" ROLE)" == W* ]] && continue   # warm-ups are discarded
       line=""
-      for col in "${COLUMNS[@]}"; do
+      for col in "${CSV_COLUMNS[@]}"; do
         IFS=: read -r name src key <<<"$col"
         f="$b/$(_col_file "$src")"
         if [[ $src == mech && $traced == 0 ]]; then val=NA
@@ -80,7 +82,7 @@ _schema_freeze() {
     printf '  "perf_freq_narrow": %s, "perf_freq_wide": %s, "perf_mmap_pages": %s, "perf_trace_mmap_pages": %s,\n' \
       "$PERF_FREQ_NARROW" "$PERF_FREQ_WIDE" "$PERF_MMAP_PAGES" "$PERF_TRACE_MMAP_PAGES"
     printf '  "ladder": "%s",\n  "columns": [' "${LADDER:-}"
-    for col in "${COLUMNS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
+    for col in "${CSV_COLUMNS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
     printf ']\n}\n'
   } > "$new"
   if [[ -f $s ]]; then

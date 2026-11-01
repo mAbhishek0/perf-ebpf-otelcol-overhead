@@ -124,7 +124,7 @@ mk_bundle() {  # mk_bundle ROLE — every key of every column, in the file colle
   local role=$1 id b col name src key val traced=0
   [[ $role == B* ]] && traced=1
   id=$(run_id nginx perf narrow 1 1 "$role"); b="$RD/raw/$id"; mkdir -p "$b/samples"
-  for col in "${COLUMNS[@]}"; do
+  for col in "${CSV_COLUMNS[@]}"; do
     IFS=: read -r name src key <<<"$col"
     if [[ $src == mech && $traced == 0 ]]; then continue; fi
     case $key in
@@ -143,7 +143,7 @@ csv="$RD/nginx_perf.csv"
 t_eq "csv exists" yes "$([[ -f $csv ]] && echo yes || echo no)"
 t_eq "csv lines (header + 3)" 4 "$(wc -l < "$csv" | tr -d ' ')"
 t_eq "csv header start" '"run_id","platform","workload","mechanism"' "$(head -1 "$csv" | cut -d, -f1-4)"
-t_eq "csv header cols" "${#COLUMNS[@]}" "$(head -1 "$csv" | awk -F'","' '{print NF}')"
+t_eq "csv header cols" "${#CSV_COLUMNS[@]}" "$(head -1 "$csv" | awk -F'","' '{print NF}')"
 t_eq "no warm-up row" 0 "$(grep -c '_W1' "$csv")"
 t_eq "untraced mech NA" 4 "$(grep '_A1' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
 sed -i '/^P99_MS=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 B1)/wl.env"
