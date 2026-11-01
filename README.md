@@ -222,9 +222,8 @@ Fans: the flat-255 `asus_custom_fan_curve` method works on this G513 (fans audib
 
 ## Next steps
 
-1. ~~Re-run the probe with the host configured~~ — done 2026-10-14, READY ×9.
-2. ~~Check the two LESSONS.md inferences~~ — handled in batch 1 by design: nginx uses `--network host` (no docker-proxy), drift judged on p99 + CPU.
-3. ~~Decide the relationship to the older tree~~ — **decided 2026-10-14: superseded.** New per-pair scripts are written here, reading the old [docs/drafts/nginx-perf-pipeline-laptop/](../docs/drafts/nginx-perf-pipeline-laptop/) and the Platform S tree as references so their known mistakes are not repeated (list in [LESSONS.md](LESSONS.md)).
-4. ~~Write the first pair~~ — batch 1 written 2026-10-15 (syntax-checked only).
-5. On the laptop: one-time setup above; `common/tests/run_tests.sh`; `pilot.sh nginx`; write `nginx-wrk2/pilot.env`; replace the SYNTHETIC `common/tests/fixtures/wrk2_L.txt` with real pilot wrk2 output; `--smoke`; check warm-up and 60 s gates; then full nginx × perf.
-6. Then eBPF and collector pairs for nginx (same interfaces), then fio, redis.
+1. **Now:** stall diagnostic — `sudo bash diag_stall.sh` (untraced 20k, variants base / nosampler / c20 / fanauto, 5 reps, ~65 min). Find what removes the ~1 s stalls; fix it.
+2. Then re-check nginx × perf tail latency (CPU results stand) if the fix changes the harness.
+3. Write and run nginx × eBPF, then nginx × collector (same interfaces).
+4. fio, then redis (decide narrow/wide meaning for each first).
+5. Last: the SMT-on arm.

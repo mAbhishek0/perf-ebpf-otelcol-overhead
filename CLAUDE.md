@@ -2,14 +2,23 @@
 
 Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md) still applies; this file adds what is specific to Platform L. Full status, machine facts and history are in [README.md](README.md). Keep both files current: when something is done, decided, or fails, record it in README.md (timeline / failures table) and update the state summary below in the same edit.
 
-## State in one paragraph (2026-10-15)
+## State (2026-11-01) — read this first
 
-Laptop probed (`probe_laptop.sh`), dependencies installed (`install_apt.sh`, `install_build.sh`) and verified: wrk2 commit `44a94c1` (rebuilt via the bytecode fallback), memtier 2.5.2, otelcol-contrib 0.161.0 (sha256 checked), fio 3.41, perf 7.0.14, BCC 0.35, bpftrace 0.25, images `nginx:1.24` and `redis:7.4`. **Batch 1 written 2026-10-15 (common/ engine, nginx workload, nginx×perf, pilot, revert, tests) — syntax-checked only, never run. No Platform L measurement exists.** Design decisions taken while writing are in README "Batch 1" (host network, bench.slice + detached `bench-<wl>` unit, 4 nginx workers, single EXIT trap, drift on p99+CPU, automatic quiesce/restore). Next: user does one-time setup, runs tests, pilot, smoke on the laptop. Interfaces: workload plugins provide `wl_preflight/wl_start/wl_ramp/wl_measure/wl_stop/wl_parse`; mechanism plugins `mech_preflight/mech_attach/mech_detach/mech_stats/mech_sanity`; `sample.sh` summary keys must match `collect.sh` CSV_COLUMNS. CPU layout and old-tree status decided (below). Probe run 2 (2026-10-14, host configured: TLP stopped, smartd disabled, profile `performance`) reports READY in all nine cells; outputs in `probe/`, every run log in `logs/` (transcribed ones say so in their header). Governor (`powersave`), boost (now 1) and SMT (on) are still at defaults — the benchmark scripts set and restore them. Never describe any laptop number as measured until a results file says so.
+**Measured on hardware:** nginx pilot (ladder frozen 5k/10k/20k/40k in `nginx-wrk2/pilot.env`), smoke cell (1 warm-up is enough), and the **full nginx × perf matrix: 8/8 cells, 64 rows** in `nginx-wrk2/perf/results/nginx_perf.csv`. CPU results are clean (narrow perf ≈ free; wide perf +59–72 % nginx CPU, tracer 0.19→0.91 cores 5k→40k). **Tail latency is not usable yet**: ~1.00 s stalls in 21/64 runs, untraced baselines included, TCP counters all 0, never at 40k (README timeline 12).
+
+**In progress:** `diag_stall.sh` (written 2026-11-01, unrun) — untraced nginx at 20k, 5 reps × variants `base`, `nosampler`, `c20` (wrk2 -c20), `fanauto`, interleaved, with a 100 ms curl probe per run; report in `nginx-wrk2/diag/<time>/report.txt`. User runs it, pushes, says "done". Next session: `bash sync.sh pull` in `laptop/`, read the report, find which variant removes the stalls (if base barely stalls untraced, rerun with wide perf attached). Fix the cause before nginx × eBPF; consider re-measuring nginx × perf latency afterwards (CPU data stands).
+
+**Not written yet:** nginx × eBPF and nginx × collector plugins (`<wl>/<mech>/scripts/mech.sh` per the interface below), fio and redis workloads, the `SMT=on` option (one SMT-on arm planned last). Known small gap: the `die` from a pipefail inside `$(...)` is not recorded in `logs/.errors_*` (seen in the perf-trace grep crash) — investigate when convenient.
+
+**Interfaces:** workload plugins provide `wl_preflight/wl_start/wl_ramp/wl_measure/wl_stop/wl_parse`; mechanism plugins `mech_preflight/mech_attach/mech_detach/mech_stats/mech_sanity`; `sample.sh` summary keys must match `collect.sh` CSV_COLUMNS. 60 unit tests (`bash common/tests/run_tests.sh`) run here in Git Bash too.
+
+**Host setup now does, in order:** save prior state (once, atomic) → governor performance on online CPUs → platform profile performance → boost off → clock ceiling 2.9 GHz + best-effort floor → fans full via `asus_custom_fan_curve` flat-255 curve (works on this G513) → SMT off (verified 0,2..14) → perf sample rate pinned, then `perf_cpu_time_max_percent=0` (order matters) → OS slices + IRQs to 12,14 → measured clock check. Everything restored on exit; `revert.sh` after a crash; files chowned back to the sudo user.
 
 ## How the user works
 
-- The user runs everything on the laptop (`ab@ab:~/Downloads/PE-4credit/`, scripts copied flat there) and pastes output or copies log files back into this folder. This Windows checkout cannot run the scripts: no Linux, and trial runs have been denied. So **the only verification possible here is `bash -n`**; say plainly that a script is syntax-checked but unrun.
-- Files arrive on the laptop without the execute bit. Always give commands as `sudo bash ./script.sh`.
+- The user runs everything on the laptop, in a clone of the GitHub repo at `~/Downloads/perf-ebpf-otelcol-overhead`, then commits and pushes results; here `bash sync.sh pull` brings them in. Linux-only scripts cannot run here; `bash -n` and the unit tests (Git Bash) can — say plainly when a script is unrun on hardware.
+- Give commands as `sudo bash <script>`. Ubuntu 26.04's `tail` needs `-n N`. If `git pull --rebase` fails on permissions, root-owned files are the cause: `sudo chown -R ab:ab .` (entry scripts now chown back on exit).
+- The user may ask to keep the prompt cache warm: a session-only CronCreate tick every 4 min replying "·" (stop when asked; not worth it across multi-hour runs).
 - The user wants token-efficient replies.
 - Prefer methods that are documented upstream or reported working by other users; cite sources when a fix comes from a search.
 
