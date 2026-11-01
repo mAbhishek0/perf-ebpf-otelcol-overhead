@@ -56,7 +56,7 @@ Laptop probed (`probe_laptop.sh`), dependencies installed (`install_apt.sh`, `in
 
 ## Syncing with the laptop
 
-`bash sync.sh pull|push` at the repo root talks to the user's GitHub repo using a token in `.sync.env` (gitignored). **Never read, print, grep or edit `.sync.env`**, and never put a token in a URL, command line or git config — the token must not enter the transcript. The user creates and fills that file.
+`laptop/` is **its own git repository** (the GitHub repo; laptop-only history). The outer project repo ignores `laptop/` and is never pushed — it holds the server docs, which contain AMD-internal details. Commit laptop work inside `laptop/`. `bash sync.sh pull|push` in `laptop/` talks to the user's GitHub repo using a token in `.sync.env` (gitignored). **Never read, print, grep or edit `.sync.env`**, and never put a token in a URL, command line or git config — the token must not enter the transcript. The user creates and fills that file.
 
 ## Editing rules for this folder
 

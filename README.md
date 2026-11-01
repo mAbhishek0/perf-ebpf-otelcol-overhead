@@ -22,6 +22,7 @@ laptop/
 │                             run_one, bracket, collect, tests/ (run_tests.sh; wrk2 fixture is SYNTHETIC)
 ├── nginx-wrk2/workload.sh    nginx+wrk2 plugin (host network, cgroup-parent bench.slice, 4 pinned workers)
 ├── nginx-wrk2/perf/scripts/  mech.sh (perf plugin), run.sh (pair wrapper); docs/README.md
+├── sync.sh                   git pull/push to GitHub with the token from gitignored .sync.env
 ├── Archive.zip               user's zip of the three probe run 2 files (duplicate of probe/)
 ├── probe/                    probe run 2 outputs (2026-10-14, host configured): profile .env, readiness .txt, raw dump
 ├── .gitignore                ignores state/, results raw/smoke/CSVs, pilot/raw
