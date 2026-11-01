@@ -80,9 +80,21 @@ fans_max() {
 }
 fans_restore() {
   local v d pair
+  kv_has "$PRIOR" FAN_CURVE_ENABLE || return 0   # older prior.env (before fan curves)
   v=$(kv_get "$PRIOR" FAN_CURVE_ENABLE); [[ $v == none ]] && return 0
   d=$(_fan_dir) || return 1
   for pair in ${v//,/ }; do sysw "$d/pwm${pair%%=*}_enable" "${pair#*=}" || return 1; done
+}
+
+# online_cpufreq — cpufreq dirs of ONLINE CPUs only. Offline CPUs (SMT
+# siblings after SMT-off, e.g. left off by an earlier aborted run) keep a
+# cpufreq dir that rejects writes.
+online_cpufreq() {
+  local r a b c
+  for r in $(tr ',' ' ' < $CPU/online); do
+    a=${r%-*}; b=${r#*-}
+    for (( c=a; c<=b; c++ )); do [[ -d $CPU/cpu$c/cpufreq ]] && echo "$CPU/cpu$c/cpufreq"; done
+  done
 }
 
 host_setup() {
@@ -91,7 +103,7 @@ host_setup() {
   local c ok=1
 
   # 1. governor + EPP on every online CPU (SMT still on).
-  for c in $CPU/cpu[0-9]*/cpufreq; do
+  for c in $(online_cpufreq); do
     sysw "$c/scaling_governor" performance || die "governor write failed on $c"
   done
   # 1b. firmware platform profile: power limits and fan curve follow it.
@@ -105,7 +117,7 @@ host_setup() {
   #     clamp or ignore it, and idle cores still sleep. So a refused floor warns,
   #     never aborts. Ceiling first.
   local floor_ok=1
-  for c in $CPU/cpu[0-9]*/cpufreq; do
+  for c in $(online_cpufreq); do
     sysw "$c/scaling_max_freq" "$CLOCK_BASE_KHZ" || die "scaling_max_freq write failed on $c"
     sysw "$c/scaling_min_freq" "$CLOCK_BASE_KHZ" || floor_ok=0
   done
@@ -193,7 +205,7 @@ host_revert() {
   # Boost before the ceiling: a ceiling above base is rejected while boost is off.
   step sysw $CPU/cpufreq/boost "$(kv_get "$PRIOR" BOOST)"
   step fans_restore
-  for c in $CPU/cpu[0-9]*/cpufreq; do
+  for c in $(online_cpufreq); do
     step sysw "$c/scaling_governor" "$(kv_get "$PRIOR" GOVERNOR)"
     step sysw "$c/energy_performance_preference" "$(kv_get "$PRIOR" EPP)"
     step sysw "$c/scaling_max_freq" "$(kv_get "$PRIOR" SCALING_MAX)"
