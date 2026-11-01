@@ -33,8 +33,19 @@ preflight_common() {
       || pf_fail "graphical session running — stop gdm and run from a TTY/ssh, or set ALLOW_GUI=1"
   else pf_ok "no graphical session"; fi
 
+  # Starting temperature is a consistency condition, not a safety one: the
+  # idle calibration that follows must see a settled machine, or every run's
+  # cooldown target is set too high. So wait for it rather than fail.
   t=$(pkg_temp_c)
-  (( t <= TEMP_MAX_START_C )) && pf_ok "package ${t} °C" || pf_fail "package ${t} °C > ${TEMP_MAX_START_C} °C"
+  if (( t >= TEMP_ABORT_C )); then pf_fail "package ${t} °C >= ${TEMP_ABORT_C} °C (unsafe)"
+  else
+    if (( t > TEMP_MAX_START_C )); then
+      log "  package ${t} °C > ${TEMP_MAX_START_C} °C — waiting up to ${TEMP_START_WAIT_S}s to cool"
+      wait_for "$TEMP_START_WAIT_S" cool _temp_ok || true
+      t=$(pkg_temp_c)
+    fi
+    (( t <= TEMP_MAX_START_C )) && pf_ok "package ${t} °C"       || pf_fail "package still ${t} °C > ${TEMP_MAX_START_C} °C after ${TEMP_START_WAIT_S}s (blocked vents? hot room?)"
+  fi
 
   free=$(df -Pm "$LAPTOP_ROOT" | awk 'NR==2{print $4}')
   (( free >= MIN_FREE_MB )) && pf_ok "${free} MB free" || pf_fail "${free} MB free < ${MIN_FREE_MB} MB"
@@ -44,6 +55,8 @@ preflight_common() {
   local smt; smt=$(cat /sys/devices/system/cpu/smt/control)
   [[ $smt == on || $smt == off ]] || pf_fail "SMT control is '$smt' (cannot switch)"
 }
+
+_temp_ok() { (( $(pkg_temp_c) <= TEMP_MAX_START_C )); }
 
 preflight_port_free() {  # preflight_port_free PORT
   if ss -ltnH "sport = :$1" 2>/dev/null | grep -q .; then pf_fail "port $1 in use"; else pf_ok "port $1 free"; fi
