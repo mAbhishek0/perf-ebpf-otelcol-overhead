@@ -213,6 +213,12 @@ Unchanged: ramp 30 s, 6 measured reps (Wilcoxon floor), A1/A2 bracket, 4 load le
 - **Drift limit calibrated per cell (2026-10-16).** p99 varies run to run even on an unchanged machine (S: ~10% between untouched baselines), so a fixed 5% on p99 would fail healthy cells. Now `p99 limit = max(5%, 2 × spread of the cell's own B1–B6 p99)`, where spread = (max − min) / mean; CPU keeps a fixed 5%. Each verdict file records `DRIFT_P99_PCT`, `B_P99_SPREAD_PCT`, `P99_LIMIT_PCT`, `DRIFT_CPU_PCT`; `drift_k` is in schema.json. Caveat: the B runs include tracer variation, so the limit loosens slightly in noisy traced cells; the CPU check and 5% floor still hold.
 - **pilot.sh never freezes the ladder** — it prints a suggestion; writing `nginx-wrk2/pilot.env` (`LADDER=`, `WRK2_THREADS=`, `WRK2_CONNS=`) is a human decision.
 
+### Planned last: SMT-on arm (decided 2026-11-01)
+
+All main runs use SMT off (the controlled, isolated cost). After every workload × mechanism pair is done, one extra arm runs with SMT **on**, everything else identical (same pins 0,2,4,6 / 8,10 / 12,14, siblings idle and fenced), at one or two load levels, into its own results directory — to show whether the conclusion survives the realistic production setting. Needs an `SMT=on` config option (not written yet). Until then the paper lists SMT-off under threats to validity.
+
+Fans: the flat-255 `asus_custom_fan_curve` method works on this G513 (fans audibly at full speed, 2026-11-01 full nginx × perf run).
+
 ## Next steps
 
 1. ~~Re-run the probe with the host configured~~ — done 2026-10-14, READY ×9.
