@@ -33,7 +33,7 @@ Laptop probed (`probe_laptop.sh`), dependencies installed (`install_apt.sh`, `in
 - **Code structure: hybrid** — keep the 9 pair folders; shared engine in `common/`, per-workload `<workload>/workload.sh`, per-pair `scripts/` holds a thin `run.sh` + mechanism code/assets. Never copy engine logic into a pair folder.
 - **Run order:** nginx → fio → redis; per workload pilot → smoke cell → perf → eBPF → collector; seeded-shuffled load levels, level outer, scope inner (narrow, wide); `fstrim` + idle before each fio cell.
 - **Drift check:** A1/A2 p99 against `max(DRIFT_PCT, DRIFT_K × spread of the cell's B p99s)` (5%, 2×), CPU against fixed 5%. Never judge drift on throughput.
-- **Shortened run:** 1 warm-up (gate: smoke-cell warm-ups 2–3 match A1), 60 s steady (gate: pilot shows first-60 s within 5% of 120 s), temperature-gated cooldown identical for baseline and traced runs. A failed gate reverts that setting to the S default. 9 runs/cell, ~33 h total. Full table in [README.md](README.md#run-plan-decided-2026-10-14-not-yet-implemented).
+- **Shortened run:** 1 warm-up (gate: smoke-cell warm-ups 2–3 match A1), 120 s steady (gate 1 FAILED in the 2026-11-01 pilot), temperature-gated cooldown identical for baseline and traced runs. A failed gate reverts that setting to the S default. 9 runs/cell, ~33 h total. Full table in [README.md](README.md#run-plan-decided-2026-10-14-not-yet-implemented).
 
 ## Lessons from the old pipelines
 

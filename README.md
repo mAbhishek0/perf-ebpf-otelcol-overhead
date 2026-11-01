@@ -136,6 +136,7 @@ Benchmark results (not yet produced) will use the same format as Platform S: one
 6. **2026-10-14** — runs 2 and 3 → everything verified; otelcol checksum confirmed by hand against the release's `.sha256`, and the script now verifies it automatically.
 7. Host set up (`systemctl stop tlp`, `systemctl disable --now smartmontools`, platform profile `performance`) and probe run 2 → **READY ×9**. Outputs in `probe/`, terminal log in `logs/`.
 8. Decisions: CPU layout 4+2+2 with OS on 12,14; old laptop tree superseded; laptop data is the priority, server docs left as they are; lessons collected in [LESSONS.md](LESSONS.md).
+10. **2026-11-01** — first hardware run: unit tests 54/54 on the laptop after two fixes (local-variable expansion; `COLUMNS` clobbered by bash). nginx pilot ran end to end (host setup, clock 2.894 GHz verified, idle 42 °C, revert, desktop restored). Findings: generator saturates (~1.92 of 2 cores) at 80k+; highest clean rate 40k; one 60 s run at 20k had a ~1 s stall (p99 837 ms); gate 1 failed (5k noise, 20k stall), so `STEADY_S` stays 120 — a 1 s stall is <1% of a 120 s window and no longer moves p99. FREQ_VERDICT fixed to ignore idle-core low clocks. Synthetic wrk2 fixture replaced with real output.
 9. **2026-10-15** — batch 1 written: `common/` engine, `nginx-wrk2/workload.sh`, nginx × perf plugin, `run_workload.sh`, `pilot.sh`, `revert.sh`, tests; then automatic quiesce/restore and detached-service launch. All syntax-checked, none run.
 
 ## Failures and fixes
@@ -180,7 +181,7 @@ Automated (batch 1): quiesce stops noisy services and the desktop and closes noi
 | Setting | Was (S default) | Now | Gate that must pass first |
 |---|---|---|---|
 | Warm-ups per cell | 3 | **1** | in the smoke cell, warm-ups 2–3 match A1 |
-| Steady window | 120 s | **60 s** | pilot: first-60 s p99/p999 and throughput within the 5% drift threshold of the full 120 s |
+| Steady window | 120 s | **120 s — gate 1 FAILED (2026-11-01 pilot), default kept** | pilot: first-60 s p99/p999 and throughput within the 5% drift threshold of the full 120 s |
 | Cooldown | — | **temperature-gated** (wait only while package temp > idle + Δ), identical for baseline and traced runs; start temp recorded per row | — |
 
 Unchanged: ramp 30 s, 6 measured reps (Wilcoxon floor), A1/A2 bracket, 4 load levels, 2 scopes. If a gate fails, that setting reverts to the S default. Cell = 1 + 1 + 6 + 1 = 9 runs.

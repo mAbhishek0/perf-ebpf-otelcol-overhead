@@ -153,6 +153,8 @@ sample_stop() {
   kv_put "$e" CLK_TCK "$clk"
   fmin=$(kv_get "$e" FREQ_MIN_KHZ); fmax=$(kv_get "$e" FREQ_MAX_KHZ)
   lo=$(calc "$CLOCK_BASE_KHZ*(1-$CLOCK_TOL_PCT/100)"); hi=$(calc "$CLOCK_BASE_KHZ*(1+$CLOCK_TOL_PCT/100)")
-  if ! gt "$lo" "$fmin" && ! gt "$fmax" "$hi"; then kv_put "$e" FREQ_VERDICT ok
-  else kv_put "$e" FREQ_VERDICT out_of_band; fi
+  # Only an upper breach means boost leaked. A low minimum is an idle core
+  # (pilot: 1.11 GHz on workload CPUs at 5k-10k rps), not a capped clock.
+  if gt "$fmax" "$hi"; then kv_put "$e" FREQ_VERDICT out_of_band
+  else kv_put "$e" FREQ_VERDICT ok; fi
 }

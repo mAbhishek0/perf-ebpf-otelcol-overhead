@@ -4,7 +4,7 @@
 # fixture, sample_stop's summary maths on a synthetic samples.tsv, and
 # collect.sh end to end on a fake results dir. A green run means the logic is
 # right, not that the pipeline works on hardware. The wrk2 fixture is
-# SYNTHETIC until replaced with real laptop output.
+# real laptop output (pilot R10000, 2026-11-01).
 
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -74,11 +74,14 @@ t_die "to_ms minutes" _to_ms 5m
 # --- wl_parse against the fixture ---
 pb="$T/parse"; mkdir -p "$pb"; cp "$HERE/fixtures/wrk2_L.txt" "$pb/workload.out"
 wl_parse "$pb"
-t_eq "parse throughput" 9983.37 "$(kv_get "$pb/wl.env" THROUGHPUT)"
-t_eq "parse p50" 1.020000 "$(kv_get "$pb/wl.env" P50_MS)"
-t_eq "parse p99" 3.410000 "$(kv_get "$pb/wl.env" P99_MS)"
-t_eq "parse p999" 6.840000 "$(kv_get "$pb/wl.env" P999_MS)"
-t_eq "parse errors" 3 "$(kv_get "$pb/wl.env" ERRORS)"
+t_eq "parse throughput" 9989.95 "$(kv_get "$pb/wl.env" THROUGHPUT)"
+t_eq "parse p50" 1.780000 "$(kv_get "$pb/wl.env" P50_MS)"
+t_eq "parse p99" 3.510000 "$(kv_get "$pb/wl.env" P99_MS)"
+t_eq "parse p999" 4.820000 "$(kv_get "$pb/wl.env" P999_MS)"
+t_eq "parse errors" 0 "$(kv_get "$pb/wl.env" ERRORS)"
+printf '  Socket errors: connect 0, read 1, write 0, timeout 3
+' >> "$pb/workload.out"; : > "$pb/wl.env"; wl_parse "$pb"
+t_eq "parse socket errors" 4 "$(kv_get "$pb/wl.env" ERRORS)"
 printf 'garbage\n' > "$pb/workload.out"
 t_die "parse garbage" wl_parse "$pb"
 
