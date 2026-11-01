@@ -60,6 +60,8 @@ Laptop probed (`probe_laptop.sh`), dependencies installed (`install_apt.sh`, `in
 
 ## Editing rules for this folder
 
+- **Commits carry no `Co-Authored-By` or other AI attribution trailer.**
+
 - Run `bash -n` on every script you touch.
 - Scripts must be read-only unless their purpose is to change the host; the probe changes nothing except a 4 KiB O_DIRECT file it deletes.
 - Logs and probe outputs pasted back by the user are evidence: don't rewrite them; add a correction next to any conclusion they overturn.
