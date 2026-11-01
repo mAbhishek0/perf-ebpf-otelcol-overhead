@@ -23,6 +23,7 @@ host_save_prior() {
   kv_put "$p" EPP "$(tr -d ' \n' < $CPU/cpu0/cpufreq/energy_performance_preference)"
   kv_put "$p" SCALING_MIN "$(cat $CPU/cpu0/cpufreq/scaling_min_freq)"
   kv_put "$p" SCALING_MAX "$(cat $CPU/cpu0/cpufreq/scaling_max_freq)"
+  kv_put "$p" FAN_PWM_ENABLE "$(f=$(_fan_ctl) && cat "$f" || echo none)"
   kv_put "$p" PLATFORM_PROFILE "$(cat /sys/firmware/acpi/platform_profile)"
   kv_put "$p" PERF_PARANOID "$(cat /proc/sys/kernel/perf_event_paranoid)"
   kv_put "$p" PERF_MAX_SAMPLE_RATE "$(cat /proc/sys/kernel/perf_event_max_sample_rate)"
@@ -39,6 +40,15 @@ host_save_prior() {
   kv_put "$p" COMPLETE yes
   mv "$p" "$PRIOR"
   log "prior state saved to $PRIOR"
+}
+
+# _fan_ctl — path of the ASUS fan-mode control, or fail if this machine has none.
+_fan_ctl() {
+  local h
+  for h in /sys/class/hwmon/hwmon*; do
+    [[ "$(cat "$h/name" 2>/dev/null)" == asus && -w $h/pwm1_enable ]] && { echo "$h/pwm1_enable"; return 0; }
+  done
+  return 1
 }
 
 host_setup() {
@@ -63,6 +73,12 @@ host_setup() {
     sysw "$c/scaling_min_freq" "$CLOCK_BASE_KHZ" || floor_ok=0
   done
   (( floor_ok )) && log "clock floor requested at ${CLOCK_BASE_KHZ} kHz"     || warn "clock floor not accepted on some CPUs — ceiling still at base; idle cores may downclock"
+
+  # 2c. Fans at full speed (asus-wmi: pwm1_enable 0 = full, 2 = auto). A fixed
+  #     fan speed removes fan-curve ramping as a source of run-to-run thermal
+  #     variation and shortens cooldowns. Best effort: warn if unsupported.
+  local fan; if fan=$(_fan_ctl) && sysw "$fan" 0; then log "fans at full speed ($fan)"
+  else warn "could not set fans to full speed (no asus pwm1_enable or write refused) — fans stay automatic"; fi
   # 3. SMT off, verified by the online set, not the control file.
   if [[ "$(cat $CPU/smt/control)" != off ]]; then
     echo off > $CPU/smt/control || die "SMT write failed"
@@ -134,6 +150,8 @@ host_revert() {
   [[ "$(kv_get "$PRIOR" IRQBALANCE)" == active ]] && step systemctl start irqbalance
   # Boost before the ceiling: a ceiling above base is rejected while boost is off.
   step sysw $CPU/cpufreq/boost "$(kv_get "$PRIOR" BOOST)"
+  _fan() { local v f; v=$(kv_get "$PRIOR" FAN_PWM_ENABLE); [[ $v == none ]] && return 0; f=$(_fan_ctl) && sysw "$f" "$v"; }
+  step _fan
   for c in $CPU/cpu[0-9]*/cpufreq; do
     step sysw "$c/scaling_governor" "$(kv_get "$PRIOR" GOVERNOR)"
     step sysw "$c/energy_performance_preference" "$(kv_get "$PRIOR" EPP)"
