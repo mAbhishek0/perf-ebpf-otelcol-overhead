@@ -27,6 +27,7 @@ host_save_prior() {
   kv_put "$p" PLATFORM_PROFILE "$(cat /sys/firmware/acpi/platform_profile)"
   kv_put "$p" PERF_PARANOID "$(cat /proc/sys/kernel/perf_event_paranoid)"
   kv_put "$p" PERF_MAX_SAMPLE_RATE "$(cat /proc/sys/kernel/perf_event_max_sample_rate)"
+  kv_put "$p" PERF_CPU_TIME_MAX "$(cat /proc/sys/kernel/perf_cpu_time_max_percent)"
   kv_put "$p" BPF_STATS "$(cat /proc/sys/kernel/bpf_stats_enabled)"
   kv_put "$p" IRQBALANCE "$(systemctl is-active irqbalance 2>/dev/null || true)"
   kv_put "$p" IRQ_DEFAULT "$(cat /proc/irq/default_smp_affinity)"
@@ -94,6 +95,10 @@ host_setup() {
 
   # 4. perf access and a pinned sample rate.
   sysw /proc/sys/kernel/perf_event_paranoid -1 || die "cannot lower perf_event_paranoid"
+  # The kernel lowers max_sample_rate by itself when a perf interrupt runs long
+  # (smoke 2026-11-01: 100000 -> 14000 mid-run). 0 disables that throttle so
+  # the pinned rate holds for the whole run; each run records the rate at end.
+  sysw /proc/sys/kernel/perf_cpu_time_max_percent 0 || die "cannot disable perf_cpu_time_max_percent"
   sysw /proc/sys/kernel/perf_event_max_sample_rate "$PERF_MAX_SAMPLE_RATE" || die "cannot pin perf_event_max_sample_rate"
   sysw /proc/sys/kernel/bpf_stats_enabled 0 || die "cannot set bpf_stats_enabled=0"
 
@@ -160,6 +165,7 @@ host_revert() {
   done
   step sysw /sys/firmware/acpi/platform_profile "$(kv_get "$PRIOR" PLATFORM_PROFILE)"
   step sysw /proc/sys/kernel/perf_event_paranoid "$(kv_get "$PRIOR" PERF_PARANOID)"
+  step sysw /proc/sys/kernel/perf_cpu_time_max_percent "$(kv_get "$PRIOR" PERF_CPU_TIME_MAX)"
   step sysw /proc/sys/kernel/perf_event_max_sample_rate "$(kv_get "$PRIOR" PERF_MAX_SAMPLE_RATE)"
   step sysw /proc/sys/kernel/bpf_stats_enabled "$(kv_get "$PRIOR" BPF_STATS)"
 

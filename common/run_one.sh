@@ -67,6 +67,7 @@ run_one() {
   kv_put "$m" TCP_TIMEOUTS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:TCPTimeouts)"
   kv_put "$m" TCP_SYN_RETRANS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:TCPSynRetrans)"
   kv_put "$m" LISTEN_DROPS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:ListenDrops)"
+  kv_put "$m" PERF_RATE_END "$(cat /proc/sys/kernel/perf_event_max_sample_rate)"
   kv_put "$m" BENCH_TRACE "${BENCH_TRACE:-0}"   # 1 = debug trace was on; not for reported data
   touch "$b/DONE"
   RUN_ACTIVE=0
