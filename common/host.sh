@@ -61,6 +61,9 @@ host_setup() {
   for c in $CPU/cpu[0-9]*/cpufreq; do
     sysw "$c/scaling_governor" performance || die "governor write failed on $c"
   done
+  # 1b. firmware platform profile: power limits and fan curve follow it.
+  #     GNOME (power-profiles-daemon) resets it at login, so set it here.
+  sysw /sys/firmware/acpi/platform_profile performance || die "cannot set platform profile to performance"
   # 2. boost off — before SMT.
   sysw $CPU/cpufreq/boost 0 || die "boost write failed"
   # 2b. Ceiling at base is the hard requirement (boost off already gives it;

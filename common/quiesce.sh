@@ -8,7 +8,7 @@
 # Opt out with QUIESCE=0 (then preflight refuses while noise is present).
 
 # Sockets/paths listed so they cannot re-activate a stopped service mid-run.
-QUIESCE_SERVICES="tlp fwupd fwupd-refresh.timer cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd smartmontools gdm"
+QUIESCE_SERVICES="tlp fwupd fwupd-refresh.timer cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd power-profiles-daemon smartmontools gdm"
 QUIESCE_APPS="firefox chrome brave Telegram gnome-software localsearch-ext localsearch-3 tracker-miner-fs-3 tracker-extract-3"
 QFILE="${STATE_DIR}/quiesced.env"
 

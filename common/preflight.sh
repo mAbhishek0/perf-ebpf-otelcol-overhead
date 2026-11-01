@@ -17,8 +17,10 @@ preflight_common() {
   [[ $ac == 1 ]] && pf_ok "on AC power" || pf_fail "not on AC power"
 
   t=$(cat /sys/firmware/acpi/platform_profile 2>/dev/null || echo none)
-  [[ $t == performance ]] && pf_ok "platform profile performance" \
-    || pf_fail "platform profile is '$t' (echo performance > /sys/firmware/acpi/platform_profile)"
+  # Host setup sets the profile (and revert restores it); here only check it exists.
+  [[ $(cat /sys/firmware/acpi/platform_profile_choices 2>/dev/null) == *performance* ]] \
+    && pf_ok "platform profile '$t' (host setup sets performance)" \
+    || pf_fail "no 'performance' platform profile available"
 
   systemctl is-active --quiet tlp 2>/dev/null && pf_fail "TLP active (systemctl stop tlp)" || pf_ok "TLP not active"
   systemctl is-active --quiet unattended-upgrades 2>/dev/null \
