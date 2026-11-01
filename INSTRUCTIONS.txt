@@ -18,7 +18,8 @@ Create laptop/.sync.env with the same five lines as on the other machine
 (GITHUB_REPO_URL, GITHUB_USER, GITHUB_PAT, GIT_NAME, GIT_EMAIL). It is
 gitignored. Line endings and execute bits come from git, so no sed step.
 
-Every later step runs from ~/Downloads/laptop. Before each step:
+Every later step runs from the cloned folder (~/Downloads/laptop, or
+~/Downloads/perf-ebpf-otelcol-overhead if cloned without a name). Before each step:
 
     bash sync.sh pull
 
@@ -34,7 +35,8 @@ After each step, send results back:
     sudo snap refresh --hold
     sudo systemctl disable --now tlp smartmontools fwupd fwupd-refresh.timer
     systemctl --user list-units --all | grep -iE 'localsearch|tracker'
-    systemctl --user mask --now <each unit the previous command listed>
+    systemctl --user mask --now localsearch-3.service
+    (if the list showed other units, mask those too, by name)
 
 Undo after the study with: systemctl enable, apt-mark unhold, and
 systemctl --user unmask.
