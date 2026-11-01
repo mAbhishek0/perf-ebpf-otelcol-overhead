@@ -65,17 +65,19 @@ What happens:
 To watch while the desktop is off: switch to a text console with
 Ctrl+Alt+F3, log in, and run:
 
-    tail -f ~/Downloads/PE-4credit/laptop/logs/bench-pilot_*.log
+    tail -f ~/Downloads/laptop/logs/bench-pilot_*.log
 
 Output: nginx-wrk2/pilot/pilot_report.txt
 
 
 5. SEND THE PILOT RESULTS BACK
 ------------------------------
-Copy these into laptop/ in the Windows checkout:
-  - nginx-wrk2/pilot/pilot_report.txt
-  - logs/bench-pilot_*.log
-  - nginx-wrk2/pilot/raw/R10000/workload.out   (real wrk2 output)
+Push them (they are not gitignored):
+
+    git add -A && git commit -m "results: nginx pilot" && bash sync.sh push
+
+The ones that matter: nginx-wrk2/pilot/pilot_report.txt, logs/bench-pilot_*.log
+and nginx-wrk2/pilot/raw/R10000/workload.out (real wrk2 output).
 
 Then, together:
   - check the 60 s gate;
@@ -90,8 +92,8 @@ Then, together:
 --------------------------------------------------------------
     sudo bash nginx-wrk2/perf/scripts/run.sh --smoke
 
-Send back nginx-wrk2/perf/results/smoke/ (the nginx_perf.csv file and the
-raw/ folder) and the newest logs/bench-nginx_*.log. Every column and the
+Push the results: git add -A && git commit -m "results: nginx smoke" &&
+bash sync.sh push (covers results/smoke/ and logs/bench-nginx_*.log). Every column and the
 warm-up gate get checked by hand before the full run.
 
 
@@ -110,7 +112,7 @@ After a crash or power loss:
 
     sudo bash revert.sh
 
-Either way, send back:
+Either way, push (git add -A && git commit -m "results: crash" && bash sync.sh push) so these arrive:
   - the newest logs/bench-*.log
   - the newest logs/crash_*.txt (written automatically on any failure:
     where it stopped, the error, container log, dmesg, clocks, processes)
