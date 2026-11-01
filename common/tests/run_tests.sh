@@ -47,6 +47,14 @@ t_eq "pct_diff equal" 0.0000 "$(pct_diff 5 5)"
 t_eq "rel_spread" 20.0000 "$(rel_spread 0.9 1.0 1.1)"
 t_eq "rel_spread flat" 0.0000 "$(rel_spread 2 2 2)"
 t_eq "rel_spread zero mean" 0.0000 "$(rel_spread 0 0)"
+t_eq "trimmed spread ignores one stall" 15.9091 "$(rel_spread_trimmed 2.93 449.54 2.89 2.85 3.38 3.23)"
+t_eq "trimmed spread small n untrimmed" 20.0000 "$(rel_spread_trimmed 0.9 1.0 1.1)"
+printf 'Tcp:RetransSegs 5
+Tcp:InSegs 1
+' > "$T/n1"; printf 'Tcp:RetransSegs 9
+' > "$T/n2"
+t_eq "net_delta" 4 "$(net_delta "$T/n1" "$T/n2" Tcp:RetransSegs)"
+t_eq "net_delta absent" 0 "$(net_delta "$T/n1" "$T/n2" Tcp:Nope)"
 t_eq "pct_diff zeros" 0 "$(pct_diff 0 0)"
 t_ok "gt true" gt 2 1
 t_die "gt false" gt 1 2
@@ -79,6 +87,7 @@ t_eq "parse p50" 1.780000 "$(kv_get "$pb/wl.env" P50_MS)"
 t_eq "parse p99" 3.510000 "$(kv_get "$pb/wl.env" P99_MS)"
 t_eq "parse p999" 4.820000 "$(kv_get "$pb/wl.env" P999_MS)"
 t_eq "parse errors" 0 "$(kv_get "$pb/wl.env" ERRORS)"
+t_eq "parse max" 7.588 "$(kv_get "$pb/wl.env" MAX_MS)"
 printf '  Socket errors: connect 0, read 1, write 0, timeout 3
 ' >> "$pb/workload.out"; : > "$pb/wl.env"; wl_parse "$pb"
 t_eq "parse socket errors" 4 "$(kv_get "$pb/wl.env" ERRORS)"

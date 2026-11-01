@@ -131,4 +131,9 @@ wl_parse() {
   kv_put "$e" P99_MS "$(_to_ms "$p99")"
   kv_put "$e" P999_MS "$(_to_ms "$p999")"
   kv_put "$e" ERRORS "$((sock + non2xx))"
+  # Largest single latency (ms). Stalls show here first: smoke B2 and pilot
+  # 20k-60s both capped at exactly 1.00 s.
+  local mx; mx=$(awk '/^#\[Max/ { gsub(/,/,""); print $3; exit }' "$o")
+  [[ -n $mx ]] || die "no #[Max line in $o"
+  kv_put "$e" MAX_MS "$mx"
 }

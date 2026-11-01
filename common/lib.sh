@@ -53,6 +53,26 @@ calc() { awk "BEGIN{ printf \"%.6f\", $* }"; }
 pct_diff() { awk -v a="$1" -v b="$2" 'BEGIN{ m=(a+b)/2; if (m==0) {print 0; exit} d=a-b; if (d<0) d=-d; printf "%.4f", 100*d/m }'; }
 # rel_spread v1 v2 ...  — (max - min) / mean x 100; 0 when the mean is 0.
 rel_spread() { printf '%s\n' "$@" | awk 'NR==1{mn=mx=$1} {s+=$1; if($1<mn)mn=$1; if($1>mx)mx=$1} END{m=s/NR; printf "%.4f", (m ? 100*(mx-mn)/m : 0)}'; }
+# rel_spread_trimmed v1 v2 ...  — drop the lowest and highest value (when there
+# are at least 5), then (max - min) / median x 100. One stalled run (smoke
+# 2026-11-01: B2 p99 449 ms among ~3 ms) must not set the drift limit.
+rel_spread_trimmed() {
+  printf '%s\n' "$@" | sort -g | awk '{v[NR]=$1} END{
+    lo=1; hi=NR; if (NR>=5) { lo=2; hi=NR-1 }
+    n=hi-lo+1; m=(n%2) ? v[lo+(n-1)/2] : (v[lo+n/2-1]+v[lo+n/2])/2
+    printf "%.4f", (m ? 100*(v[hi]-v[lo])/m : 0) }'
+}
+
+# net_snap — TCP counters as "Group:Name value" lines (from /proc/net/snmp and
+# /proc/net/netstat, which alternate a header line and a value line).
+net_snap() {
+  awk 'FNR%2==1 { n=split($0,h); next } { for (i=2;i<=NF;i++) print h[1] h[i], $i }' /proc/net/snmp /proc/net/netstat
+}
+# net_delta BEFORE AFTER KEY  — after - before for one counter (0 if absent).
+net_delta() {
+  awk -v k="$3" 'FNR==NR { if ($1==k) a=$2; next } $1==k { b=$2 } END { printf "%d", b-a }' "$1" "$2"
+}
+
 gt() { awk -v a="$1" -v b="$2" 'BEGIN{ exit !(a>b) }'; }
 
 # run_id WL MECH SCOPE LEVEL TRY ROLE  — deterministic, so a rerun collides

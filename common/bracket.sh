@@ -8,6 +8,7 @@
 # an unchanged machine (S: ~10% between untouched baselines), so its limit is
 # calibrated per cell from the cell's own traced reps:
 #   limit = max(DRIFT_PCT, DRIFT_K x spread of B1..Bn p99)
+# where spread drops the lowest and highest B, so one stalled run cannot set it.
 # CPU is stable and keeps the fixed DRIFT_PCT. Spread and limit go into the
 # verdict file so every pass/fail is auditable. A failed bracket is rerun whole;
 # its runs stay on disk, marked by the verdict file, and collect.sh skips them.
@@ -41,7 +42,7 @@ bracket() {
     for (( r=1; r<=MEASURED_REPS; r++ )); do
       bp99+="$(kv_get "$rdir/raw/$(run_id "$wl" "$mech" "$scope" "$level" "$try" "B$r")/wl.env" P99_MS) "
     done
-    spread=$(rel_spread $bp99)
+    spread=$(rel_spread_trimmed $bp99)
     lim=$(awk -v f="$DRIFT_PCT" -v k="$DRIFT_K" -v s="$spread" 'BEGIN{ l=k*s; printf "%.4f", (l>f ? l : f) }')
     : > "$v.partial"
     kv_put "$v.partial" DRIFT_P99_PCT "$d1"

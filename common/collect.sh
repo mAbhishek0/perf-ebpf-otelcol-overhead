@@ -17,7 +17,8 @@ CSV_COLUMNS=(
   rate_target:run_meta:RATE_TARGET try:run_meta:TRY role:run_meta:ROLE traced:run_meta:TRACED
   t_start:run_meta:T_START window_s:run_meta:WINDOW_S steady_s:run_meta:STEADY_S
   workload_cpus:run_meta:WORKLOAD_CPUS tracer_cpus:run_meta:TRACER_CPUS gen_cpus:run_meta:GEN_CPUS
-  throughput:wl:THROUGHPUT p50_ms:wl:P50_MS p99_ms:wl:P99_MS p999_ms:wl:P999_MS errors:wl:ERRORS
+  throughput:wl:THROUGHPUT p50_ms:wl:P50_MS p99_ms:wl:P99_MS p999_ms:wl:P999_MS max_ms:wl:MAX_MS errors:wl:ERRORS
+  tcp_retrans:run_meta:TCP_RETRANS tcp_timeouts:run_meta:TCP_TIMEOUTS tcp_syn_retrans:run_meta:TCP_SYN_RETRANS listen_drops:run_meta:LISTEN_DROPS
   workload_cpu_usec:run_meta:WORKLOAD_CPU_USEC workload_cpu_cores:run_meta:WORKLOAD_CPU_CORES
   tracer_cpu_cores:samples:TRACER_CPU_CORES loadgen_cpu_cores:samples:LOADGEN_CPU_CORES
   busy_pct_workload:samples:BUSY_PCT_WORKLOAD freq_min_khz:samples:FREQ_MIN_KHZ

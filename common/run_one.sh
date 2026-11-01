@@ -29,12 +29,14 @@ run_one() {
 
   # --- measured window ---
   u0=$(cgroup_usec "$(cat "$b/cgroup_path")")
+  net_snap > "$b/net_before.txt"
   stage "$id measure"; sample_start "$b"; RUN_SAMPLING=1
   t0=$(date +%s.%N)
   wl_measure "$rate" "$b"
   t1=$(date +%s.%N)
   sample_stop "$b"; RUN_SAMPLING=0
   u1=$(cgroup_usec "$(cat "$b/cgroup_path")")
+  net_snap > "$b/net_after.txt"
   # --- window closed ---
 
   if (( traced )); then
@@ -59,6 +61,12 @@ run_one() {
   kv_put "$m" WORKLOAD_CPUS "$WORKLOAD_CPUS"; kv_put "$m" TRACER_CPUS "$TRACER_CPUS"
   kv_put "$m" GEN_CPUS "$GEN_CPUS"; kv_put "$m" KERNEL "$(uname -r)"
   kv_put "$m" CLOCK_CHECK "$(kv_get "$STATE_DIR/clock_check.env" CLOCK_VERDICT)"
+  # TCP trouble during the window — candidate cause of the 1.00 s stalls
+  # (1 s is the initial retransmission timeout).
+  kv_put "$m" TCP_RETRANS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" Tcp:RetransSegs)"
+  kv_put "$m" TCP_TIMEOUTS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:TCPTimeouts)"
+  kv_put "$m" TCP_SYN_RETRANS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:TCPSynRetrans)"
+  kv_put "$m" LISTEN_DROPS "$(net_delta "$b/net_before.txt" "$b/net_after.txt" TcpExt:ListenDrops)"
   kv_put "$m" BENCH_TRACE "${BENCH_TRACE:-0}"   # 1 = debug trace was on; not for reported data
   touch "$b/DONE"
   RUN_ACTIVE=0
