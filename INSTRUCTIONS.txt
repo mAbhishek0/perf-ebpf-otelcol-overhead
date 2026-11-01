@@ -7,13 +7,24 @@ anything fails.
 Steps 1-3 are done once. From step 4 on, each step is one command.
 
 
-1. COPY AND PREPARE (once)
---------------------------
-Copy the whole laptop/ folder, including its subfolders, to
-~/Downloads/PE-4credit/laptop/ on the laptop. Then:
+1. GET THE REPO (once)
+---------------------
+    cd ~/Downloads
+    git clone https://github.com/mAbhishek0/perf-ebpf-otelcol-overhead.git PE
+    (username: your GitHub user; password: the token)
+    cd PE
 
-    cd ~/Downloads/PE-4credit/laptop
-    find . -name '*.sh' -o -name '*.env' -o -name '*.txt' | xargs sed -i 's/\r$//'
+Create PE/.sync.env with the same five lines as on the other machine
+(GITHUB_REPO_URL, GITHUB_USER, GITHUB_PAT, GIT_NAME, GIT_EMAIL). It is
+gitignored. Line endings and execute bits come from git, so no sed step.
+
+Every later step runs from ~/Downloads/PE/laptop. Before each step:
+
+    bash ../sync.sh pull
+
+After each step, send results back:
+
+    cd ~/Downloads/PE && git add laptop && git commit -m "results: <what ran>" && bash sync.sh push
 
 
 2. ONE-TIME HOST SETUP (once)
