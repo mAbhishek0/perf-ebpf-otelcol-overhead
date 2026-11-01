@@ -12,4 +12,5 @@ need_root
 docker rm -f "$NGINX_CONTAINER" >/dev/null 2>&1 || true
 host_revert
 give_back
+quiet_off         # undoes a diag_stall.sh "quiet" variant cut short
 quiesce_restore   # restarts only the services quiesce stopped (desktop last); apps stay closed
