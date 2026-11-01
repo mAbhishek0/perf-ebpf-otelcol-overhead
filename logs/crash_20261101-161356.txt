@@ -1,0 +1,143 @@
+CRASH REPORT  2026-11-01T16:14:02+05:30  exit=1  stage=host setup  unit=bench-nginx
+run in flight: none (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+16:14:02 die stage=host setup: governor write failed on /sys/devices/system/cpu/cpu11/cpufreq (in host_setup)
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-nginx_20261101-161346.log'
+16:14:01 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+16:14:01 [run|preflight] preflight
+16:14:01 [run|preflight]   [ok]   on AC power
+16:14:01 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+16:14:01 [run|preflight]   [ok]   TLP not active
+16:14:01 [run|preflight]   [ok]   unattended-upgrades not active
+16:14:01 [run|preflight]   [ok]   no noisy processes
+16:14:01 [run|preflight]   [ok]   no graphical session
+16:14:01 [run|preflight]   [ok]   package 45 °C
+16:14:01 [run|preflight]   [ok]   60102 MB free
+16:14:01 [run|preflight]   [ok]   BPF JIT on
+16:14:01 [run|preflight]   [ok]   docker reachable
+16:14:01 [run|preflight]   [ok]   wrk2 with -R
+16:14:01 [run|preflight]   [ok]   nginx:1.24 id matches
+16:14:01 [run|preflight]   [ok]   port 8080 free
+16:14:02 [run|preflight]   [ok]   perf version 7.0.14
+16:14:02 [run|preflight] preflight passed
+16:14:02 [run|host setup] prior state already saved at /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env — keeping it (never overwritten)
+16:14:02 [run|host setup] FAIL: governor write failed on /sys/devices/system/cpu/cpu11/cpufreq
+
+##### docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+##### docker logs --tail 100 bench-nginx
+Error response from daemon: No such container: bench-nginx
+
+##### dmesg -T | tail -n 60
+[Sun Nov  1 15:47:58 2026] audit: type=1400 audit(1793528278.221:478): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=161191 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:47:59 2026] audit: type=1400 audit(1793528279.287:479): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=161841 comm="fusermount3" flags="rw, rprivate"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:480): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163812 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:481): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163812 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:482): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163809 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:483): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163809 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:484): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163813 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.775:485): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163814 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.794:486): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=163822 comm="fusermount3" flags="rw, rprivate"
+[Sun Nov  1 15:57:14 2026] rfkill: input handler enabled
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.870:487): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163909 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:14 2026] audit: type=1400 audit(1793528834.871:488): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=163915 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:16 2026] audit: type=1400 audit(1793528836.492:489): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=164064 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 1 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 3 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 5 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 7 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 9 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 11 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 13 is now offline
+[Sun Nov  1 15:57:30 2026] smpboot: CPU 15 is now offline
+[Sun Nov  1 15:57:30 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Sun Nov  1 15:57:30 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+[Sun Nov  1 15:57:30 2026] kauditd_printk_skb: 2 callbacks suppressed
+[Sun Nov  1 15:57:30 2026] audit: type=1400 audit(1793528851.026:492): apparmor="DENIED" operation="open" class="file" profile="/usr/sbin/cupsd" name="/etc/paperspecs" pid=165846 comm="cupsd" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+[Sun Nov  1 15:57:30 2026] audit: type=1400 audit(1793528851.032:493): apparmor="DENIED" operation="capable" class="cap" profile="/usr/sbin/cupsd" pid=165846 comm="cupsd" capability=12  capname="net_admin"
+[Sun Nov  1 15:57:31 2026] loop33: detected capacity change from 0 to 8
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.271:494): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=166191 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.272:495): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=166191 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.272:496): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=166193 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.274:497): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=166193 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.294:498): apparmor="DENIED" operation="getattr" class="file" info="Failed name lookup - disconnected path" error=-13 profile="unprivileged_userns" name="" pid=166232 comm="systemd-detect-" requested_mask="r" denied_mask="r" fsuid=60578 ouid=0
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.450:499): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=166304 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.450:500): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=166304 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:32 2026] audit: type=1400 audit(1793528852.450:501): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=166305 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:34 2026] rfkill: input handler disabled
+[Sun Nov  1 15:57:56 2026] rfkill: input handler enabled
+[Sun Nov  1 15:57:56 2026] kauditd_printk_skb: 2 callbacks suppressed
+[Sun Nov  1 15:57:56 2026] audit: type=1400 audit(1793528876.662:504): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=167902 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:56 2026] audit: type=1400 audit(1793528876.662:505): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=167902 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:56 2026] audit: type=1400 audit(1793528876.662:506): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=167904 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:59 2026] rfkill: input handler disabled
+[Sun Nov  1 15:57:59 2026] audit: type=1400 audit(1793528879.354:507): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168423 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:57:59 2026] audit: type=1400 audit(1793528879.354:508): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168423 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:57:59 2026] audit: type=1400 audit(1793528879.354:509): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168424 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:58:00 2026] audit: type=1400 audit(1793528880.565:510): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168865 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 15:58:00 2026] audit: type=1400 audit(1793528880.566:511): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168865 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:58:00 2026] audit: type=1400 audit(1793528880.566:512): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=168879 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 15:58:00 2026] audit: type=1400 audit(1793528880.579:513): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=168881 comm="fusermount3" flags="rw, rprivate"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.518:514): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170581 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.518:515): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170581 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.518:516): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170582 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.533:517): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170585 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.533:518): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170585 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.534:519): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170588 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.574:520): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=170606 comm="fusermount3" flags="rw, rprivate"
+[Sun Nov  1 16:13:59 2026] rfkill: input handler enabled
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.711:521): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170693 comm="fusermount3" capability=1  capname="dac_override"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.711:522): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170693 comm="fusermount3" capability=7  capname="setuid"
+[Sun Nov  1 16:13:59 2026] audit: type=1400 audit(1793529839.712:523): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=170695 comm="fusermount3" capability=7  capname="setuid"
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+1
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2900000
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2885036
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2892924
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 45000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+  41798   41444  12  0.0 Ss      02:50:20 bash
+ 156091    4493   3  0.0 S          34:33 sleep
+ 170517       1  12  0.6 Ss         00:05 bash
+ 170731   41629   8  4.9 S          00:02 python3
+ 171199  171197  12  0.0 S          00:00 bash
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887        1903        8498           3        4596       12983
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   44G   59G  43% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=
+
+AllowedCPUs=
+
+AllowedCPUs=
+
+AllowedCPUs=
