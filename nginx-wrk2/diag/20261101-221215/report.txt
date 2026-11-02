@@ -1,0 +1,29 @@
+stall diagnostic  rate=20000  window=120s  reps=5  2026-11-01T23:03:41+05:30
+stall = wrk2 max latency >= 900 ms; probe = 1 curl / 100 ms on its own connection
+
+variant    rep   p99_ms  p999_ms    max_ms  stall | probe_max p_slow first_slow_s
+base         1 455.170000 948.730000  1002.496    YES |     0.005      0 -
+base         2 454.140000 949.250000  1003.008    YES |     0.005      0 -
+base         3 728.580000 975.870000  1002.496    YES |     0.005      0 -
+base         4 455.420000 949.250000  1003.008    YES |     0.005      0 -
+base         5 5.760000 892.930000  1001.984    YES |     0.005      0 -
+isolgen      1 4.280000 893.950000  1002.496    YES |     0.003      0 -
+isolgen      2 5.070000 944.130000  1003.008    YES |     0.004      0 -
+isolgen      3 2.830000 4.170000     6.476      - |     0.003      0 -
+isolgen      4 3.670000 4.790000     7.044      - |     0.004      0 -
+isolgen      5 3.150000 4.760000     7.140      - |     0.003      0 -
+quiet        1 5.660000 892.930000  1000.960    YES |     0.007      0 -
+quiet        2 784.380000 981.500000  1002.496    YES |     0.004      0 -
+quiet        3 903.170000 992.770000  1004.544    YES |     0.005      0 -
+quiet        4 729.090000 976.380000  1003.008    YES |     0.005      0 -
+quiet        5 637.950000 968.190000  1003.520    YES |     0.004      0 -
+isolquiet    1 4.760000 892.410000   999.936    YES |     0.003      0 -
+isolquiet    2 3.080000 4.780000     8.132      - |     0.003      0 -
+isolquiet    3 4.030000 893.950000  1000.960    YES |     0.003      0 -
+isolquiet    4 783.870000 981.500000  1003.008    YES |     0.004      0 -
+isolquiet    5 455.930000 948.730000  1001.984    YES |     0.003      0 -
+
+base: 5 of 5 runs stalled
+isolgen: 2 of 5 runs stalled
+quiet: 5 of 5 runs stalled
+isolquiet: 4 of 5 runs stalled

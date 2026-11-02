@@ -1,0 +1,118 @@
+22:12:20 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd gdm ], apps closed
+22:12:20 [diag|preflight] preflight
+22:12:20 [diag|preflight]   [ok]   on AC power
+22:12:20 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+22:12:20 [diag|preflight]   [ok]   TLP not active
+22:12:20 [diag|preflight]   [ok]   unattended-upgrades not active
+22:12:20 [diag|preflight]   [ok]   no noisy processes
+22:12:20 [diag|preflight]   [ok]   no graphical session
+22:12:20 [diag|preflight]   package 70 °C > 55 °C — waiting up to 900s to cool
+22:12:30 [diag|preflight]   cooled for 10s, now 55 °C
+22:12:30 [diag|preflight]   [ok]   package 55 °C
+22:12:30 [diag|preflight]   [ok]   59897 MB free
+22:12:30 [diag|preflight]   [ok]   BPF JIT on
+22:12:30 [diag|preflight]   [ok]   docker reachable
+22:12:30 [diag|preflight]   [ok]   wrk2 with -R
+22:12:30 [diag|preflight]   [ok]   nginx:1.24 id matches
+22:12:30 [diag|preflight]   [ok]   port 8080 free
+22:12:30 [diag|preflight] preflight passed
+22:12:30 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+22:12:31 [diag|host setup] clock floor requested at 2900000 kHz
+22:12:31 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+22:12:31 [diag|host setup] IRQs moved to 12,14: 33 (unmovable, e.g. per-CPU timers: 11)
+22:12:35 [diag|host setup] clock under load: 2894814 kHz (ok)
+22:12:35 [diag|host setup] host configured
+22:13:05 [diag|host setup] idle package temp 44 C (min of 15 samples over 30 s)
+22:13:05 [diag|diag base r1] diag base rep 1: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+22:13:05 [diag|diag base r1] cooldown 0s -> start at 44 C (limit 49 C, idle 44 C)
+22:15:36 [diag|diag isolgen r1] diag isolgen rep 1: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+22:15:36 [diag|diag isolgen r1] cooldown 0s -> start at 43 C (limit 49 C, idle 44 C)
+22:18:07 [diag|diag quiet r1] diag quiet rep 1: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 1
+22:18:07 [diag|diag quiet r1] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:18:08 [diag|diag quiet r1] cooldown 1s -> start at 42 C (limit 49 C, idle 44 C)
+22:20:40 [diag|diag quiet r1] quiet: restored
+22:20:40 [diag|diag isolquiet r1] diag isolquiet rep 1: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 1
+22:20:40 [diag|diag isolquiet r1] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:20:40 [diag|diag isolquiet r1] cooldown 0s -> start at 43 C (limit 49 C, idle 44 C)
+22:23:12 [diag|diag isolquiet r1] quiet: restored
+22:23:13 [diag|diag base r2] diag base rep 2: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+22:23:13 [diag|diag base r2] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:25:43 [diag|diag isolgen r2] diag isolgen rep 2: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+22:25:43 [diag|diag isolgen r2] cooldown 0s -> start at 41 C (limit 49 C, idle 44 C)
+22:28:14 [diag|diag quiet r2] diag quiet rep 2: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 1
+22:28:15 [diag|diag quiet r2] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:28:15 [diag|diag quiet r2] cooldown 0s -> start at 41 C (limit 49 C, idle 44 C)
+22:30:47 [diag|diag quiet r2] quiet: restored
+22:30:47 [diag|diag isolquiet r2] diag isolquiet rep 2: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 1
+22:30:48 [diag|diag isolquiet r2] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:30:48 [diag|diag isolquiet r2] cooldown 0s -> start at 43 C (limit 49 C, idle 44 C)
+22:33:20 [diag|diag isolquiet r2] quiet: restored
+22:33:20 [diag|diag base r3] diag base rep 3: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+22:33:20 [diag|diag base r3] cooldown 0s -> start at 43 C (limit 49 C, idle 44 C)
+22:35:50 [diag|diag isolgen r3] diag isolgen rep 3: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+22:35:50 [diag|diag isolgen r3] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:38:21 [diag|diag quiet r3] diag quiet rep 3: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 1
+22:38:22 [diag|diag quiet r3] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:38:22 [diag|diag quiet r3] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:40:54 [diag|diag quiet r3] quiet: restored
+22:40:54 [diag|diag isolquiet r3] diag isolquiet rep 3: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 1
+22:40:55 [diag|diag isolquiet r3] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:40:55 [diag|diag isolquiet r3] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:43:27 [diag|diag isolquiet r3] quiet: restored
+22:43:27 [diag|diag base r4] diag base rep 4: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+22:43:27 [diag|diag base r4] cooldown 0s -> start at 43 C (limit 49 C, idle 44 C)
+22:45:58 [diag|diag isolgen r4] diag isolgen rep 4: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+22:45:58 [diag|diag isolgen r4] cooldown 0s -> start at 41 C (limit 49 C, idle 44 C)
+22:48:28 [diag|diag quiet r4] diag quiet rep 4: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 1
+22:48:29 [diag|diag quiet r4] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:48:29 [diag|diag quiet r4] cooldown 0s -> start at 41 C (limit 49 C, idle 44 C)
+22:51:01 [diag|diag quiet r4] quiet: restored
+22:51:01 [diag|diag isolquiet r4] diag isolquiet rep 4: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 1
+22:51:02 [diag|diag isolquiet r4] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:51:02 [diag|diag isolquiet r4] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:53:34 [diag|diag isolquiet r4] quiet: restored
+22:53:34 [diag|diag base r5] diag base rep 5: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+22:53:34 [diag|diag base r5] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+22:56:05 [diag|diag isolgen r5] diag isolgen rep 5: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+22:56:05 [diag|diag isolgen r5] cooldown 0s -> start at 41 C (limit 49 C, idle 44 C)
+22:58:36 [diag|diag quiet r5] diag quiet rep 5: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 1
+22:58:36 [diag|diag quiet r5] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+22:58:37 [diag|diag quiet r5] cooldown 1s -> start at 42 C (limit 49 C, idle 44 C)
+23:01:09 [diag|diag quiet r5] quiet: restored
+23:01:09 [diag|diag isolquiet r5] diag isolquiet rep 5: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 1
+23:01:09 [diag|diag isolquiet r5] quiet: stopped [NetworkManager wpa_supplicant avahi-daemon cron rsyslog apport colord udisks2 upower switcheroo-control accounts-daemon ], timers [anacron.timer dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer sysstat-collect.timer sysstat-rotate.timer sysstat-summary.timer systemd-tmpfiles-clean.timer update-notifier-download.timer update-notifier-motd.timer ], radios [0 ] blocked, user.slice frozen
+23:01:09 [diag|diag isolquiet r5] cooldown 0s -> start at 42 C (limit 49 C, idle 44 C)
+23:03:41 [diag|diag isolquiet r5] quiet: restored
+stall diagnostic  rate=20000  window=120s  reps=5  2026-11-01T23:03:41+05:30
+stall = wrk2 max latency >= 900 ms; probe = 1 curl / 100 ms on its own connection
+
+variant    rep   p99_ms  p999_ms    max_ms  stall | probe_max p_slow first_slow_s
+base         1 455.170000 948.730000  1002.496    YES |     0.005      0 -
+base         2 454.140000 949.250000  1003.008    YES |     0.005      0 -
+base         3 728.580000 975.870000  1002.496    YES |     0.005      0 -
+base         4 455.420000 949.250000  1003.008    YES |     0.005      0 -
+base         5 5.760000 892.930000  1001.984    YES |     0.005      0 -
+isolgen      1 4.280000 893.950000  1002.496    YES |     0.003      0 -
+isolgen      2 5.070000 944.130000  1003.008    YES |     0.004      0 -
+isolgen      3 2.830000 4.170000     6.476      - |     0.003      0 -
+isolgen      4 3.670000 4.790000     7.044      - |     0.004      0 -
+isolgen      5 3.150000 4.760000     7.140      - |     0.003      0 -
+quiet        1 5.660000 892.930000  1000.960    YES |     0.007      0 -
+quiet        2 784.380000 981.500000  1002.496    YES |     0.004      0 -
+quiet        3 903.170000 992.770000  1004.544    YES |     0.005      0 -
+quiet        4 729.090000 976.380000  1003.008    YES |     0.005      0 -
+quiet        5 637.950000 968.190000  1003.520    YES |     0.004      0 -
+isolquiet    1 4.760000 892.410000   999.936    YES |     0.003      0 -
+isolquiet    2 3.080000 4.780000     8.132      - |     0.003      0 -
+isolquiet    3 4.030000 893.950000  1000.960    YES |     0.003      0 -
+isolquiet    4 783.870000 981.500000  1003.008    YES |     0.004      0 -
+isolquiet    5 455.930000 948.730000  1001.984    YES |     0.003      0 -
+
+base: 5 of 5 runs stalled
+isolgen: 2 of 5 runs stalled
+quiet: 5 of 5 runs stalled
+isolquiet: 4 of 5 runs stalled
+23:03:42 [diag|report] no machine-state drift
+23:03:43 [diag|host revert] host reverted
+23:03:44 [diag|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth nvidia-powerd gdm 
+23:03:44 [diag|restore services] done — report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/diag/20261101-221215/report.txt
