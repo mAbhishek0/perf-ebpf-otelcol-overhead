@@ -1,0 +1,57 @@
+# nginx × eBPF (BCC)
+
+Run on the laptop, from the repo root:
+
+```bash
+sudo bash nginx-wrk2/ebpf/scripts/run.sh --smoke     # one cell (E1 narrow) first — BCC 0.35 has never run here
+sudo bash nginx-wrk2/ebpf/scripts/run.sh             # full matrix: 4 levels x 2 scopes, ~3 h
+```
+
+## What is traced
+
+Ported from Platform S (`docs/drafts/nginx-perf-pipeline-server/ebpf/`, 88 runs there); the
+probe logic is unchanged so both platforms trace the same thing. Full rationale in the header
+of [nginx_probes.c](../scripts/nginx_probes.c).
+
+| scope | probes | in-kernel filter | perf counterpart |
+|---|---|---|---|
+| narrow | kprobes `tcp_sendmsg`, `tcp_recvmsg` | nginx worker PIDs | `perf record -F 99 -p <workers>` |
+| wide | tracepoints `raw_syscalls:sys_enter` + `sys_exit`, per-syscall count map | `WORKLOAD_CPUS` | `perf record -F 999 -C` + `perf trace --summary -C` |
+
+One 24-byte record per event goes through a BCC perf buffer of `EBPF_PERF_BUFFER_PAGES` (512)
+pages per CPU — the same number and unit as `PERF_MMAP_PAGES`. Wide submits on `sys_enter`
+only; `sys_exit` is attached and counted, not submitted (one syscall = one event).
+
+## Columns
+
+- `mech_events` records delivered to the Python poller; `mech_lost` records the perf buffer
+  dropped; `mech_drop_rate` = lost ÷ (delivered + lost) — the schema 2.0.0 definition every
+  mechanism uses.
+- `tracer_cpu_cores` is the Python poller only. The BPF programs run in the context of the task
+  that hit the probe, so their cost is in `workload_cpu_cores` (and, wide, in other tasks on
+  the workload CPUs). `kernel.bpf_stats_enabled` stays 0, so in-kernel BPF time is not measured
+  separately (LESSONS: it cannot be symmetrised across A-B-A).
+- Per bundle in `mech.stats`: `EBPF_KERNEL_SUBMITTED`, `EBPF_KERNEL_SUBMIT_FAILED`,
+  `EBPF_KERNEL_FILTERED` (probe fired, discarded by the scope filter — the asymmetry with
+  perf's attach-time filter; S measured 15.7 discards per kept event at wide),
+  `EBPF_FILTERED_PER_SUBMIT`, `EBPF_UNACCOUNTED` (submitted − delivered − lost; noted in
+  `mech_notes` when non-zero). Wide runs also leave `ebpf_syscalls.txt` (per-syscall counts).
+
+## Guards
+
+- Preflight: `import bcc`, kprobe symbols in `/proc/kallsyms`, `raw_syscalls` tracepoint,
+  `bpf_jit_enable=1` (hard), `bpf_jit_harden` recorded.
+- Attach: the tracer writes `ebpf.ready` only after compile, attach and buffer open; the run
+  waits up to `EBPF_ATTACH_TIMEOUT_S` and fails at once if the tracer dies first.
+- The scope filter is verified after writing (PID count / CPU slots read back); CPU ids
+  ≥ 1024 and non-power-of-two buffer sizes are refused.
+- Stop: SIGINT at detach. `EBPF_EXIT=ok` is written last; anything else (killed, or the
+  `EBPF_MAX_WINDOW_S` safety stop) fails the run instead of ingesting a short window.
+- `mech_sanity` fails a traced run whose probes submitted 0 events.
+
+## Expectations to check on the first run
+
+- S delivered up to ~212k events/s with 0 lost at 0.76 tracer cores (~3.5–5.4 µs per event in
+  Python). Wide at 40k rps here is several hundred thousand syscalls/s and the poller is one
+  Python thread, so drops are possible at E3/E4 wide. That is a measured property of this
+  configuration; it is recorded, not tuned away.

@@ -9,8 +9,8 @@
 # CSV_COLUMNS: name:file:key. (Not "COLUMNS": bash overwrites that with the
 # terminal width after every external command when run from a terminal.)
 # Entry format: file is run_meta | wl | samples | cooldown | mech.
-# mech columns are NA on untraced runs, interrupt-split columns NA on bundles
-# sampled before the split existed; everything else is required.
+# mech columns are NA on untraced runs, LATE_KEYS columns NA on bundles from
+# before they existed (no RUN_SCHEMA); everything else is required.
 
 CSV_COLUMNS=(
   run_id:run_meta:RUN_ID platform:run_meta:PLATFORM workload:run_meta:WORKLOAD
@@ -32,19 +32,22 @@ CSV_COLUMNS=(
   n_samples:samples:SAMPLES
   cooldown_s:cooldown:COOLDOWN_S cooldown_timed_out:cooldown:COOLDOWN_TIMED_OUT freq_verdict:samples:FREQ_VERDICT
   clock_check:run_meta:CLOCK_CHECK perf_rate_end:run_meta:PERF_RATE_END kernel:run_meta:KERNEL bench_trace:run_meta:BENCH_TRACE
+  power_source:power:POWER_SOURCE
   mech_events:mech:MECH_EVENTS mech_lost:mech:MECH_LOST mech_drop_rate:mech:MECH_DROP_RATE
   mech_notes:mech:MECH_NOTES
 )
-SCHEMA_VERSION="2.0.0"
+SCHEMA_VERSION="2.1.0"
+# 2.1.0 (2026-11-07): power_source (ac | battery | mixed), see power.sh.
 # 2.0.0 (2026-11-07): interrupt split columns added; mech_events/mech_lost/
 # mech_drop_rate redefined as samples (not loss records) over everything the
 # mechanism runs (see the perf plugin's mech_stats).
-# Bundles sampled before the split (summary.env without IRQ_DEV_DELTA) get NA
-# in the split columns: those counters were never captured, and NA says so.
-IRQ_SPLIT_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DELTA IRQ_OTHER_DELTA SOFTIRQ_NET_RX_DELTA SOFTIRQ_NET_TX_DELTA "
+# LATE_KEYS were added after the first runs. A bundle whose run_meta lacks
+# RUN_SCHEMA predates them, so they read NA there (never captured, and NA says
+# so); on any bundle with RUN_SCHEMA a missing late key fails like any other.
+LATE_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DELTA IRQ_OTHER_DELTA SOFTIRQ_NET_RX_DELTA SOFTIRQ_NET_TX_DELTA POWER_SOURCE "
 
 _col_file() {
-  case $1 in run_meta) echo run_meta.env;; wl) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; esac
+  case $1 in run_meta) echo run_meta.env;; wl) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; power) echo power.env;; esac
 }
 _csvq() { local v=${1//\"/\"\"}; printf '"%s"' "$v"; }
 
@@ -69,7 +72,7 @@ collect() {
         IFS=: read -r name src key <<<"$col"
         f="$b/$(_col_file "$src")"
         if [[ $src == mech && $traced == 0 ]]; then val=NA
-        elif [[ $IRQ_SPLIT_KEYS == *" $key "* ]] && ! kv_has "$f" IRQ_DEV_DELTA; then val=NA
+        elif [[ $LATE_KEYS == *" $key "* ]] && ! kv_has "$b/run_meta.env" RUN_SCHEMA; then val=NA
         else val=$(kv_get "$f" "$key") || die "collect: $b lacks $key"
         fi
         line+="${line:+,}$(_csvq "$val")"
@@ -95,6 +98,7 @@ _schema_freeze() {
       "$RAMP_S" "$STEADY_S" "$WARMUP_REPS" "$MEASURED_REPS" "$DRIFT_PCT" "$DRIFT_K"
     printf '  "perf_freq_narrow": %s, "perf_freq_wide": %s, "perf_mmap_pages": %s, "perf_trace_mmap_pages": %s,\n' \
       "$PERF_FREQ_NARROW" "$PERF_FREQ_WIDE" "$PERF_MMAP_PAGES" "$PERF_TRACE_MMAP_PAGES"
+    printf '  "ebpf_perf_buffer_pages": %s,\n' "$EBPF_PERF_BUFFER_PAGES"
     printf '  "ladder": "%s",\n  "columns": [' "${LADDER:-}"
     for col in "${CSV_COLUMNS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
     printf ']\n}\n'

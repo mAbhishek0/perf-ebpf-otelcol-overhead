@@ -26,6 +26,7 @@ run_one() {
   # (a trap set here would replace the one that reverts the host).
   RUN_BUNDLE=$b RUN_ATTACHED=0 RUN_SAMPLING=0 RUN_ACTIVE=1
 
+  stage "$id power";    power_gate "$b"
   stage "$id cooldown"; cooldown_wait "$b"
   stage "$id start";    wl_start "$b"
   stage "$id ramp";     wl_ramp "$rate" "$b"
@@ -41,6 +42,7 @@ run_one() {
   sample_stop "$b"; RUN_SAMPLING=0
   u1=$(cgroup_usec "$(cat "$b/cgroup_path")")
   net_snap > "$b/net_after.txt"
+  power_end "$b"
   # --- window closed ---
 
   if (( traced )); then
@@ -52,6 +54,7 @@ run_one() {
 
   local m="$b/run_meta.env"
   : > "$m"
+  kv_put "$m" RUN_SCHEMA "$SCHEMA_VERSION"   # keys added after 1.0.0 are NA only on bundles without this
   kv_put "$m" RUN_ID "$id";        kv_put "$m" PLATFORM "$PLATFORM"
   kv_put "$m" WORKLOAD "$wl";      kv_put "$m" MECHANISM "$mech"
   kv_put "$m" SCOPE "$scope";      kv_put "$m" LEVEL "$level"

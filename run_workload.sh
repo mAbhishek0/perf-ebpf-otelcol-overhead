@@ -39,7 +39,7 @@ case $WL in
   *) die "unknown workload $WL" ;;
 esac
 
-for f in crash host preflight quiesce sample cooldown run_one bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
+for f in crash host power preflight quiesce sample cooldown run_one bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
 crash_init
 # The harness itself (bash, docker CLI, perf report, zstd) stays off the
 # workload and tracer CPUs; children inherit this, explicit taskset overrides it.

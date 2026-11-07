@@ -204,6 +204,7 @@ mk_bundle() {  # mk_bundle ROLE — every key of every column, in the file colle
     esac
     kv_put "$b/$(_col_file "$src")" "$key" "$val"
   done
+  kv_put "$b/run_meta.env" RUN_SCHEMA "$SCHEMA_VERSION"
   touch "$b/DONE"
 }
 for r in W1 A1 B1 A2; do mk_bundle "$r"; done
@@ -218,15 +219,108 @@ t_eq "csv header cols" "${#CSV_COLUMNS[@]}" "$(head -1 "$csv" | awk -F'","' '{pr
 t_eq "no warm-up row" 0 "$(grep -c '_W1' "$csv")"
 t_eq "untraced mech NA" 4 "$(grep '_A1' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
 t_eq "irq split present" 1 "$(grep '_A1' "$csv" | grep -c v_IRQ_DEV_DELTA)"
-sb2="$RD/raw/$(run_id nginx perf narrow 1 1 A2)/samples/summary.env"
-for k in $IRQ_SPLIT_KEYS; do sed -i "/^$k=/d" "$sb2"; done
+t_eq "power source present" 1 "$(grep '_A1' "$csv" | grep -c v_POWER_SOURCE)"
+ab2="$RD/raw/$(run_id nginx perf narrow 1 1 A2)"
+for k in $LATE_KEYS; do sed -i "/^$k=/d" "$ab2/samples/summary.env" "$ab2/power.env"; done
+sed -i '/^RUN_SCHEMA=/d' "$ab2/run_meta.env"
 collect nginx perf "$RD" >/dev/null 2>&1
-t_eq "pre-split bundle: 8 split + 4 mech NA" 12 "$(grep '_A2' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
+t_eq "pre-2.0 bundle: 8 irq + power + 4 mech NA" 13 "$(grep '_A2' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
 sed -i '/^IRQ_PMI_DELTA=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env"
 t_die "partial split dies" collect nginx perf "$RD"
 kv_put "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env" IRQ_PMI_DELTA v
 sed -i '/^P99_MS=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 B1)/wl.env"
 t_die "collect dies on missing key" collect nginx perf "$RD"
+
+# --- power.sh (fake power_supply tree; host/probe stubbed) ---
+source "$LAPTOP_ROOT/common/power.sh"
+POWER_SUPPLY_DIR="$T/ps"; POWER_STATE_FILE="$T/power_last"
+mkdir -p "$POWER_SUPPLY_DIR/ACAD" "$POWER_SUPPLY_DIR/BAT1"
+echo Mains > "$POWER_SUPPLY_DIR/ACAD/type"; echo 1 > "$POWER_SUPPLY_DIR/ACAD/online"
+echo Battery > "$POWER_SUPPLY_DIR/BAT1/type"; echo 80 > "$POWER_SUPPLY_DIR/BAT1/capacity"
+t_eq "ac online" 1 "$(ac_online)"
+t_eq "battery pct" 80 "$(battery_pct)"
+REASSERTS=0
+host_reassert() { REASSERTS=$((REASSERTS+1)); echo r >> "$T/reasserts"; }
+power_probe() { printf '%s 2890000 2910000' "${PROBE_VERDICT:-ok}"; }
+pb2="$T/pw1"; mkdir -p "$pb2"
+power_gate "$pb2" 2>/dev/null
+t_eq "gate on AC" ac "$(kv_get "$pb2/power.env" POWER_SOURCE_START)"
+t_eq "no probe on AC" no "$(kv_has "$pb2/power.env" PROBE_BATTERY && echo yes || echo no)"
+echo 0 > "$POWER_SUPPLY_DIR/ACAD/online"
+t_eq "ac offline" 0 "$(ac_online)"
+power_end "$pb2" 2>/dev/null
+t_eq "source changed mid-run -> mixed" mixed "$(kv_get "$pb2/power.env" POWER_SOURCE)"
+pb3="$T/pw2"; mkdir -p "$pb3"; : > "$T/reasserts"
+power_gate "$pb3" 2>/dev/null
+t_eq "battery ok -> runs on battery" battery "$(kv_get "$pb3/power.env" POWER_SOURCE_START)"
+t_eq "battery probe recorded" ok "$(kv_get "$pb3/power.env" PROBE_BATTERY)"
+t_eq "reassert on battery" 1 "$(wc -l < "$T/reasserts" | tr -d ' ')"
+power_end "$pb3" 2>/dev/null
+t_eq "battery whole run" battery "$(kv_get "$pb3/power.env" POWER_SOURCE)"
+pb4="$T/pw3"; mkdir -p "$pb4"
+POWER_WAIT_S=0 PROBE_VERDICT=out_of_band t_die "probe fails, no AC -> dies" power_gate "$pb4"
+echo 20 > "$POWER_SUPPLY_DIR/BAT1/capacity"
+POWER_WAIT_S=0 t_die "low battery, no AC -> dies" power_gate "$pb4"
+sleep() { echo 1 > "$POWER_SUPPLY_DIR/ACAD/online"; }   # AC returns during the wait
+pb5="$T/pw4"; mkdir -p "$pb5"; : > "$T/reasserts"
+power_gate "$pb5" 2>/dev/null
+t_eq "low battery waits, AC back -> ac" ac "$(kv_get "$pb5/power.env" POWER_SOURCE_START)"
+t_eq "probe re-run on AC" ok "$(kv_get "$pb5/power.env" PROBE_AC)"
+unset -f sleep
+pb6="$T/pw5"; mkdir -p "$pb6"; : > "$T/reasserts"; echo battery > "$POWER_STATE_FILE"
+power_gate "$pb6" 2>/dev/null
+t_eq "AC back between runs -> reassert" 1 "$(wc -l < "$T/reasserts" | tr -d ' ')"
+rm -rf "$POWER_SUPPLY_DIR/ACAD"
+t_eq "no Mains supply" 2 "$(ac_online)"
+
+# --- eBPF mech_stats ---
+source "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts/mech.sh"
+eb="$T/ebpf"; mkdir -p "$eb"; : > "$eb/mech.meta"
+mk_ebpf_stats() {  # mk_ebpf_stats RECEIVED LOST SUBMITTED FAILED EXIT
+  : > "$eb/ebpf_stats.env"
+  for kv in EBPF_LIBRARY=bcc EBPF_SCOPE=wide EBPF_FILTER_ENTRIES=4 EBPF_PERF_BUFFER_PAGES=512 \
+            "EBPF_EVENTS_RECEIVED=$1" "EBPF_EVENTS_LOST=$2" "EBPF_KERNEL_SUBMITTED=$3" \
+            "EBPF_KERNEL_SUBMIT_FAILED=$4" EBPF_KERNEL_FILTERED=500 EBPF_KERNEL_SECONDARY=1000 \
+            EBPF_STOP=signal "EBPF_EXIT=$5"; do kv_put "$eb/ebpf_stats.env" "${kv%%=*}" "${kv#*=}"; done
+}
+mk_ebpf_stats 900 100 1000 100 ok
+mech_stats "$eb"
+t_eq "ebpf events" 900 "$(kv_get "$eb/mech.stats" MECH_EVENTS)"
+t_eq "ebpf lost" 100 "$(kv_get "$eb/mech.stats" MECH_LOST)"
+t_eq "ebpf drop rate" 0.100000 "$(kv_get "$eb/mech.stats" MECH_DROP_RATE)"
+t_eq "ebpf unaccounted 0" 0 "$(kv_get "$eb/mech.stats" EBPF_UNACCOUNTED)"
+t_eq "ebpf filtered ratio" 0.5000 "$(kv_get "$eb/mech.stats" EBPF_FILTERED_PER_SUBMIT)"
+t_eq "ebpf notes" "ebpf_lost=100;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
+t_ok "ebpf sanity" mech_sanity "$eb"
+mk_ebpf_stats 990 0 1000 0 ok; mech_stats "$eb"
+t_eq "ebpf unaccounted noted" "unaccounted=10;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
+mk_ebpf_stats 0 0 0 0 ok; mech_stats "$eb"
+t_die "ebpf saw nothing dies" mech_sanity "$eb"
+mk_ebpf_stats 900 0 900 0 stopped_max_window
+t_die "ebpf unclean stop dies" mech_stats "$eb"
+rm -f "$eb/ebpf_stats.env"
+t_die "ebpf no stats dies" mech_stats "$eb"
+
+# --- bcc_tracer.py pure helpers (no bcc needed) ---
+PY=""
+for c in python3 python; do "$c" -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
+if [[ -n $PY ]]; then
+  t_eq "tracer helpers" ok "$("$PY" -I -c '
+import sys; sys.path.insert(0, sys.argv[1]); import bcc_tracer as t
+assert t.parse_id_list("1, 2,3", "x") == [1, 2, 3]
+for bad in ("", "1,a"):
+    try: t.parse_id_list(bad, "x"); raise AssertionError(bad)
+    except SystemExit: pass
+t.check_buffer_pages(512)
+try: t.check_buffer_pages(500); raise AssertionError("500")
+except SystemExit: pass
+try: t.check_cpus([0, 1024]); raise AssertionError("1024")
+except SystemExit: pass
+assert t.kv_lines([("A", 1), ("B", "x'"'"'y")]) == "A='"'"'1'"'"'\nB='"'"'xy'"'"'\n"
+a = t.parse_args(["--scope", "wide", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
+assert a.max_window == 9 and a.scope == "wide"
+print("ok")' "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts" 2>&1)"
+fi
 
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))

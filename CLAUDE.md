@@ -12,7 +12,9 @@ Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md)
 
 **Schema 2.0.0 (2026-11-07, README timeline 18):** loss is lost samples ÷ (delivered + lost) over everything a mechanism runs (perf: record + trace), and interrupts are split (`irq_dev/timer/ipi/nmi/pmi/other_delta`, `softirq_net_rx/tx_delta`). The perf CSV was rebuilt with `restat.sh` (split columns NA, counters not captured then). The eBPF plugin's `mech_stats` must use the same loss definition.
 
-**Next:** write the nginx × eBPF plugin (`nginx-wrk2/ebpf/scripts/mech.sh`, interface below), run its matrix, then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
+**nginx × eBPF plugin written, never run (2026-11-07, README timeline 19)** — BCC port of S's tracer, see `nginx-wrk2/ebpf/docs/README.md`. **AC-loss handling** in `common/power.sh` (probe on battery, wait for AC or abort); runs record `power_source`. Schema 2.1.0.
+
+**Next:** on the laptop: pull, `bash restat.sh nginx perf` (rebuilds the perf CSV for 2.1.0 — `power_source` NA there; skip if already pushed from Windows), then `sudo bash nginx-wrk2/ebpf/scripts/run.sh --smoke` (first BCC 0.35 run here; check `ebpf_tracer.log`, `mech.stats`, attach time), then the full eBPF matrix (~3 h). Then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
 
 **Not written yet:** nginx × eBPF and nginx × collector plugins (`<wl>/<mech>/scripts/mech.sh` per the interface below), fio and redis workloads, the `SMT=on` option (one SMT-on arm planned last). Known small gap: the `die` from a pipefail inside `$(...)` is not recorded in `logs/.errors_*` (seen in the perf-trace grep crash) — investigate when convenient.
 
