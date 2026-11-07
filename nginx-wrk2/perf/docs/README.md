@@ -34,6 +34,10 @@ Under `nginx-wrk2/perf/results/`:
 - `order.txt` the seeded level order actually used
 - `smoke/` the same layout for the smoke cell, kept apart from the data
 
+`results-prefix-wrk2-stall/` holds the first matrix (2026-11-01), run with an
+unpatched wrk2 whose event-loop bug caused ~1 s stalls in 21 of 64 runs. Its CPU
+figures stand; its latency does not. Current data is in `results/` only.
+
 ## Gates
 
 - **Warm-up gate** (from the smoke cell): do warm-ups 2 and 3 look like A1?

@@ -1,20 +1,17 @@
 PLATFORM L (LAPTOP) - HOW TO RUN THE BENCHMARKS
 ================================================
 Status (2026-11-07): one-time setup, unit tests, nginx pilot, smoke cell,
-the full nginx x perf matrix (8 cells) and stall diagnostic runs 1-3 are DONE.
-Run 3 found the ~1 s stall: a timer bug in wrk2's event loop (ae.c).
+the first nginx x perf matrix and stall diagnostic runs 1-4 are DONE.
+The ~1 s stall was a timer bug in wrk2 (ae.c); patched wrk2 is installed and
+run 4 had 0 of 5 stalls.
 
-NEXT: stall diagnostic run 4 = rebuild wrk2 with the fix, then 5 untraced
-runs (about 15 min). The rebuild replaces /usr/local/bin/wrk2.
+NEXT: re-run the full nginx x perf matrix with the fixed wrk2 (about 4 h).
+The old results were moved to nginx-wrk2/perf/results-prefix-wrk2-stall/.
 
     git pull
-    sudo bash install_build.sh
-    sudo bash diag_stall.sh --variants base
+    sudo bash nginx-wrk2/perf/scripts/run.sh
 
-install_build.sh must print "ae.c patched". If it stops with "ae.c timeout
-clamp not found", paste its output in chat instead of running the diagnostic.
-The report is in nginx-wrk2/diag/<time>/report.txt.
-Then push: git add -A && git commit -m "results: stall diagnostic run 4" && git pull --rebase && git push
+Then push: git add -A && git commit -m "results: nginx x perf matrix (patched wrk2)" && git pull --rebase && git push
 
 Everything below runs from the cloned folder:
 
@@ -97,6 +94,6 @@ DONE SO FAR (for reference)
   file indexer masked.
 - Pilot: ladder frozen in nginx-wrk2/pilot.env = 5k/10k/20k/40k req/s.
 - Smoke cell: 1 warm-up is enough.
-- nginx x perf: 8/8 cells, 64 rows in nginx-wrk2/perf/results/nginx_perf.csv.
+- nginx x perf (pre-fix wrk2): 8/8 cells, 64 rows in nginx-wrk2/perf/results-prefix-wrk2-stall/nginx_perf.csv; latency unusable, re-run pending.
   Open issue: ~1 s latency stalls in 21 runs (see README).
 - Last of all (after every workload x tool): one SMT-on arm.
