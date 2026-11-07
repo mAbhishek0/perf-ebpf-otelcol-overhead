@@ -1,17 +1,21 @@
 PLATFORM L (LAPTOP) - HOW TO RUN THE BENCHMARKS
 ================================================
-Status (2026-11-07): one-time setup, unit tests, nginx pilot, smoke cell,
-the first nginx x perf matrix and stall diagnostic runs 1-4 are DONE.
-The ~1 s stall was a timer bug in wrk2 (ae.c); patched wrk2 is installed and
-run 4 had 0 of 5 stalls.
+Status (2026-11-07): nginx x perf and nginx x eBPF matrices are DONE (8/8
+cells each). The nginx x collector plugin and a progress screen are written
+but have never run.
 
-NEXT: re-run the full nginx x perf matrix with the fixed wrk2 (about 4 h).
-The old results were moved to nginx-wrk2/perf/results-prefix-wrk2-stall/.
+NEXT: the collector check (about 5 min), then push:
 
     git pull
-    sudo bash nginx-wrk2/perf/scripts/run.sh
+    sudo bash nginx-wrk2/collector/scripts/check.sh
+    git add -A && git commit -m "results: collector check" && git pull --rebase && git push
 
-Then push: git add -A && git commit -m "results: nginx x perf matrix (patched wrk2)" && git pull --rebase && git push
+After it looks right in chat, the full collector matrix (about 3.5 h):
+
+    sudo bash nginx-wrk2/collector/scripts/run.sh
+
+During the matrix the screen should NOT go black: it shows a progress page
+(cells done, current run, ETA). If it is black anyway, say so in chat.
 
 Everything below runs from the cloned folder:
 
@@ -38,7 +42,8 @@ EVERY RUN, THE SAME FOUR STEPS
    - At the end, or on any failure, it restores everything and the desktop
      comes back. If it comes back within minutes, it failed.
 
-3. Watch it (optional): Ctrl+Alt+F3, log in, then
+3. Watch it (optional): the progress page is on screen (tty8). For more,
+   Ctrl+Alt+F3, log in, cd to the folder and run  bash status.sh  — or, as before,
 
        L=$(ls -t logs/bench-*.log | head -n 1)
        grep -E 'cell .* ok|drift|WARN|FAIL' "$L"     # one "ok" per finished cell

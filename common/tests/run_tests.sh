@@ -322,5 +322,38 @@ assert a.max_window == 9 and a.scope == "wide"
 print("ok")' "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts" 2>&1)"
 fi
 
+# --- progress.sh (pure parts + a full cell with no console) ---
+(
+  STATE_DIR="$T/pstate" LAPTOP_ROOT="$T/proot"; mkdir -p "$LAPTOP_ROOT"
+  WARMUP_REPS=1 MEASURED_REPS=6 QUIESCED=0 STATUS_HOLD_S=0
+  source "$HERE/../progress.sh"
+  t_eq "fmt_dur min" "4m05s" "$(fmt_dur 245)"
+  t_eq "fmt_dur hour" "1h02m" "$(fmt_dur 3720)"
+  t_eq "per try" 9 "$P_PER_TRY"
+  t_eq "left before start" 72 "$(progress_runs_left 8 0 9 0)"
+  t_eq "left mid cell 1" 70 "$(progress_runs_left 8 1 9 2)"
+  t_eq "left last cell done" 0 "$(progress_runs_left 8 8 9 9)"
+  progress_init 2
+  t_eq "no console without quiesce" "" "$P_TTY"
+  progress_cell L_nginx_x_narrow_E1
+  progress_run B1 2 1; progress_run_done
+  t_eq "runs timed" 1 "$P_RUNS"
+  grep -q 'run B1 (3/9)' "$PROGRESS_FILE" && ok || bad "status line shows run"
+  progress_cell_end L_nginx_x_narrow_E1 1 drift "p99 1%/5%  cpu 6%/5%"
+  t_eq "drift restarts try" 0 "$P_IDX"
+  progress_cell_end L_nginx_x_narrow_E1 2 ok "p99 1%/5%  cpu 1%/5%"
+  t_eq "history" 2 "${#P_HIST[@]}"
+  progress_finish 0
+  grep -q 'FINISHED 1/2 cells ok' "$PROGRESS_FILE" && ok || bad "finish line"
+  P_ON=0; CRASH_ERRFILE="$T/err"; echo "12:00:00 die stage=x: boom (in f)" > "$CRASH_ERRFILE"
+  progress_finish 1
+  grep -q 'ABORTED: stage=x: boom' "$PROGRESS_FILE" && ok || bad "abort reason: $(cat "$PROGRESS_FILE")"
+  echo "$NPASS $NFAIL" > "$T/pcount"
+)
+read -r NPASS NFAIL < "$T/pcount"
+
+# --- nginx x collector plugin (its own file; runs standalone too) ---
+source "$LAPTOP_ROOT/nginx-wrk2/collector/tests/test_mech.sh"
+
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))
