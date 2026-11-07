@@ -15,6 +15,10 @@ run_one() {
   [[ $role == B* ]] && traced=1
   [[ -e $b ]] && die "run $id already exists at $b — run IDs are deterministic; move it aside to rerun"
   mkdir -p "$b"
+  # Marker: proves this dir was created by run_one in this tree. bracket.sh
+  # counts a try as crashed only if its dirs carry it; dirs left behind when a
+  # results tree is moved through git (only gitignored files survive) do not.
+  : > "$b/started"
   rate=$(level_rate "$level")
   log "run $id (rate $rate, traced=$traced)"
 

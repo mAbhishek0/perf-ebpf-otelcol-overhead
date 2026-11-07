@@ -24,6 +24,8 @@ bracket() {
       continue
     fi
     if compgen -G "$rdir/raw/${cell}_try${try}_*" >/dev/null; then
+      compgen -G "$rdir/raw/${cell}_try${try}_*/started" >/dev/null \
+        || die "stale run dirs $rdir/raw/${cell}_try${try}_* have no 'started' marker — left over from moving a results tree through git (only gitignored files remain); delete them and rerun"
       : > "$v.partial"; kv_put "$v.partial" VERDICT crashed; mv "$v.partial" "$v"
       warn "cell $cell try $try has runs but no verdict (earlier crash) — marked crashed, moving on"
       continue
