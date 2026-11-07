@@ -20,6 +20,13 @@ Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md)
 
 **Not written yet:** nginx × eBPF and nginx × collector plugins (`<wl>/<mech>/scripts/mech.sh` per the interface below), fio and redis workloads, the `SMT=on` option (one SMT-on arm planned last). Known small gap: the `die` from a pipefail inside `$(...)` is not recorded in `logs/.errors_*` (seen in the perf-trace grep crash) — investigate when convenient.
 
+**Planned: progress notifier (user request 2026-11-07), build before the next long run (nginx × collector).** During the eBPF matrix the screen was black for 3.5 h (gdm stopped by quiesce) and the only way to see progress was to log in on tty3 and read the log. A drift retry on the last cell (wide E1, CPU drift 5.39 % vs 5 %) added ~23 min past the estimate with no visible sign of it. Requirements:
+- At every run and cell boundary, write one status line to `logs/status.txt` (overwritten, not appended): cell k/N, run within the cell, try t/MAX_TRIES, the last drift result, elapsed time, and an ETA computed from the measured run time so far (~2.5 min per run, 9 runs per cell try).
+- Show that line on the physical screen without anyone logging in: write it to a text console (e.g. `/dev/tty1`) and `chvt` to it after quiesce stops gdm. Restore the VT on exit.
+- A `status.sh` command that prints the status line, the unit state (`systemctl list-units 'bench-*'`), the AC state and the last 10 log lines, for when someone does log in.
+- Optional phone push (e.g. ntfy) at cell boundaries and at finish or abort only. Off by default, because network traffic during a measured run is noise.
+- Writing the status line must not add work inside a measured run. Update it only between runs, and never during ramp or steady state.
+
 **Interfaces:** workload plugins provide `wl_preflight/wl_start/wl_ramp/wl_measure/wl_stop/wl_parse`; mechanism plugins `mech_preflight/mech_attach/mech_detach/mech_stats/mech_sanity`; `sample.sh` summary keys must match `collect.sh` CSV_COLUMNS. 60 unit tests (`bash common/tests/run_tests.sh`) run here in Git Bash too.
 
 **Host setup now does, in order:** save prior state (once, atomic) → governor performance on online CPUs → platform profile performance → boost off → clock ceiling 2.9 GHz + best-effort floor → fans full via `asus_custom_fan_curve` flat-255 curve (works on this G513) → SMT off (verified 0,2..14) → perf sample rate pinned, then `perf_cpu_time_max_percent=0` (order matters) → OS slices + IRQs to 12,14 → measured clock check. Everything restored on exit; `revert.sh` after a crash; files chowned back to the sudo user.
