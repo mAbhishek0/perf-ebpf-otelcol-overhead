@@ -1,0 +1,11 @@
+# collector check 20261107-234834  kernel 7.0.0-43-generic  otelcol-contrib version 0.161.0
+# 10s ramp + 30s load per row; mode scraper, queue 512, batch 512; not a measurement
+scope  lvl   rate  iv attach_s nginx_acc host_acc     sent   lost drop_rate   tracer self_cpu   rss_mb logerr   p99_ms      tput
+narrow E1    5000  15     0.26       14        0       14      0  0.000000   0.0010   0.0013      180      0 2.910000   4980.61
+wide   E1    5000   1     0.25      210    21360    21570      0  0.000000   0.0869   0.0867      198      0 2.800000   4980.59
+narrow E4   40000  15     0.25       14        0       14      0  0.000000   0.0007   0.0010      181      0 5.350000  39835.21
+wide   E4   40000   1     0.26      210    21360    21570      0  0.000000   0.0863   0.0857      200      0 5.490000  39833.82
+# iv: scrape interval (s); attach_s: otelcol start to first telemetry read (config load + receivers up)
+# nginx_acc/host_acc: points accepted per receiver, attach->detach; sent: exporter sent (= mech_events)
+# lost: refused + receiver failed + send_failed; tracer: otelcol cores (sampler, /proc); self_cpu: otelcol's own report (cross-check)
+# logerr: error lines in otelcol.log (S's 403 showed only there) — open the bundle's otelcol.log if non-zero
