@@ -96,12 +96,13 @@ t_die "parse garbage" wl_parse "$pb"
 
 # --- sample_stop summary on a synthetic samples.tsv (2 workload CPUs) ---
 # cols: epoch tracer gen energy temp irq tstale gstale | busy total x2 | freq x2
+#       | irq dev timer ipi nmi pmi other | softirq net_rx net_tx
 mk_samples() {  # mk_samples BUNDLE NROWS
   local b=$1 n=$2 i
   local -a rows=(
-    $'100.0\tNA\tNA\t1000000\t50\t1000\t0\t0\t100\t1000\t100\t1000\t2900000\t2900000'
-    $'101.0\tNA\t50\t3000000\t55\t1500\t0\t0\t300\t1500\t200\t1500\t2950000\t2900000'
-    $'102.0\tNA\t150\t5000000\t60\t2000\t0\t0\t600\t2000\t300\t2000\t2900000\t2900000')
+    $'100.0\tNA\tNA\t1000000\t50\t1000\t0\t0\t100\t1000\t100\t1000\t2900000\t2900000\t10\t20\t30\t40\t50\t60\t70\t80'
+    $'101.0\tNA\t50\t3000000\t55\t1500\t0\t0\t300\t1500\t200\t1500\t2950000\t2900000\t11\t22\t33\t44\t55\t66\t77\t88'
+    $'102.0\tNA\t150\t5000000\t60\t2000\t0\t0\t600\t2000\t300\t2000\t2900000\t2900000\t12\t24\t36\t48\t60\t72\t84\t96')
   mkdir -p "$b/samples"
   { echo '# header'; for (( i=0; i<n; i++ )); do echo "${rows[$i]}"; done; } > "$b/samples/samples.tsv"
   echo 262143328850 > "$b/samples/rapl_range"
@@ -125,9 +126,67 @@ t_eq "tracer NA" NA "$(kv_get "$se" TRACER_CPU_CORES)"
 t_near "loadgen" "$(calc "100/$(getconf CLK_TCK)")" "$(kv_get "$se" LOADGEN_CPU_CORES)"
 t_eq "irq delta" 1000 "$(kv_get "$se" IRQ_WORKLOAD_DELTA)"
 t_eq "samples" 3 "$(kv_get "$se" SAMPLES)"
+i=0; for k in IRQ_DEV IRQ_TIMER IRQ_IPI IRQ_NMI IRQ_PMI IRQ_OTHER SOFTIRQ_NET_RX SOFTIRQ_NET_TX; do
+  i=$((i+1)); t_eq "split $k" "$((2*i))" "$(kv_get "$se" ${k}_DELTA)"; done
 t_eq "freq verdict" ok "$(kv_get "$se" FREQ_VERDICT)"
 sb1="$T/samp1"; mk_samples "$sb1" 1
 t_die "sample_stop 1 row dies" stop_with_fake_sampler "$sb1"
+
+# --- interrupt / softirq classification (/proc layout, CPUs 0,2 of 0..3) ---
+WORKLOAD_CPUS="0,2"
+printf '%s\n' '           CPU0       CPU1       CPU2       CPU3' \
+  '  0:         10          1         20          1  IR-IO-APIC    2-edge      timer' \
+  ' 42:        100          1        200          1  IR-PCI-MSI  eth0' \
+  'NMI:          5          1          6          1   Non-maskable interrupts' \
+  'LOC:       1000          1       2000          1   Local timer interrupts' \
+  'PMI:          5          1          6          1   Performance monitoring interrupts' \
+  'RES:          7          1          8          1   Rescheduling interrupts' \
+  'CAL:          1          1          2          1   Function call interrupts' \
+  'TLB:          3          1          4          1   TLB shootdowns' \
+  'ERR:          0' 'MIS:          0' \
+  'DFR:          9          1          9          1   Deferred Error APIC interrupts' > "$T/interrupts"
+t_eq "irq split" "3395 330 3000 25 11 11 18" "$(_sample_irq "$T/interrupts")"
+printf '%s\n' '                    CPU0       CPU1       CPU2       CPU3' \
+  '          HI:          0          0          0          0' \
+  '      NET_TX:          3          9          4          9' \
+  '      NET_RX:        100          9        200          9' > "$T/softirqs"
+t_eq "softirq net" "300 7" "$(_sample_softirq "$T/softirqs")"
+grep -v NET_TX "$T/softirqs" > "$T/softirqs2"
+t_die "softirq missing NET_TX" _sample_softirq "$T/softirqs2"
+WORKLOAD_CPUS="0,5"
+t_die "irq offline cpu" _sample_irq "$T/interrupts"
+
+# --- perf mech_stats loss accounting (perf stubbed) ---
+source "$LAPTOP_ROOT/nginx-wrk2/perf/scripts/mech.sh"
+mb="$T/mech"; mkdir -p "$mb"; : > "$mb/mech.meta"
+printf '%s\n' 'Aggregated stats:' '               TOTAL events:     1000' \
+  '              SAMPLE events:      900' 'cpu/cycles/P stats:' '              SAMPLE events:      900' > "$mb/perf_report_stats.txt"
+printf '%s\n' '' ' Summary of events:' '' ' perf (11), 24 events, 0.0%' '' ' nginx worker (12), 1000 events, 50.0%' \
+  '   writev   10   0' ' wrk:2 (13), 76 events, 2.0%' 'LOST 5 events!' > "$mb/perf_trace.out"
+mech_stats "$mb"
+t_eq "events = samples + trace" 2000 "$(kv_get "$mb/mech.stats" MECH_EVENTS)"
+t_eq "trace events" 1100 "$(kv_get "$mb/mech.stats" MECH_TRACE_EVENTS)"
+t_eq "lost = trace lost" 5 "$(kv_get "$mb/mech.stats" MECH_LOST)"
+t_eq "drop rate" 0.002494 "$(kv_get "$mb/mech.stats" MECH_DROP_RATE)"
+printf '%s\n' '              LOST events:        2' >> "$mb/perf_report_stats.txt"
+sed -i '1a\               LOST events:        2' "$mb/perf_report_stats.txt"
+t_die "loss records without perf.data" mech_stats "$mb"
+: > "$mb/perf.data"
+perf() {  # stub: --stats rewrites the saved file; -D prints two loss records
+  case $1 in
+    report) if [[ $2 == --stats ]]; then printf '%s\n' 'Aggregated stats:' '              SAMPLE events:      900' '                LOST events:        2'
+            else printf '%s\n' '0x10 [0x30]: event: 2' '0x10 [0x30]: PERF_RECORD_LOST: id:5: lost:4000' 'x' '0x40 [0x30]: PERF_RECORD_LOST: id:5: lost:95' '                LOST events:        2'; fi ;;
+  esac
+}
+zstd() { :; }
+mech_stats "$mb"
+t_eq "record lost samples summed" 4095 "$(kv_get "$mb/mech.stats" MECH_REC_LOST)"
+t_eq "lost total" 4100 "$(kv_get "$mb/mech.stats" MECH_LOST)"
+t_eq "loss records" 2 "$(kv_get "$mb/mech.stats" MECH_REC_LOSS_RECORDS)"
+perf() { case $1 in report) if [[ $2 == --stats ]]; then printf '%s\n' '              SAMPLE events:      900' '                LOST events:        3'
+         else printf '%s\n' 'PERF_RECORD_LOST: id:5: lost:4000'; fi ;; esac; }
+t_die "record count mismatch dies" mech_stats "$mb"
+unset -f perf zstd
 
 # --- collect end to end on a fake results dir ---
 RD="$T/results"; mkdir -p "$RD/raw"
@@ -158,6 +217,14 @@ t_eq "csv header start" '"run_id","platform","workload","mechanism"' "$(head -1 
 t_eq "csv header cols" "${#CSV_COLUMNS[@]}" "$(head -1 "$csv" | awk -F'","' '{print NF}')"
 t_eq "no warm-up row" 0 "$(grep -c '_W1' "$csv")"
 t_eq "untraced mech NA" 4 "$(grep '_A1' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
+t_eq "irq split present" 1 "$(grep '_A1' "$csv" | grep -c v_IRQ_DEV_DELTA)"
+sb2="$RD/raw/$(run_id nginx perf narrow 1 1 A2)/samples/summary.env"
+for k in $IRQ_SPLIT_KEYS; do sed -i "/^$k=/d" "$sb2"; done
+collect nginx perf "$RD" >/dev/null 2>&1
+t_eq "pre-split bundle: 8 split + 4 mech NA" 12 "$(grep '_A2' "$csv" | grep -o '"NA"' | wc -l | tr -d ' ')"
+sed -i '/^IRQ_PMI_DELTA=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env"
+t_die "partial split dies" collect nginx perf "$RD"
+kv_put "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env" IRQ_PMI_DELTA v
 sed -i '/^P99_MS=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 B1)/wl.env"
 t_die "collect dies on missing key" collect nginx perf "$RD"
 

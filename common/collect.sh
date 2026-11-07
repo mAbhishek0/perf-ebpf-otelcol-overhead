@@ -9,7 +9,8 @@
 # CSV_COLUMNS: name:file:key. (Not "COLUMNS": bash overwrites that with the
 # terminal width after every external command when run from a terminal.)
 # Entry format: file is run_meta | wl | samples | cooldown | mech.
-# mech columns are NA on untraced runs; everything else is required.
+# mech columns are NA on untraced runs, interrupt-split columns NA on bundles
+# sampled before the split existed; everything else is required.
 
 CSV_COLUMNS=(
   run_id:run_meta:RUN_ID platform:run_meta:PLATFORM workload:run_meta:WORKLOAD
@@ -24,13 +25,23 @@ CSV_COLUMNS=(
   busy_pct_workload:samples:BUSY_PCT_WORKLOAD freq_min_khz:samples:FREQ_MIN_KHZ
   freq_max_khz:samples:FREQ_MAX_KHZ pkg_watts_mean:samples:PKG_WATTS_MEAN
   temp_start_c:samples:TEMP_START_C temp_max_c:samples:TEMP_MAX_C
-  irq_workload_delta:samples:IRQ_WORKLOAD_DELTA n_samples:samples:SAMPLES
+  irq_workload_delta:samples:IRQ_WORKLOAD_DELTA
+  irq_dev_delta:samples:IRQ_DEV_DELTA irq_timer_delta:samples:IRQ_TIMER_DELTA irq_ipi_delta:samples:IRQ_IPI_DELTA
+  irq_nmi_delta:samples:IRQ_NMI_DELTA irq_pmi_delta:samples:IRQ_PMI_DELTA irq_other_delta:samples:IRQ_OTHER_DELTA
+  softirq_net_rx_delta:samples:SOFTIRQ_NET_RX_DELTA softirq_net_tx_delta:samples:SOFTIRQ_NET_TX_DELTA
+  n_samples:samples:SAMPLES
   cooldown_s:cooldown:COOLDOWN_S cooldown_timed_out:cooldown:COOLDOWN_TIMED_OUT freq_verdict:samples:FREQ_VERDICT
   clock_check:run_meta:CLOCK_CHECK perf_rate_end:run_meta:PERF_RATE_END kernel:run_meta:KERNEL bench_trace:run_meta:BENCH_TRACE
   mech_events:mech:MECH_EVENTS mech_lost:mech:MECH_LOST mech_drop_rate:mech:MECH_DROP_RATE
   mech_notes:mech:MECH_NOTES
 )
-SCHEMA_VERSION="1.0.0"
+SCHEMA_VERSION="2.0.0"
+# 2.0.0 (2026-11-07): interrupt split columns added; mech_events/mech_lost/
+# mech_drop_rate redefined as samples (not loss records) over everything the
+# mechanism runs (see the perf plugin's mech_stats).
+# Bundles sampled before the split (summary.env without IRQ_DEV_DELTA) get NA
+# in the split columns: those counters were never captured, and NA says so.
+IRQ_SPLIT_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DELTA IRQ_OTHER_DELTA SOFTIRQ_NET_RX_DELTA SOFTIRQ_NET_TX_DELTA "
 
 _col_file() {
   case $1 in run_meta) echo run_meta.env;; wl) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; esac
@@ -58,6 +69,7 @@ collect() {
         IFS=: read -r name src key <<<"$col"
         f="$b/$(_col_file "$src")"
         if [[ $src == mech && $traced == 0 ]]; then val=NA
+        elif [[ $IRQ_SPLIT_KEYS == *" $key "* ]] && ! kv_has "$f" IRQ_DEV_DELTA; then val=NA
         else val=$(kv_get "$f" "$key") || die "collect: $b lacks $key"
         fi
         line+="${line:+,}$(_csvq "$val")"

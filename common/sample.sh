@@ -8,7 +8,14 @@
 # Row layout (tab-separated, '#' header skipped):
 #   1 epoch  2 tracer_ticks  3 gen_ticks  4 energy_uj  5 temp_c  6 irq_total
 #   7 tracer_stale  8 gen_stale   then per workload CPU: busy total (2n cols),
-#   then per workload CPU: scaling_cur_freq (n cols).
+#   then per workload CPU: scaling_cur_freq (n cols),
+#   then 8 interrupt counters summed over the workload CPUs: irq_dev irq_timer
+#   irq_ipi irq_nmi irq_pmi irq_other softirq_net_rx softirq_net_tx.
+# irq_total (col 6) is every /proc/interrupts row; the split classifies them:
+# dev = numbered rows (devices), timer = LOC, ipi = RES CAL TLB IWI,
+# nmi = NMI, pmi = PMI, other = the rest. On x86 a perf sampling interrupt is
+# delivered as an NMI and counted in both NMI and PMI, so irq_total double
+# counts it; the split columns let the analysis pick one.
 # A row is written only after every value in it was read. If a tracer/gen PID
 # can no longer be read (process gone), that tick reuses the previous row's
 # value and the stale flag is 1; the summary only uses rows with flag 0. Tracer
@@ -34,12 +41,32 @@ _sample_ticks() {  # _sample_ticks PIDFILE -> sum of utime+stime; 1 if any PID u
   printf '%s' "$sum"
 }
 
-_sample_irq() {  # sum of interrupt counts on the workload CPUs; header lists online CPUs only
+# _sample_irq [FILE] -> "total dev timer ipi nmi pmi other", summed over the
+# workload CPUs; the header lists online CPUs only. FILE: /proc/interrupts.
+_sample_irq() {
   awk -v cpus="$WORKLOAD_CPUS" '
     NR==1 { for (i=1;i<=NF;i++) { c=$i; sub(/^CPU/,"",c); col[c]=i+1 }
             n=split(cpus,a,","); for (i=1;i<=n;i++) if (!(a[i] in col)) bad=1; next }
-    { for (i=1;i<=n;i++) { v=$(col[a[i]]); if (v ~ /^[0-9]+$/) s+=v } }
-    END { if (bad) exit 1; printf "%d", s }' /proc/interrupts
+    { k=$1; sub(/:$/,"",k); s=0
+      for (i=1;i<=n;i++) { v=$(col[a[i]]); if (v ~ /^[0-9]+$/) s+=v }
+      t+=s
+      if (k ~ /^[0-9]+$/) dv+=s
+      else if (k=="LOC") tm+=s
+      else if (k=="RES" || k=="CAL" || k=="TLB" || k=="IWI") ip+=s
+      else if (k=="NMI") nm+=s
+      else if (k=="PMI") pm+=s
+      else ot+=s }
+    END { if (bad) exit 1; printf "%d %d %d %d %d %d %d", t, dv, tm, ip, nm, pm, ot }' "${1:-/proc/interrupts}"
+}
+
+# _sample_softirq [FILE] -> "net_rx net_tx" summed over the workload CPUs.
+_sample_softirq() {
+  awk -v cpus="$WORKLOAD_CPUS" '
+    NR==1 { for (i=1;i<=NF;i++) { c=$i; sub(/^CPU/,"",c); col[c]=i+1 }
+            n=split(cpus,a,","); for (i=1;i<=n;i++) if (!(a[i] in col)) bad=1; next }
+    $1=="NET_RX:" || $1=="NET_TX:" { s=0; for (i=1;i<=n;i++) { v=$(col[a[i]]); if (v ~ /^[0-9]+$/) s+=v }
+      if ($1=="NET_RX:") { rx=s; hr=1 } else { tx=s; ht=1 } }
+    END { if (bad || !hr || !ht) exit 1; printf "%d %d", rx, tx }' "${1:-/proc/softirqs}"
 }
 
 _sample_stat() {  # "busy total" per workload CPU, in WORKLOAD_CPUS order; busy = total - idle - iowait
@@ -50,14 +77,17 @@ _sample_stat() {  # "busy total" per workload CPU, in WORKLOAD_CPUS order; busy 
 }
 
 _sample_loop() {
-  local b=$1 out="$1/samples/samples.tsv" i now stat irq energy temp c f fr tk gk ts gs
+  local b=$1 out="$1/samples/samples.tsv" i now stat irq irqv sirq ext energy temp c f fr tk gk ts gs
   local prev_t="" prev_g="" tab=$'\t' ok
   taskset -cp "$GEN_CPUS" "$BASHPID" >/dev/null 2>&1
   for (( i=0; i<SAMPLE_MAX_TICKS; i++ )); do
     ok=1
     now=$(date +%s.%N)
     stat=$(_sample_stat) || ok=0
-    irq=$(_sample_irq) || ok=0
+    irqv=$(_sample_irq) || ok=0
+    irq=${irqv%% *}
+    sirq=$(_sample_softirq) || ok=0
+    ext="${irqv#* } $sirq"
     energy=$(cat /sys/class/powercap/intel-rapl:0/energy_uj 2>/dev/null) || ok=0
     temp=$(pkg_temp_c)
     fr=""
@@ -78,8 +108,8 @@ _sample_loop() {
       else gk=NA; gs=1; fi
     fi
     if (( ok )); then
-      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s\n' "$now" "$tk" "$gk" "$energy" "$temp" "$irq" \
-        "$ts" "$gs" "${stat// /$tab}" "$fr" >> "$out"
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s\t%s\n' "$now" "$tk" "$gk" "$energy" "$temp" "$irq" \
+        "$ts" "$gs" "${stat// /$tab}" "$fr" "${ext// /$tab}" >> "$out"
     fi
     sleep 1
   done
@@ -92,7 +122,7 @@ sample_start() {
   [[ -r /sys/class/powercap/intel-rapl:0/energy_uj ]] || die "RAPL energy_uj unreadable"
   cat /sys/class/powercap/intel-rapl:0/max_energy_range_uj > "$b/samples/rapl_range" 2>/dev/null \
     || die "RAPL max_energy_range_uj unreadable"
-  printf '# epoch tracer_ticks gen_ticks energy_uj temp_c irq tracer_stale gen_stale busy/total x%s freq x%s\n' "$n" "$n" \
+  printf '# epoch tracer_ticks gen_ticks energy_uj temp_c irq tracer_stale gen_stale busy/total x%s freq x%s irq_dev irq_timer irq_ipi irq_nmi irq_pmi irq_other softirq_net_rx softirq_net_tx\n' "$n" "$n" \
     > "$b/samples/samples.tsv"
   _sample_loop "$b" &
   echo $! > "$b/pids.sampler"
@@ -120,10 +150,11 @@ sample_stop() {
   n=$(wc -w <<<"${WORKLOAD_CPUS//,/ }")
   out=$(awk -F'\t' -v n="$n" -v clk="$clk" -v wrap="$wrap" -v hastr="$hastr" '
     /^#/ { next }
-    NF != 8+3*n { next }
+    NF != 16+3*n { next }
     { r++; ep[r]=$1; en[r]=$4; tp[r]=$5; ir[r]=$6
       for (k=0;k<n;k++) { bz[r,k]=$(9+2*k); tz[r,k]=$(10+2*k); fq=$(9+2*n+k)+0
         if (!fset || fq<fmin) fmin=fq; if (!fset || fq>fmax) fmax=fq; fset=1 }
+      for (j=1;j<=8;j++) x[r,j]=$(8+3*n+j)
       if (r==1 || tp[r]+0>tmax) tmax=tp[r]+0
       if ($7==0 && $2!="NA") { if (!tf) tf=r; tl=r; tk[r]=$2 }
       if ($8==0 && $3!="NA") { if (!gf) gf=r; gl=r; gk[r]=$3 }
@@ -146,6 +177,8 @@ sample_stop() {
       if (gf==0 || gl<=gf) { print "ERR fewer than 2 samples with the load generator present"; exit 1 }
       printf "LOADGEN_CPU_CORES %.4f\n", (gk[gl]-gk[gf])/clk/(ep[gl]-ep[gf])
       printf "IRQ_WORKLOAD_DELTA %d\nSAMPLES %d\n", ir[r]-ir[1], r
+      split("IRQ_DEV IRQ_TIMER IRQ_IPI IRQ_NMI IRQ_PMI IRQ_OTHER SOFTIRQ_NET_RX SOFTIRQ_NET_TX", xn, " ")
+      for (j=1;j<=8;j++) printf "%s_DELTA %d\n", xn[j], x[r,j]-x[1,j]
     }' "$s") || die "sample summary failed for $b: $out"
   : > "$e"
   while read -r k v; do kv_put "$e" "$k" "$v"; done <<<"$out"

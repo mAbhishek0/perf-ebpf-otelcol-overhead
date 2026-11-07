@@ -10,6 +10,8 @@ Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md)
 
 **nginx × perf matrix with the patched wrk2: done (2026-11-07), 8/8 cells, 64 rows in `nginx-wrk2/perf/results/`** (README timeline 17). Re-run 1 aborted at 2/8 (stale pre-fix dirs burned bracket tries, fixed in `5dcad8c`); re-run 2 (13:37–15:56) ran the other 6 cells, all ok on try 1. No stalls (max ≤ 18.4 ms in all 64 runs), so latency is usable. Wide: nginx CPU +54…+69 %, tracer 0.20→0.92 cores 5k→40k, p99 +3…+28 %; narrow ≈ free. CPU matches the pre-fix run within ~6 %. 0 events lost (pre-fix perf trace lost up to 23,723 in 3 runs).
 
+**Schema 2.0.0 (2026-11-07, README timeline 18):** loss is lost samples ÷ (delivered + lost) over everything a mechanism runs (perf: record + trace), and interrupts are split (`irq_dev/timer/ipi/nmi/pmi/other_delta`, `softirq_net_rx/tx_delta`). The perf CSV was rebuilt with `restat.sh` (split columns NA, counters not captured then). The eBPF plugin's `mech_stats` must use the same loss definition.
+
 **Next:** write the nginx × eBPF plugin (`nginx-wrk2/ebpf/scripts/mech.sh`, interface below), run its matrix, then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
 
 **Not written yet:** nginx × eBPF and nginx × collector plugins (`<wl>/<mech>/scripts/mech.sh` per the interface below), fio and redis workloads, the `SMT=on` option (one SMT-on arm planned last). Known small gap: the `die` from a pipefail inside `$(...)` is not recorded in `logs/.errors_*` (seen in the perf-trace grep crash) — investigate when convenient.

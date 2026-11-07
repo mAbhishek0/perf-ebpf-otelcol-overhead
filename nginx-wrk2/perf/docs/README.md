@@ -47,8 +47,15 @@ figures stand; its latency does not. Current data is in `results/` only.
 
 ## Caveats
 
-- `perf trace` is lossy at high event rates. The loss is recorded in
-  `mech_notes` on that row; never quote an overhead without its drop rate.
+- `perf trace` is lossy at high event rates. Since schema 2.0.0 its events
+  and losses are part of `mech_events` / `mech_lost` / `mech_drop_rate`
+  (perf record samples + perf trace events; lost samples, not loss records —
+  see `mech_stats`), with the per-tool split in each bundle's `mech.stats`.
+  Never quote an overhead without its drop rate.
+- Interrupts (schema 2.0.0): `irq_workload_delta` is every `/proc/interrupts`
+  row on the workload CPUs; perf sampling interrupts count in both NMI and
+  PMI there. Use the split columns (`irq_dev/timer/ipi/nmi/pmi/other_delta`,
+  `softirq_net_rx/tx_delta`). Runs before 2026-11-07 have NA in them.
 - Tracer CPU is the pinned tracer PIDs' CPU, not the workload cgroup's.
 - Tracer CPUs (8,10) and generator CPUs (12,14) are separate from the workload
   CPUs, so there is no co-location bias, but the laptop has only these 8 CPUs.
