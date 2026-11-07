@@ -39,7 +39,7 @@ case $WL in
   *) die "unknown workload $WL" ;;
 esac
 
-for f in crash host power preflight quiesce sample cooldown run_one progress bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
+for f in crash host power preflight quiesce sample cooldown run_one progress provenance bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
 crash_init
 # The harness itself (bash, docker CLI, perf report, zstd) stays off the
 # workload and tracer CPUs; children inherit this, explicit taskset overrides it.
@@ -98,6 +98,7 @@ for m in ${MECHS//,/ }; do
   mkdir -p "$rdir/raw"
   mapfile -t order < <(seeded_shuffle "$(( SHUFFLE_SEED + $(cksum <<<"$m" | cut -d" " -f1) % 100000 ))" ${LEVELS//,/ })
   echo "$(date -Is) $m levels: ${order[*]} scopes: $SCOPES" >> "$rdir/order.txt"
+  provenance_write "$rdir" "$m"
   log "### $WL x $m: level order ${order[*]}"
   for lvl in "${order[@]}"; do
     for sc in ${SCOPES//,/ }; do

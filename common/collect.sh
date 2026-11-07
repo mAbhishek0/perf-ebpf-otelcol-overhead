@@ -81,15 +81,15 @@ collect() {
     done
   done
   mv "$tmp" "$csv"
-  _schema_freeze "$rdir"
+  _schema_freeze "$rdir" "$mech"
   log "collect: $n rows -> $csv"
 }
 
 # schema.json records the columns and the constants that define a row's
 # meaning. Written once; any later difference is a hard failure — a changed
 # layout or constant belongs in a new results directory, not the same CSV.
-_schema_freeze() {
-  local s="$1/schema.json" new="$1/schema.json.new" col first=1
+_schema_freeze() {  # RDIR MECH
+  local s="$1/schema.json" new="$1/schema.json.new" mech=${2:-} col first=1
   {
     printf '{\n  "schema_version": "%s",\n  "platform": "%s",\n' "$SCHEMA_VERSION" "$PLATFORM"
     printf '  "workload_cpus": "%s", "tracer_cpus": "%s", "gen_cpus": "%s", "os_cpus": "%s",\n' \
@@ -99,6 +99,14 @@ _schema_freeze() {
     printf '  "perf_freq_narrow": %s, "perf_freq_wide": %s, "perf_mmap_pages": %s, "perf_trace_mmap_pages": %s,\n' \
       "$PERF_FREQ_NARROW" "$PERF_FREQ_WIDE" "$PERF_MMAP_PAGES" "$PERF_TRACE_MMAP_PAGES"
     printf '  "ebpf_perf_buffer_pages": %s,\n' "$EBPF_PERF_BUFFER_PAGES"
+    # Collector constants only in collector dirs: adding them everywhere would
+    # change the frozen schema.json of the finished perf and eBPF matrices.
+    if [[ $mech == collector ]]; then
+      printf '  "otelcol_version": "%s", "collector_mode": "%s", "otelcol_batch_size": %s, "otelcol_sending_queue_size": %s,\n' \
+        "$OTELCOL_VERSION_EXPECTED" "$COLLECTOR_MODE" "$OTELCOL_BATCH_SIZE" "$OTELCOL_SENDING_QUEUE_SIZE"
+      printf '  "collector_scrape_interval_narrow_s": %s, "collector_scrape_interval_wide_s": %s, "otelcol_telemetry_port": %s,\n' \
+        "$COLLECTOR_SCRAPE_INTERVAL_NARROW_S" "$COLLECTOR_SCRAPE_INTERVAL_WIDE_S" "$OTELCOL_TELEMETRY_PORT"
+    fi
     printf '  "ladder": "%s",\n  "columns": [' "${LADDER:-}"
     for col in "${CSV_COLUMNS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
     printf ']\n}\n'

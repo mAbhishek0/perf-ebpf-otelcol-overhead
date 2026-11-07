@@ -231,6 +231,28 @@ kv_put "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env" IRQ_PMI_
 sed -i '/^P99_MS=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 B1)/wl.env"
 t_die "collect dies on missing key" collect nginx perf "$RD"
 
+# --- schema.json: finished matrices must re-freeze byte-identical; collector adds its constants ---
+( source "$LAPTOP_ROOT/common/config.env"   # earlier tests change WORKLOAD_CPUS
+  LADDER="1:5000 2:10000 3:20000 4:40000"
+  for m in perf ebpf; do
+    mkdir -p "$T/sch_$m"; _schema_freeze "$T/sch_$m" "$m" >/dev/null 2>&1
+    cmp -s "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" && echo ok || echo "bad $m: $(diff "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" | grep "^[<>]" | cut -c1-120 | tr "
+" " ")"
+  done
+  source "$LAPTOP_ROOT/nginx-wrk2/collector/scripts/collector.env"
+  mkdir -p "$T/sch_c"; _schema_freeze "$T/sch_c" collector >/dev/null 2>&1
+  grep -q '"otelcol_version": "0.161.0"' "$T/sch_c/schema.json" && grep -q '"collector_scrape_interval_wide_s": 1,' "$T/sch_c/schema.json" && echo ok || echo "bad collector"
+) > "$T/sch.out"
+while read -r r; do [[ $r == ok ]] && ok || bad "schema: $r"; done < "$T/sch.out"
+
+# --- provenance.sh ---
+source "$LAPTOP_ROOT/common/provenance.sh"
+( EBPF_PYTHON=/nonexistent OTELCOL_BIN=/nonexistent WRK2_BIN=/nonexistent; provenance_write "$T/prov" perf ) >/dev/null 2>&1
+pf=$(ls "$T"/prov/provenance/*_perf.env 2>/dev/null | head -1)
+t_eq "provenance file" yes "$([[ -n $pf ]] && echo yes || echo no)"
+t_eq "provenance commit" 40 "$(kv_get "$pf" HARNESS_COMMIT | tr -d '\n' | wc -c | tr -d ' ')"
+t_eq "provenance missing tool NA" NA "$(kv_get "$pf" OTELCOL_VERSION)"
+
 # --- power.sh (fake power_supply tree; host/probe stubbed) ---
 source "$LAPTOP_ROOT/common/power.sh"
 POWER_SUPPLY_DIR="$T/ps"; POWER_STATE_FILE="$T/power_last"
