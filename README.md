@@ -157,6 +157,7 @@ Benchmark results (not yet produced) will use the same format as Platform S: one
 | otelcol checksum file 404 | releases have no combined checksums file; each artifact has its own `<artifact>.sha256` (+ sigstore bundle) | fetch `<tarball>.sha256` and compare |
 | Probe run 2: no GUI warning although gnome-shell was running; TLP warning although TLP was stopped | `pgrep` has no `-E` flag, so the GUI check errored and silently never fired; the TLP check tested "installed", not "active" | `pgrep -x` without `-E`; TLP warns only when `systemctl is-active tlp`; new noisy-process check (indexer, browsers, Telegram, fwupd) |
 | `smartmontools` install enabled `smartd` | package default | disable during runs (it polls the disk under fio) |
+| nginx × perf re-run 1 aborted after 2/8 cells (narrow E3 "failed drift on all 3 tries" after one real try) | moving the pre-fix results tree through git left its gitignored files (`perf.data*`, `samples.tsv`) in the old `results/raw/*_try1_*`/`_try2_*` dirs on the laptop; `bracket.sh` took them for earlier crashes and burned those tries | `run_one.sh` writes a `started` marker; `bracket.sh` dies on marker-less dirs; bogus verdicts relabelled `stale` / removed; stale dirs deleted on the laptop |
 
 ## Plan
 
@@ -226,7 +227,7 @@ Fans: the flat-255 `asus_custom_fan_curve` method works on this G513 (fans audib
 
 ## Next steps
 
-1. **Now:** re-run the nginx × perf matrix with the patched wrk2 — `sudo bash nginx-wrk2/perf/scripts/run.sh` (~4 h). Latency from this run only; CPU checked against the pre-fix run.
+1. **Now:** nginx × perf matrix with the patched wrk2 — re-run 1 aborted at 2/8 cells (stale pre-fix dirs burned bracket tries, fixed in `5dcad8c`); re-run 2 started 2026-11-07 13:37 for the other 6 cells (~3 h). Latency from this run only; CPU checked against the pre-fix run.
 3. Write and run nginx × eBPF, then nginx × collector (same interfaces).
 4. fio, then redis (decide narrow/wide meaning for each first).
 5. Last: the SMT-on arm.
