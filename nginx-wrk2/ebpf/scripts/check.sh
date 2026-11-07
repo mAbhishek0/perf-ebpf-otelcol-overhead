@@ -19,16 +19,23 @@ source "$LAPTOP_ROOT/common/config.env"
 source "$LAPTOP_ROOT/common/lib.sh"
 LOG_TAG=ebpf-check
 need_root
+# Not a measurement, so a desktop session is allowed and nothing is quiesced
+# (preflight still refuses browsers and indexers: close them first).
+ALLOW_GUI=${ALLOW_GUI:-1}
+# Run as a transient service in bench.slice, as the matrix does: host setup
+# restricts the OS slices (this terminal's included) to OS_CPUS, and taskset
+# onto the tracer/workload CPUs is refused from inside them (2026-11-07: the
+# first check died on exactly that).
+QUIESCE=0 bench_detach "bench-ebpf-check" "$0" "$@"
 for f in crash host power preflight sample run_one; do source "$LAPTOP_ROOT/common/$f.sh"; done
 crash_init
+# The harness itself stays off the workload and tracer CPUs (as run_workload.sh).
+taskset -cp "$OS_CPUS" $$ >/dev/null || die "cannot pin harness to $OS_CPUS"
 source "$LAPTOP_ROOT/nginx-wrk2/workload.sh"
 [[ -n ${LADDER:-} ]] || die "no frozen ladder in nginx-wrk2/pilot.env"
 source "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts/mech.sh"
 
 CHECK_S=${CHECK_S:-30}
-# Not a measurement, so a desktop session is allowed (preflight still refuses
-# browsers and indexers: close them first).
-ALLOW_GUI=${ALLOW_GUI:-1}
 RAMP_S=10; STEADY_S=$CHECK_S
 lo=${LADDER%% *}; lo=${lo%%:*}
 hi=${LADDER##* }; hi=${hi%%:*}
