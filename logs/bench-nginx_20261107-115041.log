@@ -1,0 +1,103 @@
+11:50:57 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+11:50:57 [run|preflight] preflight
+11:50:57 [run|preflight]   [ok]   on AC power
+11:50:57 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+11:50:57 [run|preflight]   [ok]   TLP not active
+11:50:57 [run|preflight]   [ok]   unattended-upgrades not active
+11:50:57 [run|preflight]   [ok]   no noisy processes
+11:50:57 [run|preflight]   [ok]   no graphical session
+11:50:57 [run|preflight]   package 59 °C > 55 °C — waiting up to 900s to cool
+11:50:59 [run|preflight]   cooled for 2s, now 55 °C
+11:50:59 [run|preflight]   [ok]   package 55 °C
+11:50:59 [run|preflight]   [ok]   58566 MB free
+11:50:59 [run|preflight]   [ok]   BPF JIT on
+11:50:59 [run|preflight]   [ok]   docker reachable
+11:50:59 [run|preflight]   [ok]   wrk2 with -R
+11:50:59 [run|preflight]   [ok]   nginx:1.24 id matches
+11:50:59 [run|preflight]   [ok]   port 8080 free
+11:50:59 [run|preflight]   [ok]   perf version 7.0.14
+11:50:59 [run|preflight] preflight passed
+11:51:00 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+11:51:00 [run|host setup] clock floor requested at 2900000 kHz
+11:51:00 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+11:51:01 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+11:51:05 [run|host setup] clock under load: 2894871 kHz (ok)
+11:51:05 [run|host setup] host configured
+11:51:35 [run|host setup] idle package temp 37 C (min of 15 samples over 30 s)
+11:51:35 [run|host setup] ### nginx x perf: level order 2 3 1 4
+11:51:35 [run|host setup] WARN: cell L_nginx_perf_narrow_E2 try 1 has runs but no verdict (earlier crash) — marked crashed, moving on
+11:51:35 [run|host setup] === cell L_nginx_perf_narrow_E2 try 2 ===
+11:51:35 [run|host setup] run L_nginx_perf_narrow_E2_try2_W1 (rate 10000, traced=0)
+11:51:35 [run|L_nginx_perf_narrow_E2_try2_W1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+11:54:06 [run|L_nginx_perf_narrow_E2_try2_W1 stop+parse] run L_nginx_perf_narrow_E2_try2_A1 (rate 10000, traced=0)
+11:54:06 [run|L_nginx_perf_narrow_E2_try2_A1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+11:56:37 [run|L_nginx_perf_narrow_E2_try2_A1 stop+parse] run L_nginx_perf_narrow_E2_try2_B1 (rate 10000, traced=1)
+11:56:37 [run|L_nginx_perf_narrow_E2_try2_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+11:59:10 [run|L_nginx_perf_narrow_E2_try2_B1 stop+parse] run L_nginx_perf_narrow_E2_try2_B2 (rate 10000, traced=1)
+11:59:10 [run|L_nginx_perf_narrow_E2_try2_B2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+12:01:42 [run|L_nginx_perf_narrow_E2_try2_B2 stop+parse] run L_nginx_perf_narrow_E2_try2_B3 (rate 10000, traced=1)
+12:01:42 [run|L_nginx_perf_narrow_E2_try2_B3 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:04:15 [run|L_nginx_perf_narrow_E2_try2_B3 stop+parse] run L_nginx_perf_narrow_E2_try2_B4 (rate 10000, traced=1)
+12:04:15 [run|L_nginx_perf_narrow_E2_try2_B4 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:06:48 [run|L_nginx_perf_narrow_E2_try2_B4 stop+parse] run L_nginx_perf_narrow_E2_try2_B5 (rate 10000, traced=1)
+12:06:48 [run|L_nginx_perf_narrow_E2_try2_B5 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:09:20 [run|L_nginx_perf_narrow_E2_try2_B5 stop+parse] run L_nginx_perf_narrow_E2_try2_B6 (rate 10000, traced=1)
+12:09:20 [run|L_nginx_perf_narrow_E2_try2_B6 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:11:53 [run|L_nginx_perf_narrow_E2_try2_B6 stop+parse] run L_nginx_perf_narrow_E2_try2_A2 (rate 10000, traced=0)
+12:11:53 [run|L_nginx_perf_narrow_E2_try2_A2 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:14:23 [run|L_nginx_perf_narrow_E2_try2_A2 stop+parse] cell L_nginx_perf_narrow_E2 try 2 ok (p99 10.9422% <= 16.1616%, cpu 0.1225% <= 5%)
+12:14:26 [run|collect nginx perf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/nginx_perf.csv
+12:14:26 [run|collect nginx perf] WARN: cell L_nginx_perf_wide_E2 try 1 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:14:26 [run|collect nginx perf] WARN: cell L_nginx_perf_wide_E2 try 2 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:14:26 [run|collect nginx perf] === cell L_nginx_perf_wide_E2 try 3 ===
+12:14:26 [run|collect nginx perf] run L_nginx_perf_wide_E2_try3_W1 (rate 10000, traced=0)
+12:14:26 [run|L_nginx_perf_wide_E2_try3_W1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:16:56 [run|L_nginx_perf_wide_E2_try3_W1 stop+parse] run L_nginx_perf_wide_E2_try3_A1 (rate 10000, traced=0)
+12:16:57 [run|L_nginx_perf_wide_E2_try3_A1 cooldown] cooldown 1s -> start at 37 C (limit 42 C, idle 37 C)
+12:19:27 [run|L_nginx_perf_wide_E2_try3_A1 stop+parse] run L_nginx_perf_wide_E2_try3_B1 (rate 10000, traced=1)
+12:19:27 [run|L_nginx_perf_wide_E2_try3_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:22:01 [run|L_nginx_perf_wide_E2_try3_B1 stop+parse] run L_nginx_perf_wide_E2_try3_B2 (rate 10000, traced=1)
+12:22:01 [run|L_nginx_perf_wide_E2_try3_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:24:35 [run|L_nginx_perf_wide_E2_try3_B2 stop+parse] run L_nginx_perf_wide_E2_try3_B3 (rate 10000, traced=1)
+12:24:35 [run|L_nginx_perf_wide_E2_try3_B3 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:27:09 [run|L_nginx_perf_wide_E2_try3_B3 stop+parse] run L_nginx_perf_wide_E2_try3_B4 (rate 10000, traced=1)
+12:27:09 [run|L_nginx_perf_wide_E2_try3_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:29:42 [run|L_nginx_perf_wide_E2_try3_B4 stop+parse] run L_nginx_perf_wide_E2_try3_B5 (rate 10000, traced=1)
+12:29:42 [run|L_nginx_perf_wide_E2_try3_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:32:16 [run|L_nginx_perf_wide_E2_try3_B5 stop+parse] run L_nginx_perf_wide_E2_try3_B6 (rate 10000, traced=1)
+12:32:16 [run|L_nginx_perf_wide_E2_try3_B6 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:34:50 [run|L_nginx_perf_wide_E2_try3_B6 stop+parse] run L_nginx_perf_wide_E2_try3_A2 (rate 10000, traced=0)
+12:34:50 [run|L_nginx_perf_wide_E2_try3_A2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:37:20 [run|L_nginx_perf_wide_E2_try3_A2 stop+parse] cell L_nginx_perf_wide_E2 try 3 ok (p99 1.5601% <= 14.2292%, cpu 1.0625% <= 5%)
+12:37:25 [run|collect nginx perf] collect: 16 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/nginx_perf.csv
+12:37:25 [run|collect nginx perf] WARN: cell L_nginx_perf_narrow_E3 try 1 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:37:25 [run|collect nginx perf] WARN: cell L_nginx_perf_narrow_E3 try 2 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:37:25 [run|collect nginx perf] === cell L_nginx_perf_narrow_E3 try 3 ===
+12:37:25 [run|collect nginx perf] run L_nginx_perf_narrow_E3_try3_W1 (rate 20000, traced=0)
+12:37:25 [run|L_nginx_perf_narrow_E3_try3_W1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:39:56 [run|L_nginx_perf_narrow_E3_try3_W1 stop+parse] run L_nginx_perf_narrow_E3_try3_A1 (rate 20000, traced=0)
+12:39:56 [run|L_nginx_perf_narrow_E3_try3_A1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:42:27 [run|L_nginx_perf_narrow_E3_try3_A1 stop+parse] run L_nginx_perf_narrow_E3_try3_B1 (rate 20000, traced=1)
+12:42:27 [run|L_nginx_perf_narrow_E3_try3_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:44:59 [run|L_nginx_perf_narrow_E3_try3_B1 stop+parse] run L_nginx_perf_narrow_E3_try3_B2 (rate 20000, traced=1)
+12:44:59 [run|L_nginx_perf_narrow_E3_try3_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:47:32 [run|L_nginx_perf_narrow_E3_try3_B2 stop+parse] run L_nginx_perf_narrow_E3_try3_B3 (rate 20000, traced=1)
+12:47:32 [run|L_nginx_perf_narrow_E3_try3_B3 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:50:04 [run|L_nginx_perf_narrow_E3_try3_B3 stop+parse] run L_nginx_perf_narrow_E3_try3_B4 (rate 20000, traced=1)
+12:50:04 [run|L_nginx_perf_narrow_E3_try3_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:52:37 [run|L_nginx_perf_narrow_E3_try3_B4 stop+parse] run L_nginx_perf_narrow_E3_try3_B5 (rate 20000, traced=1)
+12:52:37 [run|L_nginx_perf_narrow_E3_try3_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:55:09 [run|L_nginx_perf_narrow_E3_try3_B5 stop+parse] run L_nginx_perf_narrow_E3_try3_B6 (rate 20000, traced=1)
+12:55:10 [run|L_nginx_perf_narrow_E3_try3_B6 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:57:42 [run|L_nginx_perf_narrow_E3_try3_B6 stop+parse] run L_nginx_perf_narrow_E3_try3_A2 (rate 20000, traced=0)
+12:57:42 [run|L_nginx_perf_narrow_E3_try3_A2 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] WARN: cell L_nginx_perf_narrow_E3 try 3: drift p99 11.6861% (limit 27.0182%, B spread 13.5091%) cpu 7.9085% (limit 5%) — rerunning bracket
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] FAIL: cell L_nginx_perf_narrow_E3 failed drift on all 3 tries
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] crash report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/crash_20261107-115052.txt
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] no machine-state drift
+13:00:14 [run|host revert] host reverted
+13:00:15 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+13:00:15 [run|restore services] exited with status 1 — host reverted; partial runs are marked INCOMPLETE

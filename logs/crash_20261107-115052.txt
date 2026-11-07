@@ -1,0 +1,243 @@
+CRASH REPORT  2026-11-07T13:00:13+05:30  exit=1  stage=L_nginx_perf_narrow_E3_try3_A2 stop+parse  unit=bench-nginx
+run in flight: /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/raw/L_nginx_perf_narrow_E3_try3_A2 (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+11:51:00 rc=1 stage=host setup cmd=[[ -w $d/pwm${n}_enable ]] stack=_fan_enable_state@host.sh:66 host_save_prior@host.sh:26 host_setup@host.sh:102 main@run_workload.sh:86 
+12:24:33 rc=1 stage=L_nginx_perf_wide_E2_try3_B2 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:144 _sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+12:24:33 rc=1 stage=L_nginx_perf_wide_E2_try3_B2 measure cmd=return stack=_sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+12:32:14 rc=1 stage=L_nginx_perf_wide_E2_try3_B5 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:144 _sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+12:32:14 rc=1 stage=L_nginx_perf_wide_E2_try3_B5 measure cmd=return stack=_sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+12:50:03 rc=1 stage=L_nginx_perf_narrow_E3_try3_B3 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:144 _sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+12:50:03 rc=1 stage=L_nginx_perf_narrow_E3_try3_B3 measure cmd=return stack=_sample_loop@sample.sh:62 sample_start@sample.sh:97 run_one@run_one.sh:33 bracket@bracket.sh:34 main@run_workload.sh:101 
+13:00:13 die stage=L_nginx_perf_narrow_E3_try3_A2 stop+parse: cell L_nginx_perf_narrow_E3 failed drift on all 3 tries (in bracket)
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-nginx_20261107-115041.log'
+12:14:26 [run|collect nginx perf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/nginx_perf.csv
+12:14:26 [run|collect nginx perf] WARN: cell L_nginx_perf_wide_E2 try 1 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:14:26 [run|collect nginx perf] WARN: cell L_nginx_perf_wide_E2 try 2 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:14:26 [run|collect nginx perf] === cell L_nginx_perf_wide_E2 try 3 ===
+12:14:26 [run|collect nginx perf] run L_nginx_perf_wide_E2_try3_W1 (rate 10000, traced=0)
+12:14:26 [run|L_nginx_perf_wide_E2_try3_W1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:16:56 [run|L_nginx_perf_wide_E2_try3_W1 stop+parse] run L_nginx_perf_wide_E2_try3_A1 (rate 10000, traced=0)
+12:16:57 [run|L_nginx_perf_wide_E2_try3_A1 cooldown] cooldown 1s -> start at 37 C (limit 42 C, idle 37 C)
+12:19:27 [run|L_nginx_perf_wide_E2_try3_A1 stop+parse] run L_nginx_perf_wide_E2_try3_B1 (rate 10000, traced=1)
+12:19:27 [run|L_nginx_perf_wide_E2_try3_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:22:01 [run|L_nginx_perf_wide_E2_try3_B1 stop+parse] run L_nginx_perf_wide_E2_try3_B2 (rate 10000, traced=1)
+12:22:01 [run|L_nginx_perf_wide_E2_try3_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:24:35 [run|L_nginx_perf_wide_E2_try3_B2 stop+parse] run L_nginx_perf_wide_E2_try3_B3 (rate 10000, traced=1)
+12:24:35 [run|L_nginx_perf_wide_E2_try3_B3 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:27:09 [run|L_nginx_perf_wide_E2_try3_B3 stop+parse] run L_nginx_perf_wide_E2_try3_B4 (rate 10000, traced=1)
+12:27:09 [run|L_nginx_perf_wide_E2_try3_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:29:42 [run|L_nginx_perf_wide_E2_try3_B4 stop+parse] run L_nginx_perf_wide_E2_try3_B5 (rate 10000, traced=1)
+12:29:42 [run|L_nginx_perf_wide_E2_try3_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:32:16 [run|L_nginx_perf_wide_E2_try3_B5 stop+parse] run L_nginx_perf_wide_E2_try3_B6 (rate 10000, traced=1)
+12:32:16 [run|L_nginx_perf_wide_E2_try3_B6 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:34:50 [run|L_nginx_perf_wide_E2_try3_B6 stop+parse] run L_nginx_perf_wide_E2_try3_A2 (rate 10000, traced=0)
+12:34:50 [run|L_nginx_perf_wide_E2_try3_A2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:37:20 [run|L_nginx_perf_wide_E2_try3_A2 stop+parse] cell L_nginx_perf_wide_E2 try 3 ok (p99 1.5601% <= 14.2292%, cpu 1.0625% <= 5%)
+12:37:25 [run|collect nginx perf] collect: 16 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/nginx_perf.csv
+12:37:25 [run|collect nginx perf] WARN: cell L_nginx_perf_narrow_E3 try 1 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:37:25 [run|collect nginx perf] WARN: cell L_nginx_perf_narrow_E3 try 2 has runs but no verdict (earlier crash) — marked crashed, moving on
+12:37:25 [run|collect nginx perf] === cell L_nginx_perf_narrow_E3 try 3 ===
+12:37:25 [run|collect nginx perf] run L_nginx_perf_narrow_E3_try3_W1 (rate 20000, traced=0)
+12:37:25 [run|L_nginx_perf_narrow_E3_try3_W1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:39:56 [run|L_nginx_perf_narrow_E3_try3_W1 stop+parse] run L_nginx_perf_narrow_E3_try3_A1 (rate 20000, traced=0)
+12:39:56 [run|L_nginx_perf_narrow_E3_try3_A1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:42:27 [run|L_nginx_perf_narrow_E3_try3_A1 stop+parse] run L_nginx_perf_narrow_E3_try3_B1 (rate 20000, traced=1)
+12:42:27 [run|L_nginx_perf_narrow_E3_try3_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:44:59 [run|L_nginx_perf_narrow_E3_try3_B1 stop+parse] run L_nginx_perf_narrow_E3_try3_B2 (rate 20000, traced=1)
+12:44:59 [run|L_nginx_perf_narrow_E3_try3_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:47:32 [run|L_nginx_perf_narrow_E3_try3_B2 stop+parse] run L_nginx_perf_narrow_E3_try3_B3 (rate 20000, traced=1)
+12:47:32 [run|L_nginx_perf_narrow_E3_try3_B3 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+12:50:04 [run|L_nginx_perf_narrow_E3_try3_B3 stop+parse] run L_nginx_perf_narrow_E3_try3_B4 (rate 20000, traced=1)
+12:50:04 [run|L_nginx_perf_narrow_E3_try3_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:52:37 [run|L_nginx_perf_narrow_E3_try3_B4 stop+parse] run L_nginx_perf_narrow_E3_try3_B5 (rate 20000, traced=1)
+12:52:37 [run|L_nginx_perf_narrow_E3_try3_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+12:55:09 [run|L_nginx_perf_narrow_E3_try3_B5 stop+parse] run L_nginx_perf_narrow_E3_try3_B6 (rate 20000, traced=1)
+12:55:10 [run|L_nginx_perf_narrow_E3_try3_B6 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+12:57:42 [run|L_nginx_perf_narrow_E3_try3_B6 stop+parse] run L_nginx_perf_narrow_E3_try3_A2 (rate 20000, traced=0)
+12:57:42 [run|L_nginx_perf_narrow_E3_try3_A2 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] WARN: cell L_nginx_perf_narrow_E3 try 3: drift p99 11.6861% (limit 27.0182%, B spread 13.5091%) cpu 7.9085% (limit 5%) — rerunning bracket
+13:00:13 [run|L_nginx_perf_narrow_E3_try3_A2 stop+parse] FAIL: cell L_nginx_perf_narrow_E3 failed drift on all 3 tries
+
+##### docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+##### docker logs --tail 100 bench-nginx
+Error response from daemon: No such container: bench-nginx
+
+##### dmesg -T | tail -n 60
+[Sat Nov  7 11:45:00 2026] kauditd_printk_skb: 2 callbacks suppressed
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.518:340): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=72817 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.518:341): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=72817 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.519:342): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=72818 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.520:343): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=72818 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.533:344): apparmor="DENIED" operation="getattr" class="file" info="Failed name lookup - disconnected path" error=-13 profile="unprivileged_userns" name="" pid=72857 comm="systemd-detect-" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.645:345): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=72989 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.645:346): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=72989 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:45:00 2026] audit: type=1400 audit(1794032100.645:347): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=72990 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:45:00 2026] rfkill: input handler enabled
+[Sat Nov  7 11:45:01 2026] audit: type=1400 audit(1794032101.003:348): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=73343 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:45:01 2026] audit: type=1400 audit(1794032101.003:349): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=73343 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:45:02 2026] rfkill: input handler disabled
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Sat Nov  7 11:45:03 2026] NVRM: No NVIDIA GPU found.
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Sat Nov  7 11:45:03 2026] NVRM: No NVIDIA GPU found.
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Sat Nov  7 11:45:03 2026] NVRM: No NVIDIA GPU found.
+[Sat Nov  7 11:45:03 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Sat Nov  7 11:45:06 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Sat Nov  7 11:45:06 2026] NVRM: No NVIDIA GPU found.
+[Sat Nov  7 11:45:06 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Sat Nov  7 11:45:06 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Sat Nov  7 11:45:06 2026] NVRM: No NVIDIA GPU found.
+[Sat Nov  7 11:45:06 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Sat Nov  7 11:50:55 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.503:355): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75620 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.503:356): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75620 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.504:357): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75621 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.509:358): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75618 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.509:359): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75618 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.509:360): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75624 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.514:361): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=75625 comm="fusermount3" flags="rw, rprivate"
+[Sat Nov  7 11:50:55 2026] rfkill: input handler enabled
+[Sat Nov  7 11:50:55 2026] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224111243
+[Sat Nov  7 11:50:55 2026] Bluetooth: hci0: Device setup in 142949 usecs
+[Sat Nov  7 11:50:55 2026] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.720:362): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75748 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.720:363): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75748 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] audit: type=1400 audit(1794032455.720:364): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=75749 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:50:55 2026] Bluetooth: hci0: AOSP extensions version v1.00
+[Sat Nov  7 11:50:55 2026] Bluetooth: hci0: AOSP quality report is supported
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 1 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 3 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 5 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 7 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 9 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 11 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 13 is now offline
+[Sat Nov  7 11:51:00 2026] smpboot: CPU 15 is now offline
+[Sat Nov  7 11:51:00 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Sat Nov  7 11:51:00 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+[Sat Nov  7 11:51:07 2026] kauditd_printk_skb: 6 callbacks suppressed
+[Sat Nov  7 11:51:07 2026] audit: type=1400 audit(1794032467.263:371): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=76898 comm="fusermount3" capability=1  capname="dac_override"
+[Sat Nov  7 11:51:07 2026] audit: type=1400 audit(1794032467.263:372): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=76898 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:51:07 2026] audit: type=1400 audit(1794032467.263:373): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=76899 comm="fusermount3" capability=7  capname="setuid"
+[Sat Nov  7 11:51:07 2026] audit: type=1400 audit(1794032467.274:374): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=76900 comm="fusermount3" flags="rw, rprivate"
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+0
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2900000
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2894932
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2894889
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 38000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+  75549       1  14  0.0 Ss      01:09:21 bash
+ 122651    4161  12  0.0 S          42:51 sleep
+ 202065  202063  14  0.0 S          00:00 bash
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887         991       10105           2        4099       13896
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   46G   58G  45% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=
+
+##### ls -la '/home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/raw/L_nginx_perf_narrow_E3_try3_A2'
+total 84
+drwxr-xr-x   3 root root  4096 Nov  7 13:00 .
+drwxr-xr-x 122 ab   root 12288 Nov  7 13:00 ..
+-rw-r--r--   1 root root     0 Nov  7 13:00 DONE
+-rw-r--r--   1 root root   105 Nov  7 12:57 cgroup_path
+-rw-r--r--   1 root root    65 Nov  7 12:57 container_id
+-rw-r--r--   1 root root    56 Nov  7 12:57 cooldown.env
+-rw-r--r--   1 root root     7 Nov  7 12:57 master_pid
+-rw-r--r--   1 root root  7432 Nov  7 13:00 net_after.txt
+-rw-r--r--   1 root root  7431 Nov  7 12:58 net_before.txt
+-rw-r--r--   1 root root   339 Nov  7 12:57 nginx.conf
+-rw-r--r--   1 root root     7 Nov  7 12:58 pids.sampler
+-rw-r--r--   1 root root   463 Nov  7 12:58 ramp.out
+-rw-r--r--   1 root root   542 Nov  7 13:00 run_meta.env
+drwxr-xr-x   2 root root  4096 Nov  7 13:00 samples
+-rw-r--r--   1 root root    28 Nov  7 12:57 target_pids
+-rw-r--r--   1 root root   103 Nov  7 13:00 wl.env
+-rw-r--r--   1 root root  6605 Nov  7 13:00 workload.out
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/raw/L_nginx_perf_narrow_E3_try3_A2/ramp.out'
+Running 30s test @ http://127.0.0.1:8080/
+  2 threads and 100 connections
+  Thread calibration: mean lat.: 1.850ms, rate sampling interval: 10ms
+  Thread calibration: mean lat.: 1.863ms, rate sampling interval: 10ms
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.83ms  401.25us   4.72ms   67.19%
+    Req/Sec    10.52k   668.16    14.33k    93.37%
+  597572 requests in 30.00s, 486.12MB read
+Requests/sec:  19917.09
+Transfer/sec:     16.20MB
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/perf/results/raw/L_nginx_perf_narrow_E3_try3_A2/workload.out'
+       5.887     0.999992      2194984    131072.00
+       5.947     0.999993      2194985    145635.56
+       6.031     0.999994      2194987    163840.00
+       6.083     0.999995      2194989    187245.71
+       6.119     0.999995      2194990    218453.33
+       6.219     0.999996      2194992    262144.00
+       6.223     0.999997      2194993    291271.11
+       6.227     0.999997      2194994    327680.00
+       6.299     0.999997      2194995    374491.43
+       6.299     0.999998      2194995    436906.67
+       6.303     0.999998      2194996    524288.00
+       6.359     0.999998      2194997    582542.22
+       6.359     0.999998      2194997    655360.00
+       6.375     0.999999      2194998    748982.86
+       6.375     0.999999      2194998    873813.33
+       6.375     0.999999      2194998   1048576.00
+       6.447     0.999999      2194999   1165084.44
+       6.447     0.999999      2194999   1310720.00
+       6.447     0.999999      2194999   1497965.71
+       6.447     0.999999      2194999   1747626.67
+       6.447     1.000000      2194999   2097152.00
+       6.571     1.000000      2195000   2330168.89
+       6.571     1.000000      2195000          inf
+#[Mean    =        1.727, StdDeviation   =        0.418]
+#[Max     =        6.568, Total count    =      2195000]
+#[Buckets =           27, SubBuckets     =         2048]
+----------------------------------------------------------
+  2397594 requests in 2.00m, 1.90GB read
+Requests/sec:  19979.40
+Transfer/sec:     16.25MB
