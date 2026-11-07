@@ -2,6 +2,17 @@
 
 Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md) still applies; this file adds what is specific to Platform L. Full status, machine facts and history are in [README.md](README.md). Keep both files current: when something is done, decided, or fails, record it in README.md (timeline / failures table) and update the state summary below in the same edit.
 
+## Publication standard (applies to everything)
+
+All results, scripts and documents here feed a paper the user will submit for peer-reviewed publication. Hold every change to that standard, not to "good enough for a course project":
+
+- **Every number is traceable.** A figure in a doc or the paper must be regenerable from committed raw data by a committed script, with the commit, kernel, tool versions and config recorded alongside it. No hand-computed or hand-copied numbers without saying where they came from.
+- **Reproducible by a stranger.** Scripts are deterministic (seeds recorded), pin their tool versions, record the host state they ran under, and are commented well enough that a reviewer could rerun them from the README alone.
+- **Claims match the evidence.** Report what was measured, on which platform, with which caveats; keep qualifications next to the numbers they qualify; distinguish mean ratios from tested statistical results; never round a caveat away.
+- **Methodology is defensible.** Statistical tests checked rather than assumed (rep floors, multiple comparisons, effect sizes with confidence intervals); threats to validity written down as they are found, not reconstructed at the end.
+- **Consistent and citable.** One term per concept across all docs; units on every number; cite the original paper/DOI, never a markdown conversion or a blog post.
+- **Clean history.** Commit messages describe the change precisely; nothing gets quietly rewritten — superseded results get a correction next to them.
+
 ## State (2026-11-07) — read this first
 
 **Measured on hardware:** nginx pilot (ladder frozen 5k/10k/20k/40k in `nginx-wrk2/pilot.env`), smoke cell (1 warm-up is enough), and the **full nginx × perf matrix: 8/8 cells, 64 rows** (pre-fix, now in `nginx-wrk2/perf/results-prefix-wrk2-stall/nginx_perf.csv`). CPU results are clean (narrow perf ≈ free; wide perf +59–72 % nginx CPU, tracer 0.19→0.91 cores 5k→40k). **Tail latency of that matrix is not usable**: ~1.00 s stalls in 21/64 runs, untraced baselines included, TCP counters all 0, never at 40k (README timeline 12).
