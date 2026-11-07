@@ -1,0 +1,50 @@
+18:12:04 [ebpf-check|preflight] preflight
+18:12:04 [ebpf-check|preflight]   [ok]   on AC power
+18:12:04 [ebpf-check|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+18:12:04 [ebpf-check|preflight]   [ok]   TLP not active
+18:12:04 [ebpf-check|preflight]   [ok]   unattended-upgrades not active
+18:12:04 [ebpf-check|preflight]   [ok]   no noisy processes
+18:12:04 [ebpf-check|preflight] WARN: graphical session running (ALLOW_GUI=1)
+18:12:04 [ebpf-check|preflight]   package 58 °C > 55 °C — waiting up to 900s to cool
+18:12:06 [ebpf-check|preflight]   cooled for 2s, now 55 °C
+18:12:06 [ebpf-check|preflight]   [ok]   package 55 °C
+18:12:06 [ebpf-check|preflight]   [ok]   41095 MB free
+18:12:06 [ebpf-check|preflight]   [ok]   BPF JIT on
+18:12:06 [ebpf-check|preflight]   [ok]   docker reachable
+18:12:06 [ebpf-check|preflight]   [ok]   wrk2 with -R
+18:12:06 [ebpf-check|preflight]   [ok]   nginx:1.24 id matches
+18:12:06 [ebpf-check|preflight]   [ok]   port 8080 free
+18:12:06 [ebpf-check|preflight]   [ok]   BCC python bindings (0.35.0)
+18:12:06 [ebpf-check|preflight]   [ok]   kprobe target tcp_sendmsg
+18:12:06 [ebpf-check|preflight]   [ok]   kprobe target tcp_recvmsg
+18:12:06 [ebpf-check|preflight]   [ok]   tracepoint raw_syscalls
+18:12:06 [ebpf-check|preflight]   [ok]   bpf_jit_enable=1
+18:12:06 [ebpf-check|preflight]   [ok]   bpf_jit_harden=0
+18:12:06 [ebpf-check|preflight]   [ok]   tracer sources present
+18:12:06 [ebpf-check|preflight] preflight passed
+18:12:06 [ebpf-check|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+18:12:07 [ebpf-check|host setup] clock floor requested at 2900000 kHz
+18:12:07 [ebpf-check|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+18:12:07 [ebpf-check|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+18:12:11 [ebpf-check|host setup] clock under load: 2894888 kHz (ok)
+18:12:11 [ebpf-check|host setup] host configured
+18:12:11 [ebpf-check|host setup] === narrow E1 (5000 rps) ===
+18:12:54 [ebpf-check|narrow E1 detach] narrow E1: submitted 298997, lost 0, notes none
+18:12:54 [ebpf-check|narrow E1 detach] === wide E1 (5000 rps) ===
+18:13:37 [ebpf-check|wide E1 detach] wide E1: submitted 1329715, lost 0, notes none
+18:13:37 [ebpf-check|wide E1 detach] === narrow E4 (40000 rps) ===
+18:14:21 [ebpf-check|narrow E4 detach] narrow E4: submitted 2390279, lost 0, notes none
+18:14:21 [ebpf-check|narrow E4 detach] === wide E4 (40000 rps) ===
+18:15:04 [ebpf-check|wide E4 detach] wide E4: submitted 9914210, lost 0, notes none
+# eBPF check 20261107-181204  kernel 7.0.0-43-generic  bcc 0.35.0
+# 10s ramp + 30s load per row; buffer 512 pages/CPU; not a measurement
+scope  lvl   rate attach_s   submitted  ev_per_s      lost drop_rate   tracer   filt/sub  unaccount   p99_ms      tput
+narrow E1    5000     2.19      298997      9863         0  0.000000   0.1102     0.9996          0 2.820000   4980.92
+wide   E1    5000     2.19     1329715     43860         0  0.000000   0.2010    23.8059          0 3.180000   4980.63
+narrow E4   40000     2.19     2390279     78848         0  0.000000   0.5741     0.9999          0 5.210000  39834.92
+wide   E4   40000     1.97     9914210    327029         0  0.000000   0.9035     7.5286          0 6.730000  39835.29
+# attach_s: start of mech_attach to ebpf.ready (compile + attach + buffer open)
+# ev_per_s: kernel submits / attach-to-detach time; tracer: Python poller cores (sampler)
+# filt/sub: events the in-kernel filter discarded per event kept; unaccount: submitted - delivered - lost
+18:15:05 [ebpf-check|host revert] host reverted
+18:15:05 [ebpf-check|host revert] done — summary in /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/ebpf-check_20261107-181204.txt

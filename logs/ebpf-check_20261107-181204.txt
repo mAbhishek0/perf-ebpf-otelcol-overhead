@@ -1,0 +1,10 @@
+# eBPF check 20261107-181204  kernel 7.0.0-43-generic  bcc 0.35.0
+# 10s ramp + 30s load per row; buffer 512 pages/CPU; not a measurement
+scope  lvl   rate attach_s   submitted  ev_per_s      lost drop_rate   tracer   filt/sub  unaccount   p99_ms      tput
+narrow E1    5000     2.19      298997      9863         0  0.000000   0.1102     0.9996          0 2.820000   4980.92
+wide   E1    5000     2.19     1329715     43860         0  0.000000   0.2010    23.8059          0 3.180000   4980.63
+narrow E4   40000     2.19     2390279     78848         0  0.000000   0.5741     0.9999          0 5.210000  39834.92
+wide   E4   40000     1.97     9914210    327029         0  0.000000   0.9035     7.5286          0 6.730000  39835.29
+# attach_s: start of mech_attach to ebpf.ready (compile + attach + buffer open)
+# ev_per_s: kernel submits / attach-to-detach time; tracer: Python poller cores (sampler)
+# filt/sub: events the in-kernel filter discarded per event kept; unaccount: submitted - delivered - lost
