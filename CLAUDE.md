@@ -14,7 +14,7 @@ Working context for agents in `laptop/`. The repo-root [CLAUDE.md](../CLAUDE.md)
 
 **nginx × eBPF plugin written, never run (2026-11-07, README timeline 19)** — BCC port of S's tracer, see `nginx-wrk2/ebpf/docs/README.md`. **AC-loss handling** in `common/power.sh` (probe on battery, wait for AC or abort); runs record `power_source`. Schema 2.1.0.
 
-**Next:** on the laptop: pull, `bash restat.sh nginx perf` (rebuilds the perf CSV for 2.1.0 — `power_source` NA there; skip if already pushed from Windows), then `sudo bash nginx-wrk2/ebpf/scripts/run.sh --smoke` (first BCC 0.35 run here; check `ebpf_tracer.log`, `mech.stats`, attach time), then the full eBPF matrix (~3 h). Then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
+**Next:** on the laptop: pull, `bash restat.sh nginx perf` done 2026-11-07 (`f89c5f6`); then `sudo bash nginx-wrk2/ebpf/scripts/check.sh` (~5 min, narrow+wide at E1/E4 through the real `mech_*`; push `logs/ebpf-check_*.txt`), then the full eBPF matrix (~3 h). No eBPF smoke cell or pilot: both are workload properties, already done. Then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
 
 **Not written yet:** nginx × eBPF and nginx × collector plugins (`<wl>/<mech>/scripts/mech.sh` per the interface below), fio and redis workloads, the `SMT=on` option (one SMT-on arm planned last). Known small gap: the `die` from a pipefail inside `$(...)` is not recorded in `logs/.errors_*` (seen in the perf-trace grep crash) — investigate when convenient.
 

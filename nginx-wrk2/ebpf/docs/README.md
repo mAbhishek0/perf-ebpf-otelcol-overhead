@@ -3,8 +3,8 @@
 Run on the laptop, from the repo root:
 
 ```bash
-sudo bash nginx-wrk2/ebpf/scripts/run.sh --smoke     # one cell (E1 narrow) first — BCC 0.35 has never run here
-sudo bash nginx-wrk2/ebpf/scripts/run.sh             # full matrix: 4 levels x 2 scopes, ~3 h
+sudo bash nginx-wrk2/ebpf/scripts/check.sh   # ~5 min shakedown: narrow+wide at E1 and E4, no results written
+sudo bash nginx-wrk2/ebpf/scripts/run.sh     # full matrix: 4 levels x 2 scopes, ~3 h
 ```
 
 ## What is traced
@@ -48,6 +48,13 @@ only; `sys_exit` is attached and counted, not submitted (one syscall = one event
 - Stop: SIGINT at detach. `EBPF_EXIT=ok` is written last; anything else (killed, or the
   `EBPF_MAX_WINDOW_S` safety stop) fails the run instead of ingesting a short window.
 - `mech_sanity` fails a traced run whose probes submitted 0 events.
+
+`check.sh` is the first thing to run (BCC 0.35 has never run here). It uses the matrix's own
+`mech_*` functions on a configured host and writes a table to `logs/ebpf-check_<ts>.txt`:
+attach time, kernel submits/s, lost, drop rate, poller CPU, filter discards per kept event,
+and submitted − delivered − lost. No smoke cell: the warm-up gate it exists for is a workload
+property, already passed on nginx × perf; no pilot: the ladder is the workload's, shared by
+every mechanism.
 
 ## Expectations to check on the first run
 
