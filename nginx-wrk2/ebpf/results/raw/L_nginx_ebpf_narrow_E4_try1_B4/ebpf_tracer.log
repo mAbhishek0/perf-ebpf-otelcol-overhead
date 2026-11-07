@@ -1,0 +1,14 @@
+sh: 1: ü: not found
+/virtual/main.c:106:53: warning: declaration of 'struct sock' will not be visible outside of this function [-Wvisibility]
+  106 | int kprobe__tcp_sendmsg(struct pt_regs *ctx, struct sock *sk,
+      |                                                     ^
+/virtual/main.c:107:32: warning: declaration of 'struct msghdr' will not be visible outside of this function [-Wvisibility]
+  107 |                         struct msghdr *msg, size_t size)
+      |                                ^
+/virtual/main.c:114:53: warning: declaration of 'struct sock' will not be visible outside of this function [-Wvisibility]
+  114 | int kprobe__tcp_recvmsg(struct pt_regs *ctx, struct sock *sk,
+      |                                                     ^
+/virtual/main.c:115:32: warning: declaration of 'struct msghdr' will not be visible outside of this function [-Wvisibility]
+  115 |                         struct msghdr *msg, size_t len)
+      |                                ^
+4 warnings generated.

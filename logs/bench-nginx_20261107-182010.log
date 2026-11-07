@@ -1,0 +1,249 @@
+18:20:26 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+18:20:26 [run|preflight] preflight
+18:20:26 [run|preflight]   [ok]   on AC power
+18:20:26 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+18:20:26 [run|preflight]   [ok]   TLP not active
+18:20:26 [run|preflight]   [ok]   unattended-upgrades not active
+18:20:26 [run|preflight]   [ok]   no noisy processes
+18:20:26 [run|preflight]   [ok]   no graphical session
+18:20:26 [run|preflight]   package 70 °C > 55 °C — waiting up to 900s to cool
+18:20:35 [run|preflight]   cooled for 9s, now 55 °C
+18:20:35 [run|preflight]   [ok]   package 55 °C
+18:20:35 [run|preflight]   [ok]   41094 MB free
+18:20:35 [run|preflight]   [ok]   BPF JIT on
+18:20:35 [run|preflight]   [ok]   docker reachable
+18:20:35 [run|preflight]   [ok]   wrk2 with -R
+18:20:35 [run|preflight]   [ok]   nginx:1.24 id matches
+18:20:35 [run|preflight]   [ok]   port 8080 free
+18:20:35 [run|preflight]   [ok]   BCC python bindings (0.35.0)
+18:20:35 [run|preflight]   [ok]   kprobe target tcp_sendmsg
+18:20:36 [run|preflight]   [ok]   kprobe target tcp_recvmsg
+18:20:36 [run|preflight]   [ok]   tracepoint raw_syscalls
+18:20:36 [run|preflight]   [ok]   bpf_jit_enable=1
+18:20:36 [run|preflight]   [ok]   bpf_jit_harden=0
+18:20:36 [run|preflight]   [ok]   tracer sources present
+18:20:36 [run|preflight] preflight passed
+18:20:36 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+18:20:36 [run|host setup] clock floor requested at 2900000 kHz
+18:20:36 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+18:20:37 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+18:20:41 [run|host setup] clock under load: 2893981 kHz (ok)
+18:20:41 [run|host setup] host configured
+18:21:11 [run|host setup] idle package temp 38 C (min of 15 samples over 30 s)
+18:21:11 [run|host setup] ### nginx x ebpf: level order 2 4 3 1
+18:21:11 [run|host setup] === cell L_nginx_ebpf_narrow_E2 try 1 ===
+18:21:11 [run|host setup] run L_nginx_ebpf_narrow_E2_try1_W1 (rate 10000, traced=0)
+18:21:11 [run|L_nginx_ebpf_narrow_E2_try1_W1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:23:42 [run|L_nginx_ebpf_narrow_E2_try1_W1 stop+parse] run L_nginx_ebpf_narrow_E2_try1_A1 (rate 10000, traced=0)
+18:23:42 [run|L_nginx_ebpf_narrow_E2_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:26:13 [run|L_nginx_ebpf_narrow_E2_try1_A1 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B1 (rate 10000, traced=1)
+18:26:13 [run|L_nginx_ebpf_narrow_E2_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:28:46 [run|L_nginx_ebpf_narrow_E2_try1_B1 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B2 (rate 10000, traced=1)
+18:28:46 [run|L_nginx_ebpf_narrow_E2_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+18:31:20 [run|L_nginx_ebpf_narrow_E2_try1_B2 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B3 (rate 10000, traced=1)
+18:31:20 [run|L_nginx_ebpf_narrow_E2_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:33:53 [run|L_nginx_ebpf_narrow_E2_try1_B3 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B4 (rate 10000, traced=1)
+18:33:53 [run|L_nginx_ebpf_narrow_E2_try1_B4 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:36:26 [run|L_nginx_ebpf_narrow_E2_try1_B4 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B5 (rate 10000, traced=1)
+18:36:26 [run|L_nginx_ebpf_narrow_E2_try1_B5 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/sample.sh: line 41: printf: write error: Broken pipe
+18:38:59 [run|L_nginx_ebpf_narrow_E2_try1_B5 stop+parse] run L_nginx_ebpf_narrow_E2_try1_B6 (rate 10000, traced=1)
+18:39:00 [run|L_nginx_ebpf_narrow_E2_try1_B6 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:41:33 [run|L_nginx_ebpf_narrow_E2_try1_B6 stop+parse] run L_nginx_ebpf_narrow_E2_try1_A2 (rate 10000, traced=0)
+18:41:33 [run|L_nginx_ebpf_narrow_E2_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:44:04 [run|L_nginx_ebpf_narrow_E2_try1_A2 stop+parse] cell L_nginx_ebpf_narrow_E2 try 1 ok (p99 4.7198% <= 23.5294%, cpu 1.7111% <= 5%)
+18:44:07 [run|collect nginx ebpf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+18:44:07 [run|collect nginx ebpf] === cell L_nginx_ebpf_wide_E2 try 1 ===
+18:44:07 [run|collect nginx ebpf] run L_nginx_ebpf_wide_E2_try1_W1 (rate 10000, traced=0)
+18:44:07 [run|L_nginx_ebpf_wide_E2_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+18:46:37 [run|L_nginx_ebpf_wide_E2_try1_W1 stop+parse] run L_nginx_ebpf_wide_E2_try1_A1 (rate 10000, traced=0)
+18:46:38 [run|L_nginx_ebpf_wide_E2_try1_A1 cooldown] cooldown 1s -> start at 37 C (limit 43 C, idle 38 C)
+18:49:08 [run|L_nginx_ebpf_wide_E2_try1_A1 stop+parse] run L_nginx_ebpf_wide_E2_try1_B1 (rate 10000, traced=1)
+18:49:08 [run|L_nginx_ebpf_wide_E2_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:51:42 [run|L_nginx_ebpf_wide_E2_try1_B1 stop+parse] run L_nginx_ebpf_wide_E2_try1_B2 (rate 10000, traced=1)
+18:51:42 [run|L_nginx_ebpf_wide_E2_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:54:15 [run|L_nginx_ebpf_wide_E2_try1_B2 stop+parse] run L_nginx_ebpf_wide_E2_try1_B3 (rate 10000, traced=1)
+18:54:15 [run|L_nginx_ebpf_wide_E2_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+18:56:48 [run|L_nginx_ebpf_wide_E2_try1_B3 stop+parse] run L_nginx_ebpf_wide_E2_try1_B4 (rate 10000, traced=1)
+18:56:48 [run|L_nginx_ebpf_wide_E2_try1_B4 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+18:59:21 [run|L_nginx_ebpf_wide_E2_try1_B4 stop+parse] run L_nginx_ebpf_wide_E2_try1_B5 (rate 10000, traced=1)
+18:59:21 [run|L_nginx_ebpf_wide_E2_try1_B5 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+19:01:54 [run|L_nginx_ebpf_wide_E2_try1_B5 stop+parse] run L_nginx_ebpf_wide_E2_try1_B6 (rate 10000, traced=1)
+19:01:54 [run|L_nginx_ebpf_wide_E2_try1_B6 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+19:04:27 [run|L_nginx_ebpf_wide_E2_try1_B6 stop+parse] run L_nginx_ebpf_wide_E2_try1_A2 (rate 10000, traced=0)
+19:04:28 [run|L_nginx_ebpf_wide_E2_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+19:06:58 [run|L_nginx_ebpf_wide_E2_try1_A2 stop+parse] cell L_nginx_ebpf_wide_E2 try 1 ok (p99 0.0000% <= 9.3816%, cpu 0.2787% <= 5%)
+19:07:04 [run|collect nginx ebpf] collect: 16 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+19:07:04 [run|collect nginx ebpf] === cell L_nginx_ebpf_narrow_E4 try 1 ===
+19:07:04 [run|collect nginx ebpf] run L_nginx_ebpf_narrow_E4_try1_W1 (rate 40000, traced=0)
+19:07:04 [run|L_nginx_ebpf_narrow_E4_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+19:09:35 [run|L_nginx_ebpf_narrow_E4_try1_W1 stop+parse] run L_nginx_ebpf_narrow_E4_try1_A1 (rate 40000, traced=0)
+19:09:35 [run|L_nginx_ebpf_narrow_E4_try1_A1 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+19:12:06 [run|L_nginx_ebpf_narrow_E4_try1_A1 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B1 (rate 40000, traced=1)
+19:12:06 [run|L_nginx_ebpf_narrow_E4_try1_B1 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+19:14:39 [run|L_nginx_ebpf_narrow_E4_try1_B1 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B2 (rate 40000, traced=1)
+19:14:39 [run|L_nginx_ebpf_narrow_E4_try1_B2 cooldown] cooldown 0s -> start at 42 C (limit 43 C, idle 38 C)
+19:17:12 [run|L_nginx_ebpf_narrow_E4_try1_B2 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B3 (rate 40000, traced=1)
+19:17:12 [run|L_nginx_ebpf_narrow_E4_try1_B3 cooldown] cooldown 0s -> start at 42 C (limit 43 C, idle 38 C)
+19:19:45 [run|L_nginx_ebpf_narrow_E4_try1_B3 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B4 (rate 40000, traced=1)
+19:19:46 [run|L_nginx_ebpf_narrow_E4_try1_B4 cooldown] cooldown 1s -> start at 42 C (limit 43 C, idle 38 C)
+19:22:19 [run|L_nginx_ebpf_narrow_E4_try1_B4 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B5 (rate 40000, traced=1)
+19:22:19 [run|L_nginx_ebpf_narrow_E4_try1_B5 cooldown] cooldown 0s -> start at 41 C (limit 43 C, idle 38 C)
+19:24:52 [run|L_nginx_ebpf_narrow_E4_try1_B5 stop+parse] run L_nginx_ebpf_narrow_E4_try1_B6 (rate 40000, traced=1)
+19:24:52 [run|L_nginx_ebpf_narrow_E4_try1_B6 cooldown] cooldown 0s -> start at 42 C (limit 43 C, idle 38 C)
+19:27:25 [run|L_nginx_ebpf_narrow_E4_try1_B6 stop+parse] run L_nginx_ebpf_narrow_E4_try1_A2 (rate 40000, traced=0)
+19:27:25 [run|L_nginx_ebpf_narrow_E4_try1_A2 cooldown] cooldown 0s -> start at 42 C (limit 43 C, idle 38 C)
+19:29:56 [run|L_nginx_ebpf_narrow_E4_try1_A2 stop+parse] cell L_nginx_ebpf_narrow_E4 try 1 ok (p99 0.0000% <= 5.0000%, cpu 0.2988% <= 5%)
+19:30:05 [run|collect nginx ebpf] collect: 24 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+19:30:05 [run|collect nginx ebpf] === cell L_nginx_ebpf_wide_E4 try 1 ===
+19:30:05 [run|collect nginx ebpf] run L_nginx_ebpf_wide_E4_try1_W1 (rate 40000, traced=0)
+19:30:06 [run|L_nginx_ebpf_wide_E4_try1_W1 cooldown] cooldown 1s -> start at 40 C (limit 43 C, idle 38 C)
+19:32:36 [run|L_nginx_ebpf_wide_E4_try1_W1 stop+parse] run L_nginx_ebpf_wide_E4_try1_A1 (rate 40000, traced=0)
+19:32:36 [run|L_nginx_ebpf_wide_E4_try1_A1 cooldown] cooldown 0s -> start at 41 C (limit 43 C, idle 38 C)
+19:35:07 [run|L_nginx_ebpf_wide_E4_try1_A1 stop+parse] run L_nginx_ebpf_wide_E4_try1_B1 (rate 40000, traced=1)
+19:35:07 [run|L_nginx_ebpf_wide_E4_try1_B1 cooldown] cooldown 0s -> start at 41 C (limit 43 C, idle 38 C)
+19:37:40 [run|L_nginx_ebpf_wide_E4_try1_B1 stop+parse] run L_nginx_ebpf_wide_E4_try1_B2 (rate 40000, traced=1)
+19:37:41 [run|L_nginx_ebpf_wide_E4_try1_B2 cooldown] cooldown 1s -> start at 43 C (limit 43 C, idle 38 C)
+19:40:14 [run|L_nginx_ebpf_wide_E4_try1_B2 stop+parse] run L_nginx_ebpf_wide_E4_try1_B3 (rate 40000, traced=1)
+19:40:14 [run|L_nginx_ebpf_wide_E4_try1_B3 cooldown] cooldown 0s -> start at 43 C (limit 43 C, idle 38 C)
+19:42:47 [run|L_nginx_ebpf_wide_E4_try1_B3 stop+parse] run L_nginx_ebpf_wide_E4_try1_B4 (rate 40000, traced=1)
+19:42:47 [run|L_nginx_ebpf_wide_E4_try1_B4 cooldown] cooldown 0s -> start at 43 C (limit 43 C, idle 38 C)
+19:45:20 [run|L_nginx_ebpf_wide_E4_try1_B4 stop+parse] run L_nginx_ebpf_wide_E4_try1_B5 (rate 40000, traced=1)
+19:45:20 [run|L_nginx_ebpf_wide_E4_try1_B5 cooldown] cooldown 0s -> start at 43 C (limit 43 C, idle 38 C)
+19:47:53 [run|L_nginx_ebpf_wide_E4_try1_B5 stop+parse] run L_nginx_ebpf_wide_E4_try1_B6 (rate 40000, traced=1)
+19:47:54 [run|L_nginx_ebpf_wide_E4_try1_B6 cooldown] cooldown 0s -> start at 43 C (limit 43 C, idle 38 C)
+19:50:27 [run|L_nginx_ebpf_wide_E4_try1_B6 stop+parse] run L_nginx_ebpf_wide_E4_try1_A2 (rate 40000, traced=0)
+19:50:27 [run|L_nginx_ebpf_wide_E4_try1_A2 cooldown] cooldown 0s -> start at 43 C (limit 43 C, idle 38 C)
+19:52:58 [run|L_nginx_ebpf_wide_E4_try1_A2 stop+parse] cell L_nginx_ebpf_wide_E4 try 1 ok (p99 0.7828% <= 20.0852%, cpu 1.7846% <= 5%)
+19:53:10 [run|collect nginx ebpf] collect: 32 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+19:53:10 [run|collect nginx ebpf] === cell L_nginx_ebpf_narrow_E3 try 1 ===
+19:53:10 [run|collect nginx ebpf] run L_nginx_ebpf_narrow_E3_try1_W1 (rate 20000, traced=0)
+19:53:10 [run|L_nginx_ebpf_narrow_E3_try1_W1 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+19:55:41 [run|L_nginx_ebpf_narrow_E3_try1_W1 stop+parse] run L_nginx_ebpf_narrow_E3_try1_A1 (rate 20000, traced=0)
+19:55:41 [run|L_nginx_ebpf_narrow_E3_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+19:58:12 [run|L_nginx_ebpf_narrow_E3_try1_A1 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B1 (rate 20000, traced=1)
+19:58:12 [run|L_nginx_ebpf_narrow_E3_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:00:45 [run|L_nginx_ebpf_narrow_E3_try1_B1 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B2 (rate 20000, traced=1)
+20:00:45 [run|L_nginx_ebpf_narrow_E3_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:03:18 [run|L_nginx_ebpf_narrow_E3_try1_B2 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B3 (rate 20000, traced=1)
+20:03:19 [run|L_nginx_ebpf_narrow_E3_try1_B3 cooldown] cooldown 1s -> start at 39 C (limit 43 C, idle 38 C)
+20:05:52 [run|L_nginx_ebpf_narrow_E3_try1_B3 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B4 (rate 20000, traced=1)
+20:05:52 [run|L_nginx_ebpf_narrow_E3_try1_B4 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:08:25 [run|L_nginx_ebpf_narrow_E3_try1_B4 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B5 (rate 20000, traced=1)
+20:08:25 [run|L_nginx_ebpf_narrow_E3_try1_B5 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:10:58 [run|L_nginx_ebpf_narrow_E3_try1_B5 stop+parse] run L_nginx_ebpf_narrow_E3_try1_B6 (rate 20000, traced=1)
+20:10:59 [run|L_nginx_ebpf_narrow_E3_try1_B6 cooldown] cooldown 1s -> start at 39 C (limit 43 C, idle 38 C)
+20:13:32 [run|L_nginx_ebpf_narrow_E3_try1_B6 stop+parse] run L_nginx_ebpf_narrow_E3_try1_A2 (rate 20000, traced=0)
+20:13:32 [run|L_nginx_ebpf_narrow_E3_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:16:03 [run|L_nginx_ebpf_narrow_E3_try1_A2 stop+parse] WARN: cell L_nginx_ebpf_narrow_E3 try 1: drift p99 12.7243% (limit 20.9150%, B spread 10.4575%) cpu 7.4483% (limit 5%) — rerunning bracket
+20:16:03 [run|L_nginx_ebpf_narrow_E3_try1_A2 stop+parse] === cell L_nginx_ebpf_narrow_E3 try 2 ===
+20:16:03 [run|L_nginx_ebpf_narrow_E3_try1_A2 stop+parse] run L_nginx_ebpf_narrow_E3_try2_W1 (rate 20000, traced=0)
+20:16:03 [run|L_nginx_ebpf_narrow_E3_try2_W1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:18:34 [run|L_nginx_ebpf_narrow_E3_try2_W1 stop+parse] run L_nginx_ebpf_narrow_E3_try2_A1 (rate 20000, traced=0)
+20:18:34 [run|L_nginx_ebpf_narrow_E3_try2_A1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:21:04 [run|L_nginx_ebpf_narrow_E3_try2_A1 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B1 (rate 20000, traced=1)
+20:21:04 [run|L_nginx_ebpf_narrow_E3_try2_B1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:23:38 [run|L_nginx_ebpf_narrow_E3_try2_B1 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B2 (rate 20000, traced=1)
+20:23:38 [run|L_nginx_ebpf_narrow_E3_try2_B2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:26:11 [run|L_nginx_ebpf_narrow_E3_try2_B2 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B3 (rate 20000, traced=1)
+20:26:11 [run|L_nginx_ebpf_narrow_E3_try2_B3 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:28:44 [run|L_nginx_ebpf_narrow_E3_try2_B3 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B4 (rate 20000, traced=1)
+20:28:44 [run|L_nginx_ebpf_narrow_E3_try2_B4 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:31:18 [run|L_nginx_ebpf_narrow_E3_try2_B4 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B5 (rate 20000, traced=1)
+20:31:18 [run|L_nginx_ebpf_narrow_E3_try2_B5 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:33:51 [run|L_nginx_ebpf_narrow_E3_try2_B5 stop+parse] run L_nginx_ebpf_narrow_E3_try2_B6 (rate 20000, traced=1)
+20:33:51 [run|L_nginx_ebpf_narrow_E3_try2_B6 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:36:24 [run|L_nginx_ebpf_narrow_E3_try2_B6 stop+parse] run L_nginx_ebpf_narrow_E3_try2_A2 (rate 20000, traced=0)
+20:36:24 [run|L_nginx_ebpf_narrow_E3_try2_A2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:38:55 [run|L_nginx_ebpf_narrow_E3_try2_A2 stop+parse] cell L_nginx_ebpf_narrow_E3 try 2 ok (p99 3.8981% <= 36.1904%, cpu 1.7908% <= 5%)
+20:39:11 [run|collect nginx ebpf] collect: 40 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+20:39:11 [run|collect nginx ebpf] === cell L_nginx_ebpf_wide_E3 try 1 ===
+20:39:11 [run|collect nginx ebpf] run L_nginx_ebpf_wide_E3_try1_W1 (rate 20000, traced=0)
+20:39:11 [run|L_nginx_ebpf_wide_E3_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:41:41 [run|L_nginx_ebpf_wide_E3_try1_W1 stop+parse] run L_nginx_ebpf_wide_E3_try1_A1 (rate 20000, traced=0)
+20:41:42 [run|L_nginx_ebpf_wide_E3_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:44:12 [run|L_nginx_ebpf_wide_E3_try1_A1 stop+parse] run L_nginx_ebpf_wide_E3_try1_B1 (rate 20000, traced=1)
+20:44:12 [run|L_nginx_ebpf_wide_E3_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+20:46:45 [run|L_nginx_ebpf_wide_E3_try1_B1 stop+parse] run L_nginx_ebpf_wide_E3_try1_B2 (rate 20000, traced=1)
+20:46:46 [run|L_nginx_ebpf_wide_E3_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 144: echo: write error: Broken pipe
+20:49:19 [run|L_nginx_ebpf_wide_E3_try1_B2 stop+parse] run L_nginx_ebpf_wide_E3_try1_B3 (rate 20000, traced=1)
+20:49:19 [run|L_nginx_ebpf_wide_E3_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+20:51:52 [run|L_nginx_ebpf_wide_E3_try1_B3 stop+parse] run L_nginx_ebpf_wide_E3_try1_B4 (rate 20000, traced=1)
+20:51:52 [run|L_nginx_ebpf_wide_E3_try1_B4 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+20:54:25 [run|L_nginx_ebpf_wide_E3_try1_B4 stop+parse] run L_nginx_ebpf_wide_E3_try1_B5 (rate 20000, traced=1)
+20:54:25 [run|L_nginx_ebpf_wide_E3_try1_B5 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+20:56:58 [run|L_nginx_ebpf_wide_E3_try1_B5 stop+parse] run L_nginx_ebpf_wide_E3_try1_B6 (rate 20000, traced=1)
+20:56:58 [run|L_nginx_ebpf_wide_E3_try1_B6 cooldown] cooldown 0s -> start at 40 C (limit 43 C, idle 38 C)
+20:59:31 [run|L_nginx_ebpf_wide_E3_try1_B6 stop+parse] run L_nginx_ebpf_wide_E3_try1_A2 (rate 20000, traced=0)
+20:59:31 [run|L_nginx_ebpf_wide_E3_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+date: write error: Broken pipe (os error 32)
+21:02:02 [run|L_nginx_ebpf_wide_E3_try1_A2 stop+parse] cell L_nginx_ebpf_wide_E3 try 1 ok (p99 18.4713% <= 44.9490%, cpu 1.5520% <= 5%)
+21:02:21 [run|collect nginx ebpf] collect: 48 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+21:02:21 [run|collect nginx ebpf] === cell L_nginx_ebpf_narrow_E1 try 1 ===
+21:02:21 [run|collect nginx ebpf] run L_nginx_ebpf_narrow_E1_try1_W1 (rate 5000, traced=0)
+21:02:21 [run|L_nginx_ebpf_narrow_E1_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+21:04:52 [run|L_nginx_ebpf_narrow_E1_try1_W1 stop+parse] run L_nginx_ebpf_narrow_E1_try1_A1 (rate 5000, traced=0)
+21:04:52 [run|L_nginx_ebpf_narrow_E1_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:07:23 [run|L_nginx_ebpf_narrow_E1_try1_A1 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B1 (rate 5000, traced=1)
+21:07:23 [run|L_nginx_ebpf_narrow_E1_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:09:56 [run|L_nginx_ebpf_narrow_E1_try1_B1 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B2 (rate 5000, traced=1)
+21:09:56 [run|L_nginx_ebpf_narrow_E1_try1_B2 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:12:30 [run|L_nginx_ebpf_narrow_E1_try1_B2 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B3 (rate 5000, traced=1)
+21:12:30 [run|L_nginx_ebpf_narrow_E1_try1_B3 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:15:03 [run|L_nginx_ebpf_narrow_E1_try1_B3 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B4 (rate 5000, traced=1)
+21:15:03 [run|L_nginx_ebpf_narrow_E1_try1_B4 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:17:36 [run|L_nginx_ebpf_narrow_E1_try1_B4 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B5 (rate 5000, traced=1)
+21:17:36 [run|L_nginx_ebpf_narrow_E1_try1_B5 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:20:09 [run|L_nginx_ebpf_narrow_E1_try1_B5 stop+parse] run L_nginx_ebpf_narrow_E1_try1_B6 (rate 5000, traced=1)
+21:20:09 [run|L_nginx_ebpf_narrow_E1_try1_B6 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:22:43 [run|L_nginx_ebpf_narrow_E1_try1_B6 stop+parse] run L_nginx_ebpf_narrow_E1_try1_A2 (rate 5000, traced=0)
+21:22:43 [run|L_nginx_ebpf_narrow_E1_try1_A2 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:25:14 [run|L_nginx_ebpf_narrow_E1_try1_A2 stop+parse] cell L_nginx_ebpf_narrow_E1 try 1 ok (p99 1.7699% <= 5.0000%, cpu 3.8882% <= 5%)
+21:25:36 [run|collect nginx ebpf] collect: 56 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+21:25:36 [run|collect nginx ebpf] === cell L_nginx_ebpf_wide_E1 try 1 ===
+21:25:36 [run|collect nginx ebpf] run L_nginx_ebpf_wide_E1_try1_W1 (rate 5000, traced=0)
+21:25:36 [run|L_nginx_ebpf_wide_E1_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 43 C, idle 38 C)
+21:28:07 [run|L_nginx_ebpf_wide_E1_try1_W1 stop+parse] run L_nginx_ebpf_wide_E1_try1_A1 (rate 5000, traced=0)
+21:28:07 [run|L_nginx_ebpf_wide_E1_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:30:38 [run|L_nginx_ebpf_wide_E1_try1_A1 stop+parse] run L_nginx_ebpf_wide_E1_try1_B1 (rate 5000, traced=1)
+21:30:38 [run|L_nginx_ebpf_wide_E1_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:33:11 [run|L_nginx_ebpf_wide_E1_try1_B1 stop+parse] run L_nginx_ebpf_wide_E1_try1_B2 (rate 5000, traced=1)
+21:33:11 [run|L_nginx_ebpf_wide_E1_try1_B2 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:35:44 [run|L_nginx_ebpf_wide_E1_try1_B2 stop+parse] run L_nginx_ebpf_wide_E1_try1_B3 (rate 5000, traced=1)
+21:35:44 [run|L_nginx_ebpf_wide_E1_try1_B3 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:38:17 [run|L_nginx_ebpf_wide_E1_try1_B3 stop+parse] run L_nginx_ebpf_wide_E1_try1_B4 (rate 5000, traced=1)
+21:38:17 [run|L_nginx_ebpf_wide_E1_try1_B4 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:40:50 [run|L_nginx_ebpf_wide_E1_try1_B4 stop+parse] run L_nginx_ebpf_wide_E1_try1_B5 (rate 5000, traced=1)
+21:40:50 [run|L_nginx_ebpf_wide_E1_try1_B5 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:43:23 [run|L_nginx_ebpf_wide_E1_try1_B5 stop+parse] run L_nginx_ebpf_wide_E1_try1_B6 (rate 5000, traced=1)
+21:43:23 [run|L_nginx_ebpf_wide_E1_try1_B6 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:45:56 [run|L_nginx_ebpf_wide_E1_try1_B6 stop+parse] run L_nginx_ebpf_wide_E1_try1_A2 (rate 5000, traced=0)
+21:45:56 [run|L_nginx_ebpf_wide_E1_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+21:48:27 [run|L_nginx_ebpf_wide_E1_try1_A2 stop+parse] WARN: cell L_nginx_ebpf_wide_E1 try 1: drift p99 2.4691% (limit 7.3620%, B spread 3.6810%) cpu 5.3858% (limit 5%) — rerunning bracket
+21:48:27 [run|L_nginx_ebpf_wide_E1_try1_A2 stop+parse] === cell L_nginx_ebpf_wide_E1 try 2 ===
+21:48:27 [run|L_nginx_ebpf_wide_E1_try1_A2 stop+parse] run L_nginx_ebpf_wide_E1_try2_W1 (rate 5000, traced=0)
+21:48:27 [run|L_nginx_ebpf_wide_E1_try2_W1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:50:58 [run|L_nginx_ebpf_wide_E1_try2_W1 stop+parse] run L_nginx_ebpf_wide_E1_try2_A1 (rate 5000, traced=0)
+21:50:58 [run|L_nginx_ebpf_wide_E1_try2_A1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:53:29 [run|L_nginx_ebpf_wide_E1_try2_A1 stop+parse] run L_nginx_ebpf_wide_E1_try2_B1 (rate 5000, traced=1)
+21:53:29 [run|L_nginx_ebpf_wide_E1_try2_B1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+21:56:02 [run|L_nginx_ebpf_wide_E1_try2_B1 stop+parse] run L_nginx_ebpf_wide_E1_try2_B2 (rate 5000, traced=1)
+21:56:02 [run|L_nginx_ebpf_wide_E1_try2_B2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+21:58:35 [run|L_nginx_ebpf_wide_E1_try2_B2 stop+parse] run L_nginx_ebpf_wide_E1_try2_B3 (rate 5000, traced=1)
+21:58:36 [run|L_nginx_ebpf_wide_E1_try2_B3 cooldown] cooldown 1s -> start at 38 C (limit 43 C, idle 38 C)
+22:01:09 [run|L_nginx_ebpf_wide_E1_try2_B3 stop+parse] run L_nginx_ebpf_wide_E1_try2_B4 (rate 5000, traced=1)
+22:01:09 [run|L_nginx_ebpf_wide_E1_try2_B4 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+22:03:42 [run|L_nginx_ebpf_wide_E1_try2_B4 stop+parse] run L_nginx_ebpf_wide_E1_try2_B5 (rate 5000, traced=1)
+22:03:42 [run|L_nginx_ebpf_wide_E1_try2_B5 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+22:06:15 [run|L_nginx_ebpf_wide_E1_try2_B5 stop+parse] run L_nginx_ebpf_wide_E1_try2_B6 (rate 5000, traced=1)
+22:06:15 [run|L_nginx_ebpf_wide_E1_try2_B6 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+22:08:48 [run|L_nginx_ebpf_wide_E1_try2_B6 stop+parse] run L_nginx_ebpf_wide_E1_try2_A2 (rate 5000, traced=0)
+22:08:49 [run|L_nginx_ebpf_wide_E1_try2_A2 cooldown] cooldown 0s -> start at 38 C (limit 43 C, idle 38 C)
+22:11:19 [run|L_nginx_ebpf_wide_E1_try2_A2 stop+parse] cell L_nginx_ebpf_wide_E1 try 2 ok (p99 1.7637% <= 12.0064%, cpu 0.5330% <= 5%)
+22:11:45 [run|collect nginx ebpf] collect: 64 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/ebpf/results/nginx_ebpf.csv
+22:11:45 [run|collect nginx ebpf] no machine-state drift
+22:11:47 [run|host revert] host reverted
+22:11:47 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+22:11:47 [run|restore services] done
