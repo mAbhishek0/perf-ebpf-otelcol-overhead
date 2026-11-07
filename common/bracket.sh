@@ -12,15 +12,24 @@
 # CPU is stable and keeps the fixed DRIFT_PCT. Spread and limit go into the
 # verdict file so every pass/fail is auditable. A failed bracket is rerun whole;
 # its runs stay on disk, marked by the verdict file, and collect.sh skips them.
+# Progress (progress.sh) is updated only between runs.
+
+_br_run() {  # IDX then run_one's args
+  local idx=$1; shift
+  progress_run "$6" "$idx" "$5"
+  run_one "$@"
+  progress_run_done
+}
 
 bracket() {
   local wl=$1 mech=$2 scope=$3 level=$4 rdir=$5
   local cell try w r v a1 a2 d1 d2 bp99 spread lim
   cell="${PLATFORM}_${wl}_${mech}_${scope}_E${level}"
+  progress_cell "$cell"
   for (( try=1; try<=MAX_TRIES; try++ )); do
     v="$rdir/raw/${cell}_try${try}.verdict"
     if [[ -f $v ]]; then
-      [[ "$(kv_get "$v" VERDICT)" == ok ]] && { log "cell $cell already ok (try $try) — skipping"; return 0; }
+      [[ "$(kv_get "$v" VERDICT)" == ok ]] && { log "cell $cell already ok (try $try) — skipping"; progress_cell_end "$cell" "$try" ok "earlier run"; return 0; }
       continue
     fi
     if compgen -G "$rdir/raw/${cell}_try${try}_*" >/dev/null; then
@@ -31,10 +40,10 @@ bracket() {
       continue
     fi
     log "=== cell $cell try $try ==="
-    for (( w=1; w<=WARMUP_REPS; w++ )); do run_one "$wl" "$mech" "$scope" "$level" "$try" "W$w" "$rdir"; done
-    run_one "$wl" "$mech" "$scope" "$level" "$try" A1 "$rdir"
-    for (( r=1; r<=MEASURED_REPS; r++ )); do run_one "$wl" "$mech" "$scope" "$level" "$try" "B$r" "$rdir"; done
-    run_one "$wl" "$mech" "$scope" "$level" "$try" A2 "$rdir"
+    for (( w=1; w<=WARMUP_REPS; w++ )); do _br_run $(( w - 1 )) "$wl" "$mech" "$scope" "$level" "$try" "W$w" "$rdir"; done
+    _br_run "$WARMUP_REPS" "$wl" "$mech" "$scope" "$level" "$try" A1 "$rdir"
+    for (( r=1; r<=MEASURED_REPS; r++ )); do _br_run $(( WARMUP_REPS + r )) "$wl" "$mech" "$scope" "$level" "$try" "B$r" "$rdir"; done
+    _br_run $(( WARMUP_REPS + MEASURED_REPS + 1 )) "$wl" "$mech" "$scope" "$level" "$try" A2 "$rdir"
 
     a1="$rdir/raw/$(run_id "$wl" "$mech" "$scope" "$level" "$try" A1)"
     a2="$rdir/raw/$(run_id "$wl" "$mech" "$scope" "$level" "$try" A2)"
@@ -53,9 +62,11 @@ bracket() {
     kv_put "$v.partial" P99_LIMIT_PCT "$lim"
     if gt "$d1" "$lim" || gt "$d2" "$DRIFT_PCT"; then
       kv_put "$v.partial" VERDICT drift; mv "$v.partial" "$v"
+      progress_cell_end "$cell" "$try" drift "p99 ${d1}%/${lim}%  cpu ${d2}%/${DRIFT_PCT}%"
       warn "cell $cell try $try: drift p99 ${d1}% (limit ${lim}%, B spread ${spread}%) cpu ${d2}% (limit ${DRIFT_PCT}%) — rerunning bracket"
     else
       kv_put "$v.partial" VERDICT ok; mv "$v.partial" "$v"
+      progress_cell_end "$cell" "$try" ok "p99 ${d1}%/${lim}%  cpu ${d2}%/${DRIFT_PCT}%"
       log "cell $cell try $try ok (p99 ${d1}% <= ${lim}%, cpu ${d2}% <= ${DRIFT_PCT}%)"
       return 0
     fi

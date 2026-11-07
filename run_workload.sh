@@ -39,7 +39,7 @@ case $WL in
   *) die "unknown workload $WL" ;;
 esac
 
-for f in crash host power preflight quiesce sample cooldown run_one bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
+for f in crash host power preflight quiesce sample cooldown run_one progress bracket collect; do source "$LAPTOP_ROOT/common/$f.sh"; done
 crash_init
 # The harness itself (bash, docker CLI, perf report, zstd) stays off the
 # workload and tracer CPUs; children inherit this, explicit taskset overrides it.
@@ -57,8 +57,10 @@ mech_file() { echo "$LAPTOP_ROOT/$WL_DIRNAME/$1/scripts/mech.sh"; }
 
 # --- quiesce, then preflight: common + workload + every requested mechanism ---
 QUIESCED=0
-trap '(( QUIESCED )) && quiesce_restore' EXIT   # replaced by on_exit below once the host is touched
+trap 'rc=$?; set +e; progress_finish "$rc"; (( QUIESCED )) && quiesce_restore' EXIT   # replaced by on_exit below once the host is touched
 if [[ ${QUIESCE:-1} == 1 ]]; then QUIESCED=1; quiesce; fi
+n_mech=$(wc -w <<<"${MECHS//,/ }") n_lvl=$(wc -w <<<"${LEVELS//,/ }") n_sc=$(wc -w <<<"${SCOPES//,/ }")
+progress_init $(( n_mech * n_lvl * n_sc ))   # takes over tty$STATUS_VT now that gdm is stopped
 preflight_common
 wl_preflight
 for m in ${MECHS//,/ }; do
@@ -76,6 +78,7 @@ on_exit() {
   (( rc != 0 )) && crash_report "$rc"
   run_abort_cleanup
   if (( HOST_SET )); then host_snapshot post; host_snapshot_diff pre post; host_revert; fi
+  progress_finish "$rc"   # FINISHED/ABORTED held on screen, then the console is restored, before gdm restarts
   (( QUIESCED )) && quiesce_restore
   give_back
   (( rc == 0 )) && log "done" || log "exited with status $rc — host reverted; partial runs are marked INCOMPLETE"
