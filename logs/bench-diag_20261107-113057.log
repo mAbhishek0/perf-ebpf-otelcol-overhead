@@ -1,0 +1,55 @@
+11:31:18 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+11:31:18 [diag|preflight] preflight
+11:31:18 [diag|preflight]   [ok]   on AC power
+11:31:18 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+11:31:18 [diag|preflight]   [ok]   TLP not active
+11:31:18 [diag|preflight]   [ok]   unattended-upgrades not active
+11:31:18 [diag|preflight]   [ok]   no noisy processes
+11:31:18 [diag|preflight]   [ok]   no graphical session
+11:31:18 [diag|preflight]   package 63 °C > 55 °C — waiting up to 900s to cool
+11:31:22 [diag|preflight]   cooled for 4s, now 55 °C
+11:31:22 [diag|preflight]   [ok]   package 55 °C
+11:31:22 [diag|preflight]   [ok]   58569 MB free
+11:31:22 [diag|preflight]   [ok]   BPF JIT on
+11:31:23 [diag|preflight]   [ok]   docker reachable
+11:31:23 [diag|preflight]   [ok]   wrk2 with -R
+11:31:23 [diag|preflight]   [ok]   nginx:1.24 id matches
+11:31:23 [diag|preflight]   [ok]   port 8080 free
+11:31:23 [diag|preflight] preflight passed
+11:31:23 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+11:31:23 [diag|host setup] clock floor requested at 2900000 kHz
+11:31:24 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+11:31:24 [diag|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+11:31:28 [diag|host setup] clock under load: 2885050 kHz (ok)
+11:31:28 [diag|host setup] host configured
+11:31:58 [diag|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+11:31:58 [diag|diag base r1] diag base rep 1: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+11:31:58 [diag|diag base r1] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+11:34:29 [diag|diag base r2] diag base rep 2: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+11:34:30 [diag|diag base r2] cooldown 1s -> start at 40 C (limit 44 C, idle 39 C)
+diag_stall.sh: line 168: /proc/25707/task/*/stat: No such file or directory
+11:37:00 [diag|diag base r3] diag base rep 3: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+11:37:01 [diag|diag base r3] cooldown 1s -> start at 39 C (limit 44 C, idle 39 C)
+11:39:31 [diag|diag base r4] diag base rep 4: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+11:39:32 [diag|diag base r4] cooldown 1s -> start at 39 C (limit 44 C, idle 39 C)
+11:42:02 [diag|diag base r5] diag base rep 5: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+11:42:02 [diag|diag base r5] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+diag_stall.sh: line 168: /proc/58698/task/*/stat: No such file or directory
+stall diagnostic  rate=20000  window=120s  reps=5  2026-11-07T11:44:33+05:30
+stall = wrk2 max latency >= 900 ms; probe = 1 curl / 100 ms on its own connection
+idle_ms = longest time no wrk2 connection sent (conn.tsv peak cli_min_lastsnd), at_s after t0,
+  with cli_rq / srv_rq = bytes unread by wrk2 / by nginx at that moment; off_ms = longest
+  off-CPU interval of a wrk2 worker thread (offcpu.txt, main thread excluded), st = its prev_state
+
+variant    rep   p99_ms  p999_ms    max_ms  stall | probe_max p_slow first | idle_ms  at_s  cli_rq  srv_rq | off_ms st
+base         1 4.070000 5.420000    12.744      - |     0.004      0     - |       4     1   35826     160 |      0  -
+base         2 4.080000 5.950000    12.488      - |     0.006      0     - |       4    52    5118      80 |      0  -
+base         3 4.280000 5.870000    11.856      - |     0.005      0     - |       3     3   21325       0 |      0  -
+base         4 3.990000 5.560000    11.264      - |     0.005      0     - |       4     1   11089     120 |      0  -
+base         5 4.390000 5.630000    13.672      - |     0.004      0     - |       3   110   15354      80 |      0  -
+
+base: 0 of 5 runs stalled
+11:44:34 [diag|report] no machine-state drift
+11:44:35 [diag|host revert] host reverted
+11:44:35 [diag|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+11:44:36 [diag|restore services] done — report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/diag/20261107-113108/report.txt
