@@ -58,13 +58,31 @@ wrk2_works() {  # wrk2_works BINARY
   [[ "$out" == *"Requests/sec"* ]] || { echo "$out" | tail -5; return 1; }
 }
 
-if command -v wrk2 >/dev/null 2>&1 && has_rate_flag wrk2 && wrk2_works wrk2; then
+# wrk2 vendors an old Redis ae.c whose aeProcessEvents mis-computes the epoll
+# timeout for a timer that is already overdue: tv_sec goes to -1 and is clamped
+# to 0, but tv_usec keeps (when_ms + 1000 - now_ms) * 1000, so the thread sleeps
+# up to ~1 s instead of firing the timer. That is the ~1.00 s stall (stall
+# diagnostic run 3: 31 of 31 long off-CPU sleeps were 998-1000 ms in ep_poll).
+# The fix zeroes both fields once tv_sec goes negative, as later Redis does.
+# A stamp file marks a patched install, so an unpatched wrk2 is rebuilt.
+WRK2_STAMP=/usr/local/share/wrk2-ae-timeout-fix
+patch_ae() {  # patch_ae WRK2_SRC_DIR
+  local f="$1/src/ae.c"
+  perl -0pi -e 's/if \(tvp->tv_sec < 0\) tvp->tv_sec = 0;/if (tvp->tv_sec < 0) { tvp->tv_sec = 0; tvp->tv_usec = 0; }/' "$f"
+  grep -q 'tvp->tv_sec = 0; tvp->tv_usec = 0; }' "$f" || {
+    echo "ae.c timeout clamp not found; wrk2 source changed. Relevant lines:" >&2
+    grep -n 'tv_sec\|tv_usec' "$f" >&2; exit 1; }
+  echo "ae.c patched: overdue timers now give a zero epoll timeout"
+}
+
+if [[ -f "$WRK2_STAMP" ]] && command -v wrk2 >/dev/null 2>&1 && has_rate_flag wrk2 && wrk2_works wrk2; then
   log "wrk2 already installed and working: $(command -v wrk2)"
 else
   log "building wrk2"
   W="$BUILD/wrk2"
   git clone --depth 1 https://github.com/giltene/wrk2.git "$W"
   echo "wrk2 commit: $(git -C "$W" rev-parse HEAD)"
+  patch_ae "$W"
   if ! make -C "$W" -j"$(nproc)"; then
     log "plain build failed; retrying with CC='$LEGACY_CC'"
     make -C "$W" clean || true
@@ -83,6 +101,8 @@ else
     wrk2_works "$W/wrk" || { echo "wrk2 still fails its run test" >&2; exit 1; }
   fi
   install -m 0755 "$W/wrk" /usr/local/bin/wrk2
+  mkdir -p "$(dirname "$WRK2_STAMP")"
+  echo "$(git -C "$W" rev-parse HEAD) ae.c overdue-timer fix" > "$WRK2_STAMP"
 fi
 has_rate_flag wrk2 || { echo "installed wrk2 has no -R option" >&2; exit 1; }
 echo "wrk2 OK ($(command -v wrk2)): constant-rate test request succeeded"
