@@ -1,0 +1,21 @@
+tracepoint:sched:sched_switch
+{
+  if (pid == $1) {
+    @off[args.prev_pid] = nsecs;
+    @st[args.prev_pid] = args.prev_state;
+    @ks[args.prev_pid] = kstack;
+    @us[args.prev_pid] = ustack(8);
+  }
+  $n = args.next_pid;
+  if (@off[$n] != 0) {
+    $d = (nsecs - @off[$n]) / 1000000;
+    if ($d >= 50) {
+      time("%H:%M:%S ");
+      printf("tid %d off %d ms prev_state %d\n", $n, $d, @st[$n]);
+      print(@ks[$n]);
+      print(@us[$n]);
+    }
+    @off[$n] = 0;
+  }
+}
+END { clear(@off); clear(@st); clear(@ks); clear(@us); }

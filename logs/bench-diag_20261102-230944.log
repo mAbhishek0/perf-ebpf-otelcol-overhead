@@ -1,0 +1,69 @@
+23:10:05 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+23:10:05 [diag|preflight] preflight
+23:10:05 [diag|preflight]   [ok]   on AC power
+23:10:05 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+23:10:05 [diag|preflight]   [ok]   TLP not active
+23:10:05 [diag|preflight]   [ok]   unattended-upgrades not active
+23:10:05 [diag|preflight]   [ok]   no noisy processes
+23:10:05 [diag|preflight]   [ok]   no graphical session
+23:10:05 [diag|preflight]   package 65 °C > 55 °C — waiting up to 900s to cool
+23:10:11 [diag|preflight]   cooled for 6s, now 55 °C
+23:10:11 [diag|preflight]   [ok]   package 55 °C
+23:10:11 [diag|preflight]   [ok]   59798 MB free
+23:10:11 [diag|preflight]   [ok]   BPF JIT on
+23:10:11 [diag|preflight]   [ok]   docker reachable
+23:10:11 [diag|preflight]   [ok]   wrk2 with -R
+23:10:11 [diag|preflight]   [ok]   nginx:1.24 id matches
+23:10:11 [diag|preflight]   [ok]   port 8080 free
+23:10:11 [diag|preflight] preflight passed
+23:10:12 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+23:10:12 [diag|host setup] clock floor requested at 2900000 kHz
+23:10:12 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+23:10:12 [diag|host setup] IRQs moved to 12,14: 31 (unmovable, e.g. per-CPU timers: 11)
+23:10:16 [diag|host setup] clock under load: 2894552 kHz (ok)
+23:10:16 [diag|host setup] host configured
+23:10:46 [diag|host setup] idle package temp 40 C (min of 15 samples over 30 s)
+23:10:46 [diag|diag base r1] diag base rep 1: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+23:10:46 [diag|diag base r1] cooldown 0s -> start at 40 C (limit 45 C, idle 40 C)
+23:15:08 [diag|diag isolgen r1] diag isolgen rep 1: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+23:15:08 [diag|diag isolgen r1] cooldown 0s -> start at 40 C (limit 45 C, idle 40 C)
+23:17:39 [diag|diag base r2] diag base rep 2: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+23:17:39 [diag|diag base r2] cooldown 0s -> start at 40 C (limit 45 C, idle 40 C)
+23:20:10 [diag|diag isolgen r2] diag isolgen rep 2: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+23:20:10 [diag|diag isolgen r2] cooldown 0s -> start at 40 C (limit 45 C, idle 40 C)
+23:22:41 [diag|diag base r3] diag base rep 3: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+23:22:41 [diag|diag base r3] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+23:25:12 [diag|diag isolgen r3] diag isolgen rep 3: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+23:25:12 [diag|diag isolgen r3] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+23:27:43 [diag|diag base r4] diag base rep 4: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+23:27:43 [diag|diag base r4] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+23:30:14 [diag|diag isolgen r4] diag isolgen rep 4: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+23:30:14 [diag|diag isolgen r4] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+23:32:45 [diag|diag base r5] diag base rep 5: rate 20000, conns 100, sampler 1, wrk2 on 12,14, quiet 0
+23:32:45 [diag|diag base r5] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+23:35:16 [diag|diag isolgen r5] diag isolgen rep 5: rate 20000, conns 100, sampler 1, wrk2 on 8,10, quiet 0
+23:35:16 [diag|diag isolgen r5] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+stall diagnostic  rate=20000  window=120s  reps=5  2026-11-02T23:37:47+05:30
+stall = wrk2 max latency >= 900 ms; probe = 1 curl / 100 ms on its own connection
+idle_ms = longest time no wrk2 connection sent (conn.tsv peak cli_min_lastsnd), at_s after t0,
+  with cli_rq / srv_rq = bytes unread by wrk2 / by nginx at that moment; off_ms = longest
+  off-CPU interval of a wrk2 worker thread (offcpu.txt, main thread excluded), st = its prev_state
+
+variant    rep   p99_ms  p999_ms    max_ms  stall | probe_max p_slow first | idle_ms  at_s  cli_rq  srv_rq | off_ms st
+base         1 455.170000 949.250000  1003.008    YES |     0.006      0     - |       4     1       0       0 |   1000  1
+base         2 455.420000 950.270000  1003.520    YES |     0.005      0     - |       4    67   12795      40 |   1000  1
+base         3 790.020000 1300.000000  1456.128    YES |     0.005      0     - |       5    46   20472       0 |    999  1
+base         4 636.930000 966.140000  1002.496    YES |     0.005      0     - |       4    39       0       0 |   1000  1
+base         5 5.940000 895.490000  1003.008    YES |     0.006      0     - |       3     1   27296     120 |    999  1
+isolgen      1 3.630000 4.700000     7.328      - |     0.004      0     - |       3     2   11089      40 |      0  -
+isolgen      2 405.760000 1020.000000  1186.816    YES |     0.003      0     - |       3     0       0      40 |    999  1
+isolgen      3 4.860000 893.440000  1005.568    YES |     0.004      0     - |       3     0    5971      80 |    999  1
+isolgen      4 892.930000 992.260000  1002.496    YES |     0.004      0     - |       4    10    2559       0 |   1000  1
+isolgen      5 728.060000 975.870000  1001.984    YES |     0.004      0     - |       4    20    1706       0 |   1000  1
+
+base: 5 of 5 runs stalled
+isolgen: 4 of 5 runs stalled
+23:37:47 [diag|report] no machine-state drift
+23:37:48 [diag|host revert] host reverted
+23:37:49 [diag|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+23:37:49 [diag|restore services] done — report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/nginx-wrk2/diag/20261102-230954/report.txt
