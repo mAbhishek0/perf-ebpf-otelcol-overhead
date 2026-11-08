@@ -71,5 +71,13 @@ bracket() {
       return 0
     fi
   done
+  # Capacity mode (run_workload.sh --capacity): a drift failure is a result,
+  # not an error — near saturation the untraced brackets are expected to
+  # disagree. The verdict stays on disk, collect writes it as bracket_verdict,
+  # and capacity_report.py counts the rate as not clean.
+  if (( ${CAPACITY:-0} )); then
+    warn "cell $cell: drift on all $MAX_TRIES tries — kept (capacity mode: rate is not clean)"
+    return 0
+  fi
   die "cell $cell failed drift on all $MAX_TRIES tries"
 }

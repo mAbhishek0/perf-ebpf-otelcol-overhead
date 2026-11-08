@@ -3,7 +3,8 @@
 # collect WL MECH RESULTS_DIR
 # The CSV is rebuilt from scratch each time (idempotent; run IDs are unique
 # directories, so no row can be duplicated). Only runs from a bracket whose
-# verdict is ok, and only bundles with DONE, become rows. A missing key fails
+# verdict is ok (also drift in capacity mode, marked in bracket_verdict), and
+# only bundles with DONE, become rows. A missing key fails
 # the collect: a blank column is not a data point.
 #
 # CSV_COLUMNS: name:file:key. (Not "COLUMNS": bash overwrites that with the
@@ -46,6 +47,15 @@ SCHEMA_VERSION="2.1.0"
 # so); on any bundle with RUN_SCHEMA a missing late key fails like any other.
 LATE_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DELTA IRQ_OTHER_DELTA SOFTIRQ_NET_RX_DELTA SOFTIRQ_NET_TX_DELTA POWER_SOURCE "
 
+# _csv_cols  — the column list for this run into CSV_COLS: CSV_COLUMNS, plus
+# bracket_verdict in capacity mode (run_workload.sh --capacity), where drift
+# brackets are kept as data. Matrix CSVs and schemas are unchanged by it.
+_csv_cols() {
+  CSV_COLS=("${CSV_COLUMNS[@]}")
+  (( ${CAPACITY:-0} )) && CSV_COLS+=(bracket_verdict:verdict:VERDICT)
+  return 0
+}
+
 _col_file() {
   case $1 in run_meta) echo run_meta.env;; wl) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; power) echo power.env;; esac
 }
@@ -56,11 +66,12 @@ collect() {
   local wl=$1 mech=$2 rdir=$3
   local csv="$rdir/${wl}_${mech}.csv" tmp v b try col name src key f val line traced n=0
   tmp="$csv.partial"
-  line=""; for col in "${CSV_COLUMNS[@]}"; do line+="${line:+,}$(_csvq "${col%%:*}")"; done
+  _csv_cols
+  line=""; for col in "${CSV_COLS[@]}"; do line+="${line:+,}$(_csvq "${col%%:*}")"; done
   echo "$line" > "$tmp"
   for v in "$rdir"/raw/*.verdict; do
     [[ -f $v ]] || continue
-    [[ "$(kv_get "$v" VERDICT)" == ok ]] || continue
+    case "$(kv_get "$v" VERDICT)" in ok) ;; drift) (( ${CAPACITY:-0} )) || continue ;; *) continue ;; esac
     try=${v##*_try}; try=${try%.verdict}
     for b in "${v%_try*}_try${try}_"*/; do
       b=${b%/}
@@ -68,10 +79,11 @@ collect() {
       traced=$(kv_get "$b/run_meta.env" TRACED)
       [[ "$(kv_get "$b/run_meta.env" ROLE)" == W* ]] && continue   # warm-ups are discarded
       line=""
-      for col in "${CSV_COLUMNS[@]}"; do
+      for col in "${CSV_COLS[@]}"; do
         IFS=: read -r name src key <<<"$col"
         f="$b/$(_col_file "$src")"
-        if [[ $src == mech && $traced == 0 ]]; then val=NA
+        if [[ $src == verdict ]]; then val=$(kv_get "$v" VERDICT)
+        elif [[ $src == mech && $traced == 0 ]]; then val=NA
         elif [[ $LATE_KEYS == *" $key "* ]] && ! kv_has "$b/run_meta.env" RUN_SCHEMA; then val=NA
         else val=$(kv_get "$f" "$key") || die "collect: $b lacks $key"
         fi
@@ -107,8 +119,11 @@ _schema_freeze() {  # RDIR MECH
       printf '  "collector_scrape_interval_narrow_s": %s, "collector_scrape_interval_wide_s": %s, "otelcol_telemetry_port": %s,\n' \
         "$COLLECTOR_SCRAPE_INTERVAL_NARROW_S" "$COLLECTOR_SCRAPE_INTERVAL_WIDE_S" "$OTELCOL_TELEMETRY_PORT"
     fi
+    # Capacity dirs only, for the same reason: the rates replace the ladder.
+    (( ${CAPACITY:-0} )) && printf '  "capacity_rates": "%s",\n' "$CAPACITY_RATES"
     printf '  "ladder": "%s",\n  "columns": [' "${LADDER:-}"
-    for col in "${CSV_COLUMNS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
+    _csv_cols
+    for col in "${CSV_COLS[@]}"; do printf '%s"%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}"; first=0; done
     printf ']\n}\n'
   } > "$new"
   if [[ -f $s ]]; then

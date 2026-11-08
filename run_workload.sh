@@ -6,6 +6,7 @@
 #   sudo bash run_workload.sh nginx --mech perf --smoke   # one cell (E1 narrow, 3 warm-ups) -> results/smoke
 #   sudo bash run_workload.sh nginx --mech perf --levels 2,3 --scopes wide
 #   sudo bash run_workload.sh nginx --mech perf --block 2   # second A-B-A block -> results-block2
+#   sudo bash run_workload.sh nginx --capacity 40000,44000,47000,50000   # capacity test -> <mech>/capacity
 #
 # Order (decided): mechanisms in the given order; per mechanism the load levels
 # in a seeded shuffle (recorded in results/order.txt), level outer, scope
@@ -24,8 +25,8 @@ need_root
 # Runs as a transient service in bench.slice (see bench_detach in lib.sh).
 bench_detach "bench-${1:-run}" "$0" "$@"
 
-WL=${1:?usage: run_workload.sh nginx|fio|redis [--mech a,b] [--levels 1,2] [--scopes narrow,wide] [--smoke]}; shift
-MECHS="perf,ebpf,collector" LEVELS="" SCOPES="narrow,wide" SMOKE=0 BLOCK=1
+WL=${1:?usage: run_workload.sh nginx|fio|redis [--mech a,b] [--levels 1,2] [--scopes narrow,wide] [--smoke] [--block N] [--capacity R1,R2]}; shift
+MECHS="" LEVELS="" SCOPES="" SMOKE=0 BLOCK=1 CAPACITY_RATES=""
 while (( $# )); do
   case $1 in
     --mech) MECHS=$2; shift 2 ;;
@@ -33,9 +34,29 @@ while (( $# )); do
     --scopes) SCOPES=$2; shift 2 ;;
     --smoke) SMOKE=1; shift ;;
     --block) BLOCK=$2; shift 2 ;;
+    --capacity) CAPACITY_RATES=$2; shift 2 ;;
     *) die "unknown option $1" ;;
   esac
 done
+
+# --capacity: the capacity / drop-onset test (PLAN.md Step 1), outside the
+# matrix. Rates are literal req/s, not ladder levels, so the cells go to
+# <mech>/capacity with their own schema (capacity_rates recorded), run ids
+# "L_cap_…", CAPACITY_REPS traced runs per bracket and one try: a drift
+# failure is kept as a result (bracket.sh), not retried. Default scope wide
+# and mechanisms perf,ebpf; the collector is refused — its scraper cost is
+# rate-invariant by construction, so it has no rate-dependent onset to find.
+CAPACITY=0
+if [[ -n $CAPACITY_RATES ]]; then
+  (( ! SMOKE && BLOCK == 1 )) && [[ -z $LEVELS ]] || die "--capacity cannot be combined with --smoke, --block or --levels"
+  CAPACITY=1
+  LEVELS=$(capacity_levels "$CAPACITY_RATES")
+  MECHS=${MECHS:-perf,ebpf} SCOPES=${SCOPES:-wide}
+  [[ ,$MECHS, == *,collector,* ]] && die "--capacity: the collector is rate-invariant (scraper mode); use perf and/or ebpf"
+  MEASURED_REPS=$CAPACITY_REPS MAX_TRIES=1
+fi
+MECHS=${MECHS:-perf,ebpf,collector} SCOPES=${SCOPES:-narrow,wide}
+export CAPACITY CAPACITY_RATES
 case $WL in
   nginx) WL_DIRNAME=nginx-wrk2 ;;
   fio)   WL_DIRNAME=fio ;;
@@ -101,7 +122,10 @@ cooldown_calibrate
 for m in ${MECHS//,/ }; do
   source "$(mech_file "$m")"
   rdir="$LAPTOP_ROOT/$WL_DIRNAME/$m/results"
-  if (( BLOCK == 1 )); then
+  if (( CAPACITY )); then
+    rdir="$LAPTOP_ROOT/$WL_DIRNAME/$m/capacity"
+    mapfile -t order < <(seeded_shuffle "$(( SHUFFLE_SEED + $(cksum <<<"$m capacity" | cut -d" " -f1) % 100000 ))" ${LEVELS//,/ })
+  elif (( BLOCK == 1 )); then
     (( SMOKE )) && rdir="$rdir/smoke"
     mapfile -t order < <(seeded_shuffle "$(( SHUFFLE_SEED + $(cksum <<<"$m" | cut -d" " -f1) % 100000 ))" ${LEVELS//,/ })
   else
@@ -114,7 +138,8 @@ for m in ${MECHS//,/ }; do
     rdir="${rdir}-block$BLOCK"
   fi
   mkdir -p "$rdir/raw"
-  echo "$(date -Is) $m block $BLOCK levels: ${order[*]} scopes: $SCOPES" >> "$rdir/order.txt"
+  if (( CAPACITY )); then tag=capacity; else tag="block $BLOCK"; fi
+  echo "$(date -Is) $m $tag levels: ${order[*]} scopes: $SCOPES" >> "$rdir/order.txt"
   provenance_write "$rdir" "$m"
   log "### $WL x $m: level order ${order[*]}"
   for lvl in "${order[@]}"; do

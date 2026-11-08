@@ -84,8 +84,25 @@ net_delta() {
 gt() { awk -v a="$1" -v b="$2" 'BEGIN{ exit !(a>b) }'; }
 
 # run_prefix  — "L" for block 1 (the original matrices keep their ids), "L_b2"
-# for block 2, … (PLAN.md: every cell runs as 2 independent A-B-A blocks).
-run_prefix() { if (( ${BLOCK:-1} == 1 )); then printf '%s' "$PLATFORM"; else printf '%s_b%s' "$PLATFORM" "$BLOCK"; fi; }
+# for block 2, … (PLAN.md: every cell runs as 2 independent A-B-A blocks);
+# "L_cap" for the capacity / drop-onset test (run_workload.sh --capacity).
+run_prefix() {
+  if (( ${CAPACITY:-0} )); then printf '%s_cap' "$PLATFORM"
+  elif (( ${BLOCK:-1} == 1 )); then printf '%s' "$PLATFORM"
+  else printf '%s_b%s' "$PLATFORM" "$BLOCK"; fi
+}
+
+# capacity_levels RATES  — "40000,44000" -> "R40000,R44000," (literal-rate
+# levels, see level_rate); dies on anything but positive integers, or repeats.
+capacity_levels() {
+  [[ $1 =~ ^[1-9][0-9]*(,[1-9][0-9]*)*$ ]] || die "bad --capacity '$1' (comma list of rates in req/s)"
+  local r out="" seen=","
+  for r in ${1//,/ }; do
+    [[ $seen == *",$r,"* ]] && die "--capacity lists $r twice"
+    seen+="$r,"; out+="R$r,"
+  done
+  printf '%s' "$out"
+}
 
 # block_order ORDER_TXT LEVELS  — block 1's last recorded level order, reversed,
 # keeping only LEVELS (comma list); one level per line. Used for blocks >= 2.

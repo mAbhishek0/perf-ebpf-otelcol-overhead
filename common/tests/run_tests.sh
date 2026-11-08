@@ -35,6 +35,15 @@ t_die "unknown level" level_rate 9
 t_eq "run_id" "L_nginx_perf_narrow_E2_try1_B3" "$(run_id nginx perf narrow 2 1 B3)"
 t_eq "run_id block 2" "L_b2_nginx_perf_narrow_E2_try1_B3" "$(BLOCK=2 run_id nginx perf narrow 2 1 B3)"
 t_eq "run_id block 1 explicit" "L_nginx_perf_narrow_E2_try1_B3" "$(BLOCK=1 run_id nginx perf narrow 2 1 B3)"
+t_eq "run_id capacity" "L_cap_nginx_perf_wide_ER44000_try1_B3" "$(CAPACITY=1 run_id nginx perf wide R44000 1 B3)"
+
+# --- capacity_levels (run_workload.sh --capacity) ---
+t_eq "capacity levels" "R40000,R44000," "$(capacity_levels 40000,44000)"
+t_eq "capacity level rate" 44000 "$(level_rate "$(capacity_levels 44000 | cut -d, -f1)")"
+t_die "capacity bad list" capacity_levels "40000,,44000"
+t_die "capacity non-number" capacity_levels "40k"
+t_die "capacity zero-led" capacity_levels "040000"
+t_die "capacity repeat" capacity_levels "40000,44000,40000"
 
 # --- block_order (block >= 2: block 1's last order, reversed) ---
 bo=$(mktemp)
@@ -241,6 +250,28 @@ t_die "partial split dies" collect nginx perf "$RD"
 kv_put "$RD/raw/$(run_id nginx perf narrow 1 1 A1)/samples/summary.env" IRQ_PMI_DELTA v
 sed -i '/^P99_MS=/d' "$RD/raw/$(run_id nginx perf narrow 1 1 B1)/wl.env"
 t_die "collect dies on missing key" collect nginx perf "$RD"
+
+# --- collect in capacity mode: drift brackets kept, verdict column, rates in schema ---
+(
+  RD="$T/cap"; mkdir -p "$RD/raw"; CAPACITY=1 CAPACITY_RATES=40000,44000
+  for r in A1 B1 A2; do mk_bundle "$r"; done                       # ids "L_cap_…": RD is read by mk_bundle
+  vf="$RD/raw/$(run_id nginx perf narrow 1 1 X)"; kv_put "${vf%_try1_X}_try1.verdict" VERDICT drift
+  collect nginx perf "$RD" >/dev/null 2>&1
+  c="$RD/nginx_perf.csv"
+  echo "rows $(($(wc -l < "$c") - 1))"
+  echo "last $(head -1 "$c" | awk -F, '{print $NF}')"
+  echo "verdict $(grep -c '"drift"$' "$c")"
+  echo "ids $(grep -c '^"L_cap_' "$c")"
+  echo "rates $(grep -c '"capacity_rates": "40000,44000",' "$RD/schema.json")"
+  CAPACITY=0; rm -f "$c" "$RD/schema.json"; collect nginx perf "$RD" >/dev/null 2>&1
+  echo "matrix skips drift $(($(wc -l < "$c") - 1))"
+) > "$T/cap.out" 2>&1
+t_eq "capacity: drift rows kept" "rows 3" "$(sed -n 1p "$T/cap.out")"
+t_eq "capacity: verdict column last" 'last "bracket_verdict"' "$(sed -n 2p "$T/cap.out")"
+t_eq "capacity: verdict value" "verdict 3" "$(sed -n 3p "$T/cap.out")"
+t_eq "capacity: run ids" "ids 3" "$(sed -n 4p "$T/cap.out")"
+t_eq "capacity: rates in schema" "rates 1" "$(sed -n 5p "$T/cap.out")"
+t_eq "matrix mode still skips drift" "matrix skips drift 0" "$(sed -n 6p "$T/cap.out")"
 
 # --- schema.json: finished matrices must re-freeze byte-identical; collector adds its constants ---
 ( source "$LAPTOP_ROOT/common/config.env"   # earlier tests change WORKLOAD_CPUS
