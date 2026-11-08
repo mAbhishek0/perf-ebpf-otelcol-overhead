@@ -52,6 +52,37 @@ class T(unittest.TestCase):
         _, est0 = s.stratified_perm_p(cells, est)
         self.assertAlmostEqual(est0, 0.0, places=12)
 
+    def test_strata_two_blocks_clear_effect_hits_minimum(self):
+        cells = [([10.0, 10.1], [20.0 + j * 0.01 for j in range(6)]),
+                 ([11.0, 11.2], [22.0 + j * 0.01 for j in range(6)])]
+        p, est = s.strata_perm_p(cells)
+        self.assertAlmostEqual(p, 1 / 28 ** 2)
+        self.assertGreater(est, math.log(1.9))
+
+    def test_strata_matches_four_cell_pooled(self):
+        cells = [([10.0, 11.0], [15.0, 9.0, 14.0, 10.5, 15.2, 11.8]),
+                 ([9.0, 9.5], [9.2, 9.9, 8.8, 9.6, 9.1, 9.4]),
+                 ([12.0, 11.0], [13.0, 12.5, 11.9, 12.2, 12.8, 11.7]),
+                 ([8.0, 8.4], [8.1, 8.9, 8.2, 8.5, 8.0, 8.7])]
+        p4, e4 = s.stratified_perm_p(cells)
+        p, e = s.strata_perm_p(cells)
+        self.assertAlmostEqual(p, p4, places=12)
+        self.assertAlmostEqual(e, e4, places=12)
+
+    def test_strata_unequal_b_counts(self):
+        # sensitivity re-test drops one traced run: 28 * 21 arrangements
+        cells = [([10.0, 10.1], [20.0 + j * 0.01 for j in range(6)]),
+                 ([11.0, 11.2], [22.0 + j * 0.01 for j in range(5)])]
+        self.assertAlmostEqual(s.strata_perm_p(cells)[0], 1 / (28 * 21))
+
+    def test_perm_ci_brackets_estimate(self):
+        cells = [([10.0, 11.0], [15.0, 16.0, 14.0, 15.5, 15.2, 14.8]),
+                 ([10.5, 10.0], [14.0, 15.0, 15.4, 14.6, 15.1, 14.9])]
+        est = s.strata_perm_p(cells)[1]
+        lo, hi = s.perm_ci(cells)
+        self.assertLess(lo, est)
+        self.assertLess(est, hi)
+
 
 if __name__ == "__main__":
     unittest.main()

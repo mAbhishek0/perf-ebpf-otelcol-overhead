@@ -85,6 +85,37 @@ the per-cell result above was seen):
   Verdict     "effect" needs q < 0.05 and |estimate| >= the per-cell noise
               floor (conservative: an average over 4 cells is less noisy).
 
+Two-block per-cell test (the protocol of README timeline 28: every cell runs
+as 2 independent A-B-A blocks; the per-cell test is a stratified permutation
+across the two blocks). Details below were fixed on 2026-11-08, after perf
+block 2 existed and had been inspected for run health (README timeline 33)
+but before the eBPF and collector block 2 data existed and before any
+two-block statistic had been computed:
+  Cell        one (mechanism, scope, level), now with 2 blocks of 2 A + 6 B runs.
+              Block 1 from <mech>/results, block 2 from <mech>/results-block2.
+  Test        stratified exact permutation, strata = the 2 blocks: A/B labels
+              re-dealt within each block (C(8,2) = 28 ways), 28^2 = 784
+              arrangements, all enumerated. Statistic: mean over the 2 blocks
+              of log(mean(B) / mean(A)), each block against its own baselines.
+              Two-sided p = fraction of arrangements with |statistic| >= the
+              observed one; smallest attainable p = 1/784 = 1.28e-03.
+  Estimate    exp(statistic) - 1 in %, with a 95 % CI by test inversion, as
+              in the pooled test. The two per-block ratios are tabulated too.
+  Multiplicity BH over the same family as the single-block test: 3 x 2 x 4 x 4
+              = 96 tests (throughput again a manipulation check, untested).
+              The family is only complete when all three block-2 CSVs exist,
+              so the outputs are written only then; --provisional prints the
+              available mechanisms with BH over the tests present, labelled
+              provisional, and writes nothing.
+  Noise floor same single-run relative SD s, now from all 48 baseline pairs
+              (both blocks, three matrices); the two-block estimate averages
+              two blocks, so its floor is 2 * s * sqrt((1/6 + 1/2) / 2).
+  Verdict     "effect" needs q < 0.05 and |estimate| >= that floor.
+  Sensitivity runs excluded for a documented health reason are NOT excluded
+              from the family; instead the cell is re-tested without them and
+              reported beside it, outside the family (no q). Listed in
+              SENSITIVITY with the timeline entry that justifies each.
+
 Metrics: workload_cpu_cores (nginx cgroup CPU), throughput, p50_ms, p99_ms,
 p999_ms. tracer_cpu_cores has no baseline (the tracer does not exist in A
 runs), so it is summarised (mean, SD) but not tested.
@@ -116,6 +147,19 @@ OUT_CSV = os.path.join(OUT_DIR, "nginx_L_cell_stats.csv")
 OUT_FLOOR = os.path.join(OUT_DIR, "nginx_L_noise_floor.csv")
 OUT_MD = os.path.join(OUT_DIR, "nginx_L_stats.md")
 OUT_POOL = os.path.join(OUT_DIR, "nginx_L_pooled_stats.csv")
+INPUTS_B2 = {
+    "perf": "nginx-wrk2/perf/results-block2/nginx_perf.csv",
+    "ebpf": "nginx-wrk2/ebpf/results-block2/nginx_ebpf.csv",
+    "collector": "nginx-wrk2/collector/results-block2/nginx_collector.csv",
+}
+OUT_TB_CSV = os.path.join(OUT_DIR, "nginx_L_twoblock_stats.csv")
+OUT_TB_MD = os.path.join(OUT_DIR, "nginx_L_twoblock_stats.md")
+# (mechanism, scope, level, block, role, reason): re-tested without the run,
+# reported beside the cell, outside the BH family
+SENSITIVITY = [
+    ("perf", "wide", "4", 2, "B2",
+     "README timeline 33: start-of-window transient (one wrk2 thread calibrated at 13.8 ms, p99 256.8 ms)"),
+]
 
 
 def avg_ranks(values):
@@ -187,9 +231,10 @@ def git_head():
         return "unknown"
 
 
-def load():
+def load(inputs=None):
+    inputs = INPUTS if inputs is None else inputs
     cells = {}
-    for mech, rel in INPUTS.items():
+    for mech, rel in inputs.items():
         with open(os.path.join(ROOT, rel), newline="") as f:
             for r in csv.DictReader(f):
                 key = (mech, r["scope"], r["level"])
@@ -198,7 +243,7 @@ def load():
         roles = sorted(r["role"] for r in rows)
         assert roles == ["A1", "A2", "B1", "B2", "B3", "B4", "B5", "B6"], (key, roles)
         assert len({r["try"] for r in rows}) == 1, key
-    assert len(cells) == len(INPUTS) * len(SCOPES) * len(LEVELS)
+    assert len(cells) == len(inputs) * len(SCOPES) * len(LEVELS)
     return cells
 
 
@@ -271,6 +316,146 @@ def pooled(cells, floor):
         else:
             row["verdict"] = "effect"
     return rows
+
+
+def strata_perm_p(cells_ab, theta=0.0):
+    """Exact two-sided stratified permutation p over any number of strata
+    (each an (A, B) pair; A/B re-dealt within a stratum). Statistic: mean over
+    strata of log(mean(B) / mean(A)), with B divided by exp(theta)."""
+    arr = [_cell_arrangements(a, b, theta) for a, b in cells_ab]
+    stat = sum(x[0] for x in arr) / len(arr)
+    sums = [0.0]
+    for x in arr:
+        sums = [s + y for s in sums for y in x]
+    obs = abs(sum(x[0] for x in arr))
+    if obs <= 1e-12:
+        return 1.0, stat
+    hits = sum(1 for s in sums if abs(s) >= obs - 1e-12)
+    return hits / len(sums), stat
+
+
+def perm_ci(ab):
+    """95 % CI of the log shift by test inversion (bisection to 1e-6)."""
+    est = strata_perm_p(ab)[1]
+
+    def edge(lo, hi):
+        plo = strata_perm_p(ab, lo)[0] < ALPHA
+        while hi - lo > 1e-6:
+            mid = (lo + hi) / 2
+            if (strata_perm_p(ab, mid)[0] < ALPHA) == plo:
+                lo = mid
+            else:
+                hi = mid
+        return (lo + hi) / 2
+    return edge(est - 3.0, est), edge(est, est + 3.0)
+
+
+def _ab(rows, m, drop=None):
+    rs = sorted(rows, key=lambda r: r["role"])
+    a = [float(r[m]) for r in rs if r["role"].startswith("A")]
+    b = [float(r[m]) for r in rs if r["role"].startswith("B") and r["role"] != drop]
+    return a, b
+
+
+def twoblock(mechs):
+    """Two-block per-cell test for the given mechanisms (see docstring)."""
+    b1 = load({k: INPUTS[k] for k in mechs})
+    b2 = load({k: INPUTS_B2[k] for k in mechs})
+    rel = {m: [] for m in METRICS}
+    for cells in (b1, b2):
+        for rows in cells.values():
+            for m in METRICS:
+                a = {r["role"]: float(r[m]) for r in rows if r["role"] in ("A1", "A2")}
+                rel[m].append((a["A2"] - a["A1"]) / ((a["A1"] + a["A2"]) / 2))
+    floor = {}
+    for m in METRICS:
+        s = math.sqrt(sum(x * x for x in rel[m]) / len(rel[m]) / 2)
+        floor[m] = {"n_pairs": len(rel[m]), "sd_run_pct": 100 * s,
+                    "floor_pct": 100 * 2 * s * math.sqrt((1 / 6 + 1 / 2) / 2)}
+    out, sens = [], []
+    for mech in mechs:
+        for sc in SCOPES:
+            for lv in LEVELS:
+                k = (mech, sc, lv)
+                for m in METRICS:
+                    ab = [_ab(b1[k], m), _ab(b2[k], m)]
+                    p, est = strata_perm_p(ab)
+                    lo, hi = perm_ci(ab)
+                    row = {"mechanism": mech, "scope": sc, "level": "E" + lv,
+                           "rate_target": b1[k][0]["rate_target"],
+                           "try_b1": b1[k][0]["try"], "try_b2": b2[k][0]["try"], "metric": m,
+                           "ratio_b1_pct": 100 * (statistics.mean(ab[0][1]) / statistics.mean(ab[0][0]) - 1),
+                           "ratio_b2_pct": 100 * (statistics.mean(ab[1][1]) / statistics.mean(ab[1][0]) - 1),
+                           "est_pct": 100 * math.expm1(est),
+                           "ci_lo_pct": 100 * math.expm1(lo), "ci_hi_pct": 100 * math.expm1(hi),
+                           "p": p, "floor_pct": floor[m]["floor_pct"], "q_bh": None,
+                           "verdict": "manipulation check" if m not in TESTED else None}
+                    out.append(row)
+                    for (sm, ss, sl, blk, role, why) in SENSITIVITY:
+                        if (sm, ss, sl) == k:
+                            ab_s = [_ab(b1[k], m, role if blk == 1 else None),
+                                    _ab(b2[k], m, role if blk == 2 else None)]
+                            ps, es = strata_perm_p(ab_s)
+                            slo, shi = perm_ci(ab_s)
+                            sens.append({"mechanism": mech, "scope": sc, "level": "E" + lv, "metric": m,
+                                         "dropped": f"block{blk}:{role}", "reason": why,
+                                         "est_pct": 100 * math.expm1(es),
+                                         "ci_lo_pct": 100 * math.expm1(slo), "ci_hi_pct": 100 * math.expm1(shi),
+                                         "p": ps, "est_with_pct": row["est_pct"], "p_with": p})
+    fam = [r for r in out if r["metric"] in TESTED]
+    for row, q in zip(fam, bh([r["p"] for r in fam])):
+        row["q_bh"] = q
+        if q >= ALPHA:
+            row["verdict"] = "no detectable effect"
+        elif abs(row["est_pct"]) < row["floor_pct"]:
+            row["verdict"] = "within floor"
+        else:
+            row["verdict"] = "effect"
+    return out, floor, sens
+
+
+def render_twoblock(mechs, out, floor, sens, provisional):
+    rels = [INPUTS[k] for k in mechs] + [INPUTS_B2[k] for k in mechs]
+    head = [f"# generated by analysis/nginx_stats.py at harness commit {git_head()}",
+            f"# python {platform.python_version()} ({platform.python_implementation()}), standard library only",
+            ] + [f"# input {rel} sha256 {sha256(os.path.join(ROOT, rel))}" for rel in rels]
+    if provisional:
+        head.insert(0, f"# PROVISIONAL: mechanisms {','.join(mechs)} only; BH family incomplete, q not final")
+    val = lambda v: "NA" if v is None else (f"{v:.6g}" if isinstance(v, float) else str(v))
+    cols = list(out[0].keys())
+    csv_text = "\n".join(head + [",".join(cols)] + [",".join(val(r[c]) for c in cols) for r in out]) + "\n"
+    n_fam = sum(r["q_bh"] is not None for r in out)
+    md = ["# Platform L, nginx: two-block per-cell statistics (generated — do not edit by hand)", ""]
+    md += [h.lstrip("# ") + "  " for h in head]
+    md += ["", "Method: see the docstring of `analysis/nginx_stats.py` (two-block per-cell test). "
+           "Estimate = geometric mean of the two blocks' mean(B)/mean(A) ratios, each block against its own "
+           "baselines; 95 % CI by test inversion; p = exact stratified permutation over 28² = 784 arrangements "
+           f"(min 1.28e-03); q = Benjamini-Hochberg over the {n_fam} tests (throughput excluded: manipulation check). "
+           f"Floor = 2 × single-run SD × √((1/6 + 1/2)/2) from {floor[METRICS[0]]['n_pairs']} baseline pairs. "
+           "\"effect\" needs q < 0.05 and |estimate| ≥ floor.", "",
+           "## Noise floor (baseline pairs, both blocks)", "",
+           "| metric | single-run SD % | floor % |", "|---|---|---|"]
+    for m in METRICS:
+        md.append(f"| {m} | {floor[m]['sd_run_pct']:.2f} | {floor[m]['floor_pct']:.2f} |")
+    for mech in mechs:
+        md += ["", f"## {mech}", "",
+               "| scope | level | metric | block 1 % | block 2 % | estimate % [95 % CI] | p | q | verdict |",
+               "|---|---|---|---|---|---|---|---|---|"]
+        for r in out:
+            if r["mechanism"] == mech:
+                md.append(f"| {r['scope']} | {r['level']} | {r['metric']} | {fmt(r['ratio_b1_pct'])} | "
+                          f"{fmt(r['ratio_b2_pct'])} | {fmt(r['est_pct'])} [{fmt(r['ci_lo_pct'])}, "
+                          f"{fmt(r['ci_hi_pct'])}] | {r['p']:.2e} | "
+                          f"{'—' if r['q_bh'] is None else format(r['q_bh'], '.2e')} | {r['verdict']} |")
+    if sens:
+        md += ["", "## Sensitivity (outside the BH family; the family result above is the reported one)", "",
+               "| cell | metric | dropped | with: estimate %, p | without: estimate % [95 % CI], p | reason |",
+               "|---|---|---|---|---|---|"]
+        for s in sens:
+            md.append(f"| {s['mechanism']} {s['scope']} {s['level']} | {s['metric']} | {s['dropped']} | "
+                      f"{fmt(s['est_with_pct'])}, {s['p_with']:.2e} | {fmt(s['est_pct'])} "
+                      f"[{fmt(s['ci_lo_pct'])}, {fmt(s['ci_hi_pct'])}], {s['p']:.2e} | {s['reason']} |")
+    return {OUT_TB_CSV: csv_text, OUT_TB_MD: "\n".join(md) + "\n"}
 
 
 def fmt(x, nd=2):
@@ -401,8 +586,23 @@ def render(out, floor, pool):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="fail if committed outputs differ")
+    ap.add_argument("--provisional", action="store_true",
+                    help="print the two-block analysis of the mechanisms whose block 2 exists; writes nothing")
     args = ap.parse_args()
+    have_b2 = [k for k in INPUTS_B2 if os.path.exists(os.path.join(ROOT, INPUTS_B2[k]))]
+    if args.provisional:
+        if not have_b2:
+            sys.exit("no block-2 CSV exists yet")
+        out, floor, sens = twoblock(have_b2)
+        sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to cp1252
+        print(render_twoblock(have_b2, out, floor, sens, provisional=len(have_b2) < len(INPUTS_B2))[OUT_TB_MD])
+        return
     files = render(*compute())
+    if len(have_b2) == len(INPUTS_B2):
+        files.update(render_twoblock(have_b2, *twoblock(have_b2), provisional=False))
+    else:
+        print(f"two-block analysis not written: block 2 present for {have_b2 or 'none'} only "
+              "(the BH family needs all three; --provisional prints what exists)")
     if args.check:
         bad = []
         for path, text in files.items():
