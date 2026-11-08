@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # pilot.sh — rate calibration and the 60 s-vs-120 s gate. Entry point.
 #
-#   sudo bash pilot.sh nginx [--rates 5000,10000,20000,40000,80000,120000] [--threads 2] [--conns 100]
+#   sudo bash pilot.sh nginx [--rates 5000,10000,20000,40000,80000,120000] [--threads 2] [--conns 100] [--out pilot]
+#   --out names the directory under nginx-wrk2/ (default pilot); it must not exist,
+#   so a repeat pilot (e.g. --out pilot-2) never overwrites an earlier one.
 #
 # Untraced runs only: per rate one 120 s window and one 60 s window (wrk2
 # cannot split a run, so the gate compares two runs). Writes
@@ -19,14 +21,15 @@ need_root
 # Same reason as run_workload.sh: transient service in bench.slice (lib.sh bench_detach).
 bench_detach "bench-pilot" "$0" "$@"
 
-WL=${1:?usage: pilot.sh nginx [--rates a,b,c] [--threads N] [--conns N]}; shift
+WL=${1:?usage: pilot.sh nginx [--rates a,b,c] [--threads N] [--conns N] [--out DIR]}; shift
 [[ $WL == nginx ]] || die "pilot supports nginx only (got $WL)"
-RATES="5000,10000,20000,40000,80000,120000" THREADS="" CONNS=""
+RATES="5000,10000,20000,40000,80000,120000" THREADS="" CONNS="" OUT="pilot"
 while (( $# )); do
   case $1 in
     --rates) RATES=$2; shift 2 ;;
     --threads) THREADS=$2; shift 2 ;;
     --conns) CONNS=$2; shift 2 ;;
+    --out) OUT=$2; shift 2 ;;
     *) die "unknown option $1" ;;
   esac
 done
@@ -40,7 +43,8 @@ source "$LAPTOP_ROOT/nginx-wrk2/workload.sh"
 [[ -n $THREADS ]] && WRK2_THREADS=$THREADS
 [[ -n $CONNS ]] && WRK2_CONNS=$CONNS
 
-PILOT_DIR="$WL_DIR/pilot"
+[[ $OUT =~ ^[A-Za-z0-9._-]+$ ]] || die "bad --out '$OUT' (a plain directory name)"
+PILOT_DIR="$WL_DIR/$OUT"
 [[ -e $PILOT_DIR ]] && die "$PILOT_DIR exists — move it aside to repeat the pilot"
 mapfile -t RATE_LIST < <(tr ',' '\n' <<<"$RATES" | sort -n)
 for r in "${RATE_LIST[@]}"; do [[ $r =~ ^[0-9]+$ ]] || die "bad rate '$r'"; done
