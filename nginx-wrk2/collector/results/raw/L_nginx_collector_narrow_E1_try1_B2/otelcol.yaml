@@ -1,0 +1,44 @@
+# otelcol-contrib config, scraper mode, NARROW scope — Platform L (laptop).
+# Rendered per run by mech.sh (_otel_render) into BUNDLE/otelcol.yaml.
+# Placeholders: 15, http://127.0.0.1:8080/status, 18888,
+# 512, 512 (values in collector.env).
+#
+# Ported unchanged from Platform S's sidecar/otelcol_scraper_narrow.yaml.template
+# (88 runs there): same receivers, scrapers, interval-by-scope, batch processor,
+# debug exporter (verbosity basic) and sending queue, so a laptop cell means what
+# an S cell meant. Only this header and the comments below were shortened. S's
+# deviation stands: the debug exporter ships nothing, so CPU is receive +
+# process + serialise, a lower bound on a deployment that really exports.
+# The pipeline receiver list must stay flow style ("receivers: [a, b]"):
+# mech.sh counts receivers from that one line.
+receivers:
+  nginx:
+    endpoint: http://127.0.0.1:8080/status
+    collection_interval: 15s
+
+processors:
+  batch:
+    send_batch_size: 512
+
+exporters:
+  debug:
+    verbosity: basic
+    sending_queue:
+      enabled: true
+      queue_size: 512
+
+service:
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 127.0.0.1
+                port: 18888
+  pipelines:
+    metrics:
+      receivers: [nginx]
+      processors: [batch]
+      exporters: [debug]
