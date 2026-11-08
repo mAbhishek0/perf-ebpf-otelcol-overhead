@@ -1,0 +1,26 @@
+pilot nginx  threads=2 conns=100  ramp=30s  kernel=7.0.0-43-generic  2026-11-08T13:02:36+05:30
+
+120 s windows (untraced)
+    rate   achieved   p50_ms   p99_ms  p999_ms errors  ngx_cpu  gen_cpu   busy%
+   40000   39958.40    1.680    4.910    7.250      0    1.919    1.592    43.8
+   45000   44953.61    1.530    5.560    9.590      0    2.120    1.742    46.9
+   50000   49948.62    1.410    5.720   16.900      0    2.276    1.874    52.5
+   55000   54942.74    1.440    7.380   18.190      0    2.463    1.894    60.1
+   60000   59938.16    1.410   11.610   24.880      0    2.659    1.883    65.0
+
+Gate 1: 60 s vs 120 s (p99 and throughput each within DRIFT_PCT=5%)
+    rate    p99_120     p99_60 p99_diff%  tp_diff%   tp_120    tp_60 verdict
+   40000      4.910      4.880    0.6129    0.1020 39958.40 39917.67 PASS
+   45000      5.560      5.760    3.5336    0.1032 44953.61 44907.26 PASS
+   50000      5.720      5.810    1.5611    0.1039 49948.62 49896.73 PASS
+   55000      7.380      7.480    1.3459    0.1017 54942.74 54886.87 PASS
+   60000     11.610     12.620    8.3368    0.1027 59938.16 59876.64 FAIL
+Gate 1 overall: FAIL (judge it on the rates you intend to freeze; a saturated rate may fail for other reasons)
+
+Highest usable rate (p99 < 10x p99@40000=4.910000 ms, errors 0, achieved >= 99%): 60000
+Suggested (NOT written):
+  LADDER="1:15000 2:30000 3:45000 4:60000"
+  WRK2_THREADS=2
+  WRK2_CONNS=100
+Review the table, then write nginx-wrk2/pilot.env by hand: freezing the ladder is a human decision.
+Generator check: max loadgen CPU 1.9021 cores >= 0.6 — keep both GEN CPUs.
