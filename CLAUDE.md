@@ -35,7 +35,9 @@ All results, scripts and documents here feed a paper the user will submit for pe
 
 **nginx × collector matrix: done (2026-11-08, 23:57–03:25), 8/8 cells, 64 rows in `nginx-wrk2/collector/results/`** (README timeline 26). Only wide E2 needed try 2 (p99 drift). 0 lost everywhere. Narrow 0.001 cores, wide 0.057 cores, rate-invariant; nginx CPU, throughput and p999 unchanged in both scopes (within ±7 %). p99 +13–14 % at E3 in *both* scopes, likely low baselines, unresolved. Unlike S's co-located collector (p999 ≈ ×2), no tail effect with dedicated tracer cores. Mean ratios only. All three nginx matrices are now done on L.
 
-**Next:** ask the user whether the tty8 progress screen showed and stayed lit (log: `setterm on tty8 failed`). Then: the statistical analysis of the three nginx matrices (Wilcoxon, effect sizes with CIs), or fio (workload plugin not written).
+**Progress screen, first hardware run:** tty8 showed the progress for at least the first 15 min (user then left), cursor blinking. `setterm` had failed (blanking off and cursor off both unapplied), most likely because it ran with the caller's `TERM` (xterm-256color), for which setterm refuses the VT-only options; whether the console blanked later is unknown. Fixed untested on hardware: both setterm calls now run with `TERM=linux` and the warning carries setterm's stderr. Verify on the next run (no warning in the log; no cursor).
+
+**Next:** the statistical analysis of the three nginx matrices (Wilcoxon, effect sizes with CIs), or fio (workload plugin not written).
 
 **Earlier next (done):** on the laptop: pull, `bash restat.sh nginx perf` done 2026-11-07 (`f89c5f6`); then `sudo bash nginx-wrk2/ebpf/scripts/check.sh` (~5 min, narrow+wide at E1/E4 through the real `mech_*`; push `logs/ebpf-check_*.txt`), then the full eBPF matrix (~3 h). No eBPF smoke cell or pilot: both are workload properties, already done. Then nginx × collector. Optional cleanup: the `echo: write error: Broken pipe` at `common/lib.sh:144` (temperature read, seen once in wide E4, harmless).
 

@@ -86,7 +86,12 @@ progress_init() {  # N_CELLS
       kv_put "$PROGRESS_CONSOLE_STATE.partial" VT "$STATUS_VT"
       mv "$PROGRESS_CONSOLE_STATE.partial" "$PROGRESS_CONSOLE_STATE"
     fi
-    setterm --blank 0 --powerdown 0 --cursor off > "$tty" < "$tty" 2>/dev/null || warn "setterm on tty$STATUS_VT failed — console may blank"
+    # TERM=linux: setterm refuses the VT-only --blank/--powerdown for the caller's
+    # TERM (xterm-256color under sudo from a desktop terminal), which made the
+    # first collector matrix log "setterm failed" and leave the cursor blinking.
+    local err
+    err=$(TERM=linux setterm --blank 0 --powerdown 0 --cursor off 2>&1 > "$tty" < "$tty")       || warn "setterm on tty$STATUS_VT failed — console may blank: ${err//$'
+'/; }"
     if chvt "$STATUS_VT" 2>/dev/null; then
       P_TTY=$tty; log "progress shown on tty$STATUS_VT (blanking off)"
     else
@@ -145,7 +150,9 @@ progress_console_restore() {
   local vt prev cb
   vt=$(kv_get "$PROGRESS_CONSOLE_STATE" VT); prev=$(kv_get "$PROGRESS_CONSOLE_STATE" PREV_VT)
   cb=$(kv_get "$PROGRESS_CONSOLE_STATE" CONSOLEBLANK_S)
-  setterm --blank $(( ${cb:-0} / 60 )) --cursor on > "/dev/tty$vt" < "/dev/tty$vt" 2>/dev/null || warn "could not restore blanking on tty$vt"
+  local err
+  err=$(TERM=linux setterm --blank $(( ${cb:-0} / 60 )) --cursor on 2>&1 > "/dev/tty$vt" < "/dev/tty$vt")     || warn "could not restore blanking on tty$vt: ${err//$'
+'/; }"
   chvt "${prev:-1}" 2>/dev/null || true
   mv "$PROGRESS_CONSOLE_STATE" "$STATE_DIR/status_console.restored.$(date +%s).env"
   P_TTY=""
