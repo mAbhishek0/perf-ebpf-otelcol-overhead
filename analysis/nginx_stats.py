@@ -171,7 +171,9 @@ def bh(pvals):
 
 def sha256(path):
     with open(path, "rb") as f:
-        return hashlib.sha256(f.read()).hexdigest()
+        # CRLF -> LF first, so a Windows checkout (core.autocrlf) and the Linux
+        # laptop record the same checksum for the same committed file
+        return hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def git_head():
