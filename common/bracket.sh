@@ -24,7 +24,7 @@ _br_run() {  # IDX then run_one's args
 bracket() {
   local wl=$1 mech=$2 scope=$3 level=$4 rdir=$5
   local cell try w r v a1 a2 d1 d2 bp99 spread lim
-  cell="${PLATFORM}_${wl}_${mech}_${scope}_E${level}"
+  cell="$(run_prefix)_${wl}_${mech}_${scope}_E${level}"
   progress_cell "$cell"
   for (( try=1; try<=MAX_TRIES; try++ )); do
     v="$rdir/raw/${cell}_try${try}.verdict"

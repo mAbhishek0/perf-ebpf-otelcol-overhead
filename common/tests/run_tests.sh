@@ -33,6 +33,17 @@ t_die "unknown level" level_rate 9
 
 # --- run_id ---
 t_eq "run_id" "L_nginx_perf_narrow_E2_try1_B3" "$(run_id nginx perf narrow 2 1 B3)"
+t_eq "run_id block 2" "L_b2_nginx_perf_narrow_E2_try1_B3" "$(BLOCK=2 run_id nginx perf narrow 2 1 B3)"
+t_eq "run_id block 1 explicit" "L_nginx_perf_narrow_E2_try1_B3" "$(BLOCK=1 run_id nginx perf narrow 2 1 B3)"
+
+# --- block_order (block >= 2: block 1's last order, reversed) ---
+bo=$(mktemp)
+printf '%s\n' "2026-11-07T18:20:10+05:30 ebpf levels: 2 4 3 1 scopes: narrow,wide" \
+              "2026-11-07T23:58:26+05:30 ebpf block 1 levels: 2 4 3 1 scopes: narrow,wide" > "$bo"
+t_eq "block_order reversed" "1 3 4 2 " "$(block_order "$bo" 1,2,3,4, | tr '\n' ' ')"
+t_eq "block_order subset" "3 2 " "$(block_order "$bo" 2,3 | tr '\n' ' ')"
+t_eq "block_order no match" "" "$(block_order "$bo" 9)"
+rm -f "$bo"
 
 # --- seeded_shuffle ---
 a=$(seeded_shuffle 42 1 2 3 4 5 6); b=$(seeded_shuffle 42 1 2 3 4 5 6)

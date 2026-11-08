@@ -56,6 +56,7 @@ run_one() {
   : > "$m"
   kv_put "$m" RUN_SCHEMA "$SCHEMA_VERSION"   # keys added after 1.0.0 are NA only on bundles without this
   kv_put "$m" RUN_ID "$id";        kv_put "$m" PLATFORM "$PLATFORM"
+  kv_put "$m" BLOCK "${BLOCK:-1}"
   kv_put "$m" WORKLOAD "$wl";      kv_put "$m" MECHANISM "$mech"
   kv_put "$m" SCOPE "$scope";      kv_put "$m" LEVEL "$level"
   kv_put "$m" RATE_TARGET "$rate"; kv_put "$m" TRY "$try"

@@ -5,11 +5,14 @@
 #   sudo bash run_workload.sh nginx --mech perf           # one pair
 #   sudo bash run_workload.sh nginx --mech perf --smoke   # one cell (E1 narrow, 3 warm-ups) -> results/smoke
 #   sudo bash run_workload.sh nginx --mech perf --levels 2,3 --scopes wide
+#   sudo bash run_workload.sh nginx --mech perf --block 2   # second A-B-A block -> results-block2
 #
 # Order (decided): mechanisms in the given order; per mechanism the load levels
 # in a seeded shuffle (recorded in results/order.txt), level outer, scope
-# inner. The host is configured once and reverted on ANY exit; if the machine
-# dies mid-run, `sudo bash revert.sh` restores it.
+# inner. Block 2 (PLAN.md) runs the same cells into <mech>/results-block2 with
+# block 1's level order reversed: always a different order, and each level at
+# the opposite end of the night. The host is configured once and reverted on
+# ANY exit; if the machine dies mid-run, `sudo bash revert.sh` restores it.
 
 set -euo pipefail
 LAPTOP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,13 +25,14 @@ need_root
 bench_detach "bench-${1:-run}" "$0" "$@"
 
 WL=${1:?usage: run_workload.sh nginx|fio|redis [--mech a,b] [--levels 1,2] [--scopes narrow,wide] [--smoke]}; shift
-MECHS="perf,ebpf,collector" LEVELS="" SCOPES="narrow,wide" SMOKE=0
+MECHS="perf,ebpf,collector" LEVELS="" SCOPES="narrow,wide" SMOKE=0 BLOCK=1
 while (( $# )); do
   case $1 in
     --mech) MECHS=$2; shift 2 ;;
     --levels) LEVELS=$2; shift 2 ;;
     --scopes) SCOPES=$2; shift 2 ;;
     --smoke) SMOKE=1; shift ;;
+    --block) BLOCK=$2; shift 2 ;;
     *) die "unknown option $1" ;;
   esac
 done
@@ -52,6 +56,9 @@ if (( SMOKE )); then
   log "smoke cell: E1 narrow with 3 warm-ups (gate: do warm-ups 2-3 match A1?)"
 fi
 [[ -n $LEVELS ]] || LEVELS=$(for p in $LADDER; do printf '%s,' "${p%%:*}"; done)
+[[ $BLOCK =~ ^[1-9][0-9]*$ ]] || die "bad --block '$BLOCK'"
+(( BLOCK == 1 || ! SMOKE )) || die "--smoke is block 1 only"
+export BLOCK
 
 mech_file() { echo "$LAPTOP_ROOT/$WL_DIRNAME/$1/scripts/mech.sh"; }
 
@@ -94,10 +101,20 @@ cooldown_calibrate
 for m in ${MECHS//,/ }; do
   source "$(mech_file "$m")"
   rdir="$LAPTOP_ROOT/$WL_DIRNAME/$m/results"
-  (( SMOKE )) && rdir="$rdir/smoke"
+  if (( BLOCK == 1 )); then
+    (( SMOKE )) && rdir="$rdir/smoke"
+    mapfile -t order < <(seeded_shuffle "$(( SHUFFLE_SEED + $(cksum <<<"$m" | cut -d" " -f1) % 100000 ))" ${LEVELS//,/ })
+  else
+    # block 1's recorded order (its order.txt is the authority: the shuffle
+    # depends on the host's awk), reversed, restricted to --levels
+    b1="$rdir/order.txt"
+    [[ -f $b1 ]] || die "block $BLOCK needs block 1's $b1"
+    mapfile -t order < <(block_order "$b1" "$LEVELS")
+    (( ${#order[@]} )) || die "no levels from $b1 match --levels $LEVELS"
+    rdir="${rdir}-block$BLOCK"
+  fi
   mkdir -p "$rdir/raw"
-  mapfile -t order < <(seeded_shuffle "$(( SHUFFLE_SEED + $(cksum <<<"$m" | cut -d" " -f1) % 100000 ))" ${LEVELS//,/ })
-  echo "$(date -Is) $m levels: ${order[*]} scopes: $SCOPES" >> "$rdir/order.txt"
+  echo "$(date -Is) $m block $BLOCK levels: ${order[*]} scopes: $SCOPES" >> "$rdir/order.txt"
   provenance_write "$rdir" "$m"
   log "### $WL x $m: level order ${order[*]}"
   for lvl in "${order[@]}"; do

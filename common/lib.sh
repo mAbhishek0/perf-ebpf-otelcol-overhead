@@ -75,9 +75,22 @@ net_delta() {
 
 gt() { awk -v a="$1" -v b="$2" 'BEGIN{ exit !(a>b) }'; }
 
+# run_prefix  — "L" for block 1 (the original matrices keep their ids), "L_b2"
+# for block 2, … (PLAN.md: every cell runs as 2 independent A-B-A blocks).
+run_prefix() { if (( ${BLOCK:-1} == 1 )); then printf '%s' "$PLATFORM"; else printf '%s_b%s' "$PLATFORM" "$BLOCK"; fi; }
+
+# block_order ORDER_TXT LEVELS  — block 1's last recorded level order, reversed,
+# keeping only LEVELS (comma list); one level per line. Used for blocks >= 2.
+block_order() {
+  local keep=",$2," l
+  sed -n 's/.* levels: \(.*\) scopes:.*/\1/p' "$1" | tail -n 1 | tr ' ' '\n' | grep -v '^$' | tac \
+    | while read -r l; do [[ $keep == *",$l,"* ]] && printf '%s\n' "$l"; done
+  return 0
+}
+
 # run_id WL MECH SCOPE LEVEL TRY ROLE  — deterministic, so a rerun collides
 # instead of duplicating rows.
-run_id() { printf '%s_%s_%s_%s_E%s_try%s_%s' "$PLATFORM" "$1" "$2" "$3" "$4" "$5" "$6"; }
+run_id() { printf '%s_%s_%s_%s_E%s_try%s_%s' "$(run_prefix)" "$1" "$2" "$3" "$4" "$5" "$6"; }
 
 # level_rate LEVEL  — ladder lookup from the frozen pilot file; "R<n>" is a
 # literal rate (pilot only).
