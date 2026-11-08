@@ -19,6 +19,8 @@ provenance_write() {
   : > "$f.partial"
   kv_put "$f.partial" WRITTEN_AT "$(date -Is)"
   kv_put "$f.partial" MECHANISM "$mech"
+  kv_put "$f.partial" LOCALE_FORCED "$LC_ALL"
+  kv_put "$f.partial" LOCALE_CALLER "${HOST_LOCALE_ORIG:-NA}"
   kv_put "$f.partial" HARNESS_COMMIT "$(_prov_cmd "${git[@]}" rev-parse HEAD)"
   kv_put "$f.partial" HARNESS_LOCAL_EDITS "${dirty:-NA}"
   kv_put "$f.partial" KERNEL "$(uname -r)"

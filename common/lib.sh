@@ -1,6 +1,14 @@
 # lib.sh — shared helpers. Sourced, never executed. Callers run under
 # `set -euo pipefail`, so every helper here is written to be safe under it.
 
+# One locale for every script and child (perf, python, awk, sort), whatever the
+# desktop's region settings are: number formats, digit grouping and date/time
+# words never depend on the user's Formats choice (it changed to India on
+# 2026-11-08). C.UTF-8 keeps UTF-8 text intact. The caller's settings are kept
+# for the provenance record.
+HOST_LOCALE_ORIG="LANG=${LANG:-} LC_ALL=${LC_ALL:-} LC_TIME=${LC_TIME:-} LC_NUMERIC=${LC_NUMERIC:-}"
+export LC_ALL=C.UTF-8
+
 log()  { printf '%s [%s|%s] %s\n' "$(date +%H:%M:%S)" "${LOG_TAG:-bench}" "${STAGE:--}" "$*" >&2; }
 warn() { log "WARN: $*"; }
 die()  {
