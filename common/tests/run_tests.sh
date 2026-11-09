@@ -281,7 +281,7 @@ t_eq "matrix mode still skips drift" "matrix skips drift 0" "$(sed -n 6p "$T/cap
     cmp -s "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" && echo ok || echo "bad $m: $(diff "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" | grep "^[<>]" | cut -c1-120 | tr "
 " " ")"
   done
-  source "$LAPTOP_ROOT/nginx-wrk2/collector/scripts/collector.env"
+  source "$LAPTOP_ROOT/common/mech/collector.env"
   mkdir -p "$T/sch_c"; _schema_freeze "$T/sch_c" collector >/dev/null 2>&1
   grep -q '"otelcol_version": "0.161.0"' "$T/sch_c/schema.json" && grep -q '"collector_scrape_interval_wide_s": 1,' "$T/sch_c/schema.json" && echo ok || echo "bad collector"
 ) > "$T/sch.out"
