@@ -445,5 +445,12 @@ read -r NPASS NFAIL < "$T/hcount"
 # --- nginx x collector plugin (its own file; runs standalone too) ---
 source "$LAPTOP_ROOT/nginx-wrk2/collector/tests/test_mech.sh"
 
+# --- fio workload (own file and counters: it sources fio/workload.sh, whose
+# wl_* would replace nginx's in this shell) ---
+bash "$LAPTOP_ROOT/fio/tests/test_fio.sh" >/dev/null 2>&1 && ok || bad "fio/tests/test_fio.sh (run it alone for details)"
+if [[ -n $PY ]]; then
+  "$PY" -I "$LAPTOP_ROOT/fio/tests/test_fio_parse.py" >/dev/null 2>&1 && ok || bad "fio/tests/test_fio_parse.py (run it alone for details)"
+fi
+
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))
