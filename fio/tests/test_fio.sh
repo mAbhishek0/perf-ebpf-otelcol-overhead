@@ -9,6 +9,7 @@ source "$LAPTOP_ROOT/common/config.env"
 source "$LAPTOP_ROOT/common/lib.sh"
 LOG_TAG=test
 source "$LAPTOP_ROOT/common/collect.sh"
+source "$LAPTOP_ROOT/common/provenance.sh"   # _prov_cmd
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 NPASS=0 NFAIL=0
 ok()   { NPASS=$((NPASS+1)); }
@@ -45,20 +46,54 @@ sh -n "$b/gate.sh" && ok || bad "gate.sh does not parse"
 ( sleep 0.3; : > "$b/go" ) &
 sh "$b/gate.sh"; t_eq "gate released by go" 0 "$?"
 t_eq "gate left a ready marker" 1 "$(_fio_ready_count "$b")"
+[[ "$(cat "$b"/ready.*)" =~ ^[0-9]{16,}$ ]] && ok || bad "ready marker does not hold a ns timestamp"
 rm -f "$b/go" "$b"/ready.*
 FIO_GATE_TIMEOUT_S=1 _fio_gate "$b" > "$b/gate_short.sh"
 sh "$b/gate_short.sh"; t_eq "gate times out" 1 "$?"
+
+# --- gate wait: oldest ready marker to go; dies on a blank or bad marker ---
+gw="$T/gw"; mkdir -p "$gw"
+echo 1700000000000000000 > "$gw/ready.11"; echo 1700000002500000000 > "$gw/ready.12"
+t_eq "gate wait from the oldest marker" 4.000 "$(_fio_gate_wait_s "$gw" 1700000004000000000)"
+t_die "gate wait: go before ready" _fio_gate_wait_s "$gw" 1699999999000000000
+t_die "gate wait: bad go time" _fio_gate_wait_s "$gw" ""
+: > "$gw/ready.13"; rm -f "$gw/ready.11" "$gw/ready.12"
+t_die "gate wait: blank marker" _fio_gate_wait_s "$gw" 1700000004000000000
+rm -f "$gw"/ready.*
+t_die "gate wait: no marker" _fio_gate_wait_s "$gw" 1700000004000000000
+
+# --- ladder / pilot / capacity rates must divide by FIO_NUMJOBS ---
+( FIO_NUMJOBS=4 LADDER="1:10000 2:25000" RATES=50000,100000 CAPACITY_RATES=44000 _fio_check_rates ) && ok || bad "even rates rejected"
+_rates_die() { FIO_NUMJOBS=$1 LADDER="$2" RATES="$3" CAPACITY_RATES="$4" _fio_check_rates; }
+t_die "ladder rate not divisible (call-time)" _rates_die 4 "1:10000 2:25002" "" ""
+t_die "pilot rate not divisible" _rates_die 4 "" "10000,15001" ""
+t_die "capacity rate not divisible" _rates_die 4 "" "" "44002"
+t_die "ladder fits 4 jobs but not 3" _rates_die 3 "1:10000" "" ""
+msg=$( ( _rates_die 4 "1:10000 2:25002" "" "" ) 2>&1 ); [[ $msg == *25002* ]] && ok || bad "message does not name the bad rate: $msg"
 
 # --- wl_parse on the fixture, with disk counters ---
 cp "$LAPTOP_ROOT/fio/tests/fixtures/fio_synthetic.json" "$b/fio.json"
 echo "1000 0 8000 50 200 0 1600 70 0 900 120 0 0 0 0 0 0" > "$b/diskstat_before.txt"
 echo "6001000 0 48008000 300000 230 0 1840 80 0 120900 300120 0 0 0 0 0 0" > "$b/diskstat_after.txt"
+echo 0.412 > "$b/gate_wait_s"
 if [[ -n $PY ]]; then
   ( wl_parse "$b" ) && ok || bad "wl_parse failed"
   t_eq "parse throughput" 49998.50 "$(kv_get "$b/wl.env" THROUGHPUT)"
   t_eq "parse p99" 0.160768 "$(kv_get "$b/wl.env" P99_MS)"
   t_eq "disk reads delta" 6000000 "$(kv_get "$b/wl.env" FIO_DISK_READS_DELTA)"
   t_eq "disk writes delta" 30 "$(kv_get "$b/wl.env" FIO_DISK_WRITES_DELTA)"
+  t_eq "gate wait in wl.env" 0.412 "$(kv_get "$b/wl.env" GATE_WAIT_S)"
+  cp "$b/diskstat_after.txt" "$b/ds_ok"
+  echo "garbage" > "$b/diskstat_after.txt"
+  t_die "wl_parse bad disk reads" wl_parse "$b"
+  echo "6001000 0 48008000 300000 xx 0 1840 80 0 120900 300120 0 0 0 0 0 0" > "$b/diskstat_after.txt"
+  t_die "wl_parse bad disk writes" wl_parse "$b"
+  echo "6001000 0 48008000 300000 100 0 1840 80 0 120900 300120 0 0 0 0 0 0" > "$b/diskstat_after.txt"
+  t_die "wl_parse negative disk writes" wl_parse "$b"
+  cp "$b/ds_ok" "$b/diskstat_after.txt"
+  rm -f "$b/gate_wait_s"
+  t_die "wl_parse without a gate wait" wl_parse "$b"
+  echo 0.412 > "$b/gate_wait_s"
   t_die "wl_parse runtime guard" eval 'STEADY_S=60 wl_parse "$b"'
 fi
 
@@ -75,6 +110,19 @@ t_eq "prep idle" 0 "$(kv_get "$T/c_try1.prep" IDLE_S)"
 printf '#!/bin/sh\necho "fstrim: busy" >&2; exit 1\n' > "$T/bin/fstrim"
 _prep_fail() { PATH="$T/bin:$PATH" FIO_CELL_IDLE_S=0 wl_cell_prep "$T/c_try3.prep"; }
 t_die "prep fstrim failure dies" _prep_fail
+
+# --- provenance: the new keys are always written, never blank ---
+# The paths (/boot/config-<kernel>, /proc/cmdline, /sys/module/nvme_core) are
+# fixed, as the existing provenance reads are, so this checks the keys and
+# that a missing source gives "unknown" or NA rather than a blank; it cannot
+# pin the values.
+pv="$T/prov.env"; : > "$pv"
+( FIO_FILE="$T/nofile" FIO_DEV=nvme0n1 wl_provenance "$pv" ) && ok || bad "wl_provenance failed"
+for k in KERNEL_CONFIG_IRQ_TIME_ACCOUNTING KERNEL_CMDLINE NVME_DEFAULT_PS_MAX_LATENCY_US; do
+  kv_has "$pv" "$k" && [[ -n "$(kv_get "$pv" "$k")" ]] && ok || bad "provenance lacks or blanks $k"
+done
+v=$(_fio_irq_config); [[ $v == unknown || $v == *CONFIG_IRQ_TIME_ACCOUNTING* ]] && ok || bad "irq config line: $v"
+v=$(_fio_nvme_ps_latency); [[ $v == unknown || $v =~ ^[0-9]+$ ]] && ok || bad "nvme ps latency: $v"
 
 # --- schema: fio constants are frozen, columns unchanged ---
 mkdir -p "$T/s"

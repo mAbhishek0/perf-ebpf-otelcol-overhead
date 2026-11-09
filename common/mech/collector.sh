@@ -14,10 +14,13 @@
 #
 # Ported from Platform S (docs/drafts/nginx-perf-pipeline-server/sidecar/,
 # 88 runs there). Same configs: the YAML templates here are S's with the same
-# receivers, intervals, batch processor, debug exporter and queue:
-#   narrow: receiver `nginx` (stub_status /status) every 15 s       — 1 receiver
-#   wide:   `nginx` + `hostmetrics` (cpu memory disk network load
-#           filesystem paging processes) every 1 s                   — 2 receivers, 8 scrapers
+# receivers, intervals, batch processor, debug exporter and queue.
+# Each pair's templates set the receivers (this file sets only the intervals):
+#   nginx narrow: receiver `nginx` (stub_status /status) every 15 s       — 1 receiver
+#   nginx wide:   `nginx` + `hostmetrics` (cpu memory disk network load
+#                 filesystem paging processes) every 1 s                   — 2 receivers, 8 scrapers
+#   fio narrow:   `hostmetrics` with the disk scraper only, every 15 s     — 1 scraper
+#   fio wide:     `hostmetrics` with the same 8 scrapers, every 1 s        — 8 scrapers
 # Exporter `debug` (verbosity basic) with sending_queue 512, batch 512: no
 # sink process whose CPU would go unattributed, no backpressure from one.
 #

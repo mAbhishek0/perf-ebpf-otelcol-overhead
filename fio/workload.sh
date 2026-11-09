@@ -100,8 +100,8 @@ _fio_gate() {  # BUNDLE -> gate.sh on stdout (POSIX sh: fio runs it via system(3
   cat <<EOF
 #!/bin/sh
 # gate.sh — fio exec_prerun for each measure job: say "waiting", then wait
-# for the harness's go. Bounded, so a dead harness cannot leave fio hanging.
-touch "$1/ready.\$\$"
+# for the harness's go. The marker holds its arrival time in ns (GATE_WAIT_S). Bounded, so a dead harness cannot leave fio hanging.
+date +%s%N > "$1/ready.\$\$"
 n=0
 while [ ! -e "$1/go" ]; do
   n=\$((n + 1))
@@ -118,6 +118,33 @@ _fio_ready_count() {  # BUNDLE -> number of measure jobs waiting at the gate
 }
 _fio_ready_or_dead() {  # BUNDLE PID
   (( $(_fio_ready_count "$1") >= FIO_NUMJOBS )) || ! kill -0 "$2" 2>/dev/null
+}
+
+# _fio_gate_wait_s BUNDLE GO_NS -> seconds from the oldest ready.* marker to GO_NS.
+# Dies on a missing or unparseable marker: GATE_WAIT_S must never be blank.
+_fio_gate_wait_s() {
+  local oldest
+  oldest=$(cat "$1"/ready.* 2>/dev/null | sort -n | head -n 1)
+  [[ $oldest =~ ^[0-9]{16,}$ ]] || die "no usable ready.* timestamp in $1 (got '$oldest')"
+  [[ $2 =~ ^[0-9]{16,}$ ]] && (( $2 >= oldest )) || die "bad go time '$2' (oldest ready $oldest)"
+  awk -v d=$(( $2 - oldest )) 'BEGIN{ printf "%.3f", d / 1e9 }'
+}
+
+# _fio_check_rates -> dies unless every rate this run will use splits evenly
+# over FIO_NUMJOBS. Rates come from the frozen LADDER ("level:rate" pairs, as
+# level_rate reads them), pilot.sh's RATES and run_workload.sh's CAPACITY_RATES;
+# read at call time, after pilot.sh --set has changed FIO_NUMJOBS.
+_fio_check_rates() {
+  local r p
+  for p in ${LADDER:-}; do
+    r=${p#*:}
+    [[ $r =~ ^[1-9][0-9]*$ ]] && (( r % FIO_NUMJOBS == 0 )) \
+      || die "ladder rate '$r' IOPS (level ${p%%:*}) does not split evenly over FIO_NUMJOBS=$FIO_NUMJOBS jobs"
+  done
+  for r in $(tr ',' ' ' <<<"${RATES:-} ${CAPACITY_RATES:-}"); do
+    [[ $r =~ ^[1-9][0-9]*$ ]] && (( r % FIO_NUMJOBS == 0 )) \
+      || die "rate '$r' IOPS does not split evenly over FIO_NUMJOBS=$FIO_NUMJOBS jobs"
+  done
 }
 
 wl_preflight() {
@@ -147,6 +174,8 @@ wl_preflight() {
   (( FIO_NUMJOBS >= 1 && FIO_NUMJOBS <= ncpu && FIO_IODEPTH >= 1 )) \
     && pf_ok "fio $FIO_NUMJOBS jobs x iodepth $FIO_IODEPTH" \
     || pf_fail "FIO_NUMJOBS=$FIO_NUMJOBS / FIO_IODEPTH=$FIO_IODEPTH (jobs must be 1..$ncpu: one per workload CPU)"
+  _fio_check_rates
+  pf_ok "every ladder / pilot / capacity rate divides by $FIO_NUMJOBS jobs"
 }
 
 wl_start() {
@@ -179,11 +208,13 @@ wl_ramp() {
 }
 
 wl_measure() {
-  local b=$2 pid rc=0
+  local b=$2 pid rc=0 t_go
   pid=$(cat "$b/fio_pid")
   echo "$pid" > "$b/pids.gen"          # fio is its own generator (header)
   cat "/sys/block/$FIO_DEV/stat" > "$b/diskstat_before.txt"
+  t_go=$(date +%s%N)
   : > "$b/go"
+  _fio_gate_wait_s "$b" "$t_go" > "$b/gate_wait_s"   # dies, rather than leave a blank
   wait "$pid" || rc=$?
   cat "/sys/block/$FIO_DEV/stat" > "$b/diskstat_after.txt"
   rm -f "$b/pids.gen"
@@ -198,8 +229,16 @@ wl_parse() {
     || die "cannot parse $b/fio.json: $(cat "$b/fio_parse.err")"
   # Whole-disk reads and writes completed during the window (/sys/block/<dev>/stat
   # fields 1 and 5): fio's I/O plus anyone else's, e.g. the harness's own writes.
-  kv_put "$e.partial" FIO_DISK_READS_DELTA "$(awk 'NR==FNR{r=$1; w=$5; next} {print $1-r}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")"
-  kv_put "$e.partial" FIO_DISK_WRITES_DELTA "$(awk 'NR==FNR{r=$1; w=$5; next} {print $5-w}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")"
+  local rd wr gw
+  rd=$(awk 'NR==FNR{r=$1; next} {print $1-r}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")
+  wr=$(awk 'NR==FNR{w=$5; next} {print $5-w}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")
+  [[ $rd =~ ^[0-9]+$ ]] || die "disk reads delta '$rd' is not a non-negative integer (see $b/diskstat_*.txt)"
+  [[ $wr =~ ^[0-9]+$ ]] || die "disk writes delta '$wr' is not a non-negative integer (see $b/diskstat_*.txt)"
+  gw=$(cat "$b/gate_wait_s" 2>/dev/null || true)
+  [[ $gw =~ ^[0-9]+\.[0-9]+$ ]] || die "no gate wait in $b/gate_wait_s (got '$gw')"
+  kv_put "$e.partial" FIO_DISK_READS_DELTA "$rd"
+  kv_put "$e.partial" FIO_DISK_WRITES_DELTA "$wr"
+  kv_put "$e.partial" GATE_WAIT_S "$gw"
   mv "$e.partial" "$e"
 }
 
@@ -217,6 +256,17 @@ wl_cell_prep() {
   mv "$f.partial" "$f"
 }
 
+_fio_irq_config() {  # the CONFIG_IRQ_TIME_ACCOUNTING line, or "unknown"
+  local line
+  line=$(grep -E -m1 '^(# )?CONFIG_IRQ_TIME_ACCOUNTING([= ]|$)' "/boot/config-$(uname -r)" 2>/dev/null) || true
+  echo "${line:-unknown}"
+}
+_fio_nvme_ps_latency() {
+  local v
+  v=$(cat /sys/module/nvme_core/parameters/default_ps_max_latency_us 2>/dev/null) || true
+  echo "${v:-unknown}"
+}
+
 wl_provenance() {
   local f=$1 d=${FIO_DEV:-NA}
   kv_put "$f" FIO_VERSION "$(_prov_cmd fio --version)"
@@ -228,6 +278,12 @@ wl_provenance() {
   kv_put "$f" FIO_DEVICE_MODEL "$(_prov_cmd cat "/sys/block/$d/device/model")"
   kv_put "$f" FIO_DEVICE_FIRMWARE "$(_prov_cmd cat "/sys/block/$d/device/firmware_rev")"
   kv_put "$f" FIO_DEVICE_SCHEDULER "$(_prov_cmd cat "/sys/block/$d/queue/scheduler")"
+  # IRQ time accounting decides whether interrupt time (the eBPF narrow
+  # completion probe) reaches workload_cpu_cores; tsc=noirqtime turns it off at
+  # run time. The NVMe power-state latency limit gates deep idle states.
+  kv_put "$f" KERNEL_CONFIG_IRQ_TIME_ACCOUNTING "$(_fio_irq_config)"
+  kv_put "$f" KERNEL_CMDLINE "$(_prov_cmd cat /proc/cmdline)"
+  kv_put "$f" NVME_DEFAULT_PS_MAX_LATENCY_US "$(_fio_nvme_ps_latency)"
 }
 
 wl_schema_json() {

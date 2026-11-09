@@ -25,7 +25,7 @@ import signal
 import sys
 import time
 
-TRACED_CPUS_SLOTS = 1024          # BPF_ARRAY(traced_cpus, u8, 1024) in nginx_probes.c
+TRACED_CPUS_SLOTS = 1024          # BPF_ARRAY(traced_cpus, u8, 1024) in the probe files (nginx_probes.c, fio_probes.c)
 CTR_SUBMITTED, CTR_SUBMIT_FAIL, CTR_FILTERED, CTR_SECONDARY, CTR_SLOTS = 0, 1, 2, 3, 4
 
 
