@@ -381,9 +381,23 @@ except SystemExit: pass
 try: t.check_cpus([0, 1024]); raise AssertionError("1024")
 except SystemExit: pass
 assert t.kv_lines([("A", 1), ("B", "x'"'"'y")]) == "A='"'"'1'"'"'\nB='"'"'xy'"'"'\n"
-a = t.parse_args(["--scope", "wide", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
-assert a.max_window == 9 and a.scope == "wide"
-print("ok")' "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts" 2>&1)"
+a = t.parse_args(["--scope", "wide", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
+assert a.max_window == 9 and a.scope == "wide" and a.src == "p.c"
+import contextlib, io  # argparse prints its usage to stderr; the harness captures 2>&1
+try:
+    with contextlib.redirect_stderr(io.StringIO()): t.parse_args(["--scope", "wide", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
+    raise AssertionError("no --src")
+except SystemExit: pass
+assert t.parse_dev_list("259:0") == [259 << 20]
+assert t.parse_dev_list("259:1, 8:0") == [(259 << 20) | 1, 8 << 20]
+for bad in ("", "259", "a:b", "4096:0", "8:1048576"):
+    try: t.parse_dev_list(bad); raise AssertionError(bad)
+    except SystemExit: pass
+for argv in (["--pids", "1", "--devs", "8:0"], []):
+    try: t.check_narrow_filter(t.parse_args(["--scope", "narrow", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"] + argv)); raise AssertionError(argv)
+    except SystemExit: pass
+t.check_narrow_filter(t.parse_args(["--scope", "narrow", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9", "--devs", "8:0"]))
+print("ok")' "$LAPTOP_ROOT/common/mech" 2>&1)"
 fi
 
 # --- progress.sh (pure parts + a full cell with no console) ---
