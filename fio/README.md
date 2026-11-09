@@ -4,9 +4,9 @@ This folder holds the fio workload and its three mechanism pairs: `perf/`, `ebpf
 
 ## 1. What fio does here
 
-fio does 4K random reads with `O_DIRECT`. The rate is fixed with `rate_iops`. The reads go to one 16 GiB file, which `fio/prepare.sh` writes once before any run (PLAN.md decision 3.3).
+fio does 4K random reads with `O_DIRECT`. The rate is fixed with `rate_iops`, which is fio's setting for how many I/Os per second one job may issue. The reads go to one 16 GiB file on an NVMe drive (a solid-state drive that connects over the PCIe bus), which `fio/prepare.sh` writes once before any run (PLAN.md decision 3.3).
 
-The reason is the laptop's SSD. It is a QLC drive with an SLC write cache. Sustained writes fill that cache, and the write speed then drops by 40 to 60 percent in the middle of a run. That would make the baselines drift. Reads of data that already exists avoid this. Each read is still one real block I/O for the tracers to see. `O_DIRECT` keeps the page cache from hiding the disk.
+The reason is the laptop's SSD. It is a QLC drive (each flash cell stores four bits, which makes writes slow) with an SLC write cache (a small part of the drive that works as fast one-bit-per-cell flash). Sustained writes fill that cache, and the write speed then drops by 40 to 60 percent in the middle of a run. That would make the baselines drift. Reads of data that already exists avoid this. Each read is still one real block I/O for the tracers to see. `O_DIRECT` keeps the page cache from hiding the disk.
 
 The constants are in `fio.env`. The engine is `libaio`. The job count (`FIO_NUMJOBS`, default 4) is one job per workload CPU. The queue depth (`FIO_IODEPTH`, default 32) is a pilot knob. Both are frozen into `fio/pilot.env` after the pilot.
 
@@ -15,7 +15,7 @@ The constants are in `fio.env`. The engine is `libaio`. The job count (`FIO_NUMJ
 One fio process serves the whole run. Its job file has two groups, separated by `stonewall`.
 
 1. The `ramp` group runs for `RAMP_S` (30 s) at the target rate. Nothing traces it. Its data is thrown away.
-2. Each job of the `measure` group first runs `gate.sh` (through fio's `exec_prerun`). The gate writes a `ready.<pid>` file and then waits for a file named `go`.
+2. Each job of the `measure` group first runs `gate.sh` (through fio's `exec_prerun`). The gate writes a `ready.<pid>` file (PID is the process ID) and then waits for a file named `go`.
 3. When every measure job is waiting at the gate, the harness attaches the tracer. The measure threads already exist at that moment, so `perf -p` can see them.
 4. The harness then creates `go`. The measure group runs for `STEADY_S` (120 s).
 
@@ -50,7 +50,7 @@ Each pair's own notes are in `perf/docs/README.md`, `ebpf/docs/README.md` and `c
 
 Run these on the laptop, after `git pull`.
 
-1. Run `grep IRQ_TIME_ACCOUNTING /boot/config-$(uname -r)`. Write the answer here: **not yet recorded**. The answer decides where interrupt time is counted. It includes the completion probe of eBPF narrow. With the option on, that time is inside `workload_cpu_cores`. With it off, it is only inside `busy_pct_workload`.
+1. Run `grep IRQ_TIME_ACCOUNTING /boot/config-$(uname -r)`. Write the answer here: **not yet recorded**. Each run's provenance file now records the same line, and also `/proc/cmdline`, because `tsc=noirqtime` turns the option off at run time. What the option does: with `CONFIG_IRQ_TIME_ACCOUNTING=y`, the kernel takes hardirq and softirq time out of task run time. So that time is not charged to fio's cgroup and is not in `workload_cpu_cores`. It shows only in the `irq` and `softirq` columns of `/proc/stat`, which means only inside `busy_pct_workload`. With the option off, interrupt time is charged to whichever task was interrupted, which is fio or the idle task. The consequence: on a stock Ubuntu kernel the option is on. There, the completion probe of eBPF narrow runs inside the NVMe hardirq. Its cost is invisible in `workload_cpu_cores` and visible only in `busy_pct_workload`.
 2. Run `sudo bash fio/prepare.sh`. Then leave the laptop idle for 30 minutes, so the drive can move the new data out of its SLC cache.
 3. Run `sudo bash pilot.sh fio`. It takes about 1 hour. Read `fio/pilot/pilot_report.txt`. Then write `fio/pilot.env` by hand. It sets `LADDER`, `FIO_NUMJOBS` and `FIO_IODEPTH`. The top of `LADDER` must be the highest rate fio sustains without a tracer (PLAN.md decision 3.2). If no rate saturates, repeat with higher `--rates` and `--out pilot-2`.
 4. Run `sudo bash fio/check.sh`. It takes about 15 minutes. Push `logs/fio-check_*.txt`. Copy one real `fio.json` from `state/fio-check/<ts>/` to `fio/tests/fixtures/fio_L.json`. Add a test that parses it.
@@ -65,9 +65,13 @@ These also go into the paper.
 
 - **NVMe interrupts land on the workload CPUs.** NVMe uses managed per-CPU interrupts. `host.sh` cannot move them to CPUs 12 and 14. This is the same in baseline and traced runs. It matters most for eBPF narrow, because its completion probe runs inside those interrupts.
 - **eBPF narrow uses a device filter, not a PID filter.** Any other I/O on `nvme0n1` during a window is traced too. `FIO_DISK_READS_DELTA` and `FIO_DISK_WRITES_DELTA` measure how much there was.
-- **The device filter assumes a plain partition or a whole disk.** Under LVM or LUKS, the parent of the device is a device-mapper device, not a disk. The run then stops with a clear error. Nothing is silently wrong.
+- **The device filter assumes a plain partition or a whole disk.** Under LVM (logical volume manager) or LUKS (disk encryption), the parent of the device is a device-mapper device, not a disk. The run then stops with a clear error. Nothing is silently wrong.
 - **`loadgen_cpu_cores` is fio's CPU.** It is not comparable with nginx's wrk2 figure.
 - **fio's rate limiter can issue I/O in small bursts.** This happens when `rate_iops` is used with `iodepth` above 1. Latency is per I/O, from submit to completion. So it includes any queueing the bursts cause. This is the same in every arm.
 - **The collector's wide cell is not identical across workloads.** For nginx, wide runs the receivers `[nginx, hostmetrics]`. For fio, wide runs `[hostmetrics]` only. Both use the same 8 scrapers and the same 1 s interval. So fio's wide collector cell has one receiver fewer than nginx's. Keep this in mind whenever "wide" is compared across workloads.
+- **Traced and baseline runs wait at the gate for different times.** The disk sits idle while `mech_attach` runs. For a baseline that is well under 1 s. For perf it is a few seconds. For BCC it is longer, because BCC compiles its probe first. For the collector it can be up to `COLLECTOR_ATTACH_TIMEOUT_S`, which is 30 s. An NVMe drive can enter deep power states on its own, and the CPUs can enter deep idle states. This may happen only in traced runs. A traced window may then open on a device that is still waking up. This is the same kind of traced-only start-of-window effect that was seen for nginx (README timelines 32 and 33). Each run now records `GATE_WAIT_S` and the NVMe power-state setting (`NVME_DEFAULT_PS_MAX_LATENCY_US`), so this can be checked. Whether to equalise the wait is still an open decision.
+- **perf writes `perf.data` to the disk under test.** perf writes `perf.data` into the run folder, and only in traced perf runs. The run folder is on the root file system. The probe puts `FIO_DIR` (`/var/tmp`) on `nvme0n1p6`, the same disk as fio's file; confirm on the laptop that the clone is on that file system too. perf compresses the file with zstd after the window. `FIO_DISK_WRITES_DELTA` records the writes inside the window, and `check.sh` shows them as `disk_wr`. Whether perf output should move to tmpfs for fio is decided after `check.sh` has run.
+- **The pilot differs from a matrix cell.** The pilot does not run `wl_cell_prep` (no trim and no idle before each pilot point). It also writes no provenance file. So calibration runs in a different disk state from the matrix cells.
+- **fio-specific values are not in the CSV.** `FIO_RUNTIME_MS`, `FIO_TOTAL_IOS`, `FIO_RAMP_IOPS`, `FIO_DISK_READS_DELTA`, `FIO_DISK_WRITES_DELTA` and `GATE_WAIT_S` are in each run's `wl.env`, not in the CSV.
 - **The test fixture is synthetic.** `fio/tests/fixtures/fio_synthetic.json` stands in until step 4 replaces it with real laptop output.
 - **Nothing here has run on hardware.** No number from fio exists yet.
