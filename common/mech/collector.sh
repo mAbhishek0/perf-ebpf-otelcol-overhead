@@ -17,7 +17,7 @@
 # receivers, intervals, batch processor, debug exporter and queue:
 #   narrow: receiver `nginx` (stub_status /status) every 15 s       — 1 receiver
 #   wide:   `nginx` + `hostmetrics` (cpu memory disk network load
-#           filesystem paging processes) every 1 s                   — 2 receivers, 9 scrapers
+#           filesystem paging processes) every 1 s                   — 2 receivers, 8 scrapers
 # Exporter `debug` (verbosity basic) with sending_queue 512, batch 512: no
 # sink process whose CPU would go unattributed, no backpressure from one.
 #
@@ -111,7 +111,7 @@ _otel_hostmetrics_scrapers() {
 }
 
 mech_attach() {
-  local scope=$1 b=$2 tpl iv cfg rc hm pid code t0 t1
+  local scope=$1 b=$2 tpl iv cfg rc hm pid t0 t1
   rm -f "$b/otel_baseline.prom" "$b/otel_final.prom" "$b/otel_stop.env"
   tpl=$(_otel_template "$scope"); iv=$(_otel_interval "$scope")
   cfg="$b/otelcol.yaml"
