@@ -3,7 +3,8 @@
 #
 # Contract (as nginx-wrk2/workload.sh): wl_preflight, wl_start BUNDLE,
 #   wl_ramp RATE BUNDLE, wl_measure RATE BUNDLE, wl_stop, wl_parse BUNDLE;
-#   plus the optional hooks wl_cell_prep, wl_provenance, wl_schema_json.
+#   plus the optional hooks wl_cell_prep, wl_provenance, wl_schema_json,
+#   wl_csv_columns.
 #
 # Decision 3.3 (PLAN.md): 4K random reads, O_DIRECT, rate set with
 # rate_iops, on a file fio/prepare.sh wrote once. RATE is total IOPS, split
@@ -124,7 +125,7 @@ _fio_ready_or_dead() {  # BUNDLE PID
 # Dies on a missing or unparseable marker: GATE_WAIT_S must never be blank.
 _fio_gate_wait_s() {
   local oldest
-  oldest=$(cat "$1"/ready.* 2>/dev/null | sort -n | head -n 1)
+  oldest=$(cat "$1"/ready.* 2>/dev/null | sort -n | head -n 1) || true   # no marker: the check below dies with the clear message
   [[ $oldest =~ ^[0-9]{16,}$ ]] || die "no usable ready.* timestamp in $1 (got '$oldest')"
   [[ $2 =~ ^[0-9]{16,}$ ]] && (( $2 >= oldest )) || die "bad go time '$2' (oldest ready $oldest)"
   awk -v d=$(( $2 - oldest )) 'BEGIN{ printf "%.3f", d / 1e9 }'
@@ -284,6 +285,24 @@ wl_provenance() {
   kv_put "$f" KERNEL_CONFIG_IRQ_TIME_ACCOUNTING "$(_fio_irq_config)"
   kv_put "$f" KERNEL_CMDLINE "$(_prov_cmd cat /proc/cmdline)"
   kv_put "$f" NVME_DEFAULT_PS_MAX_LATENCY_US "$(_fio_nvme_ps_latency)"
+}
+
+# fio's own CSV columns, after the shared ones (common/collect.sh _csv_cols).
+# Each is "csv name:wl.env key:unit"; every value is a non-negative number.
+#   fio_runtime_ms        measured group's runtime (fio_parse.py; within 2 % of STEADY_S)
+#   fio_total_ios         I/Os fio completed in the measured group
+#   fio_ramp_iops         IOPS of the discarded ramp group, for the record
+#   fio_disk_reads_delta  whole-disk reads completed during the window, by anyone
+#   fio_disk_writes_delta whole-disk writes completed during the window, by anyone
+#   gate_wait_s           oldest ready.* marker to go: how long the disk sat idle
+wl_csv_columns() {
+  printf '%s\n' \
+    'fio_runtime_ms:FIO_RUNTIME_MS:ms' \
+    'fio_total_ios:FIO_TOTAL_IOS:I/Os' \
+    'fio_ramp_iops:FIO_RAMP_IOPS:IOPS' \
+    'fio_disk_reads_delta:FIO_DISK_READS_DELTA:completed requests' \
+    'fio_disk_writes_delta:FIO_DISK_WRITES_DELTA:completed requests' \
+    'gate_wait_s:GATE_WAIT_S:s'
 }
 
 wl_schema_json() {

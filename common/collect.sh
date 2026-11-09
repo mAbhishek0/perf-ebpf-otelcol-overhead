@@ -47,17 +47,38 @@ SCHEMA_VERSION="2.1.0"
 # so); on any bundle with RUN_SCHEMA a missing late key fails like any other.
 LATE_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DELTA IRQ_OTHER_DELTA SOFTIRQ_NET_RX_DELTA SOFTIRQ_NET_TX_DELTA POWER_SOURCE "
 
-# _csv_cols  — the column list for this run into CSV_COLS: CSV_COLUMNS, plus
-# bracket_verdict in capacity mode (run_workload.sh --capacity), where drift
-# brackets are kept as data. Matrix CSVs and schemas are unchanged by it.
+# _csv_cols  — the column list for this run into CSV_COLS: CSV_COLUMNS, then
+# the workload's own columns if it defines wl_csv_columns (fio; nginx defines
+# none, so its CSVs and schemas are unchanged), then bracket_verdict in
+# capacity mode (run_workload.sh --capacity), where drift brackets are kept
+# as data. Matrix CSVs and schemas are unchanged by capacity mode.
+#
+# wl_csv_columns prints one "name:KEY:unit" line per column. KEY is read from
+# the bundle's wl.env; the value must be a non-negative number (collect dies
+# otherwise, never writes a blank). unit goes into schema.json as
+# workload_column_units. This hook is the one place a workload column is
+# declared: the CSV header, the row and schema.json's columns all come from it.
 _csv_cols() {
+  local e names=" "
   CSV_COLS=("${CSV_COLUMNS[@]}")
+  WL_COL_UNITS=()
+  if declare -F wl_csv_columns >/dev/null; then
+    for e in "${CSV_COLUMNS[@]}"; do names+="${e%%:*} "; done
+    while IFS= read -r e; do
+      [[ $e =~ ^([a-z][a-z0-9_]*):([A-Z][A-Z0-9_]*):([^:\"]+)$ ]] \
+        || die "wl_csv_columns: bad entry '$e' (want name:KEY:unit)"
+      [[ $names == *" ${BASH_REMATCH[1]} "* ]] && die "wl_csv_columns: column ${BASH_REMATCH[1]} already exists"
+      names+="${BASH_REMATCH[1]} "
+      CSV_COLS+=("${BASH_REMATCH[1]}:wlcol:${BASH_REMATCH[2]}")
+      WL_COL_UNITS+=("${BASH_REMATCH[1]}:${BASH_REMATCH[3]}")
+    done < <(wl_csv_columns)
+  fi
   (( ${CAPACITY:-0} )) && CSV_COLS+=(bracket_verdict:verdict:VERDICT)
   return 0
 }
 
 _col_file() {
-  case $1 in run_meta) echo run_meta.env;; wl) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; power) echo power.env;; esac
+  case $1 in run_meta) echo run_meta.env;; wl|wlcol) echo wl.env;; samples) echo samples/summary.env;; cooldown) echo cooldown.env;; mech) echo mech.stats;; power) echo power.env;; esac
 }
 _csvq() { local v=${1//\"/\"\"}; printf '"%s"' "$v"; }
 
@@ -87,6 +108,9 @@ collect() {
         elif [[ $LATE_KEYS == *" $key "* ]] && ! kv_has "$b/run_meta.env" RUN_SCHEMA; then val=NA
         else val=$(kv_get "$f" "$key") || die "collect: $b lacks $key"
         fi
+        if [[ $src == wlcol && ! $val =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+          die "collect: $b $key='$val' is not a non-negative number"
+        fi
         line+="${line:+,}$(_csvq "$val")"
       done
       echo "$line" >> "$tmp"; n=$((n+1))
@@ -114,6 +138,13 @@ _schema_freeze() {  # RDIR MECH
     # Workload constants, only for workloads that define the hook (fio):
     # nginx defines none, so its frozen schema.json files are unchanged.
     if declare -F wl_schema_json >/dev/null; then wl_schema_json; fi
+    # Units of the workload's own CSV columns (wl_csv_columns), same rule.
+    _csv_cols
+    if (( ${#WL_COL_UNITS[@]} )); then
+      printf '  "workload_column_units": {'
+      for col in "${WL_COL_UNITS[@]}"; do printf '%s"%s": "%s"' "$([[ $first == 1 ]] || echo ', ')" "${col%%:*}" "${col#*:}"; first=0; done
+      printf '},\n'; first=1
+    fi
     # Collector constants only in collector dirs: adding them everywhere would
     # change the frozen schema.json of the finished perf and eBPF matrices.
     if [[ $mech == collector ]]; then

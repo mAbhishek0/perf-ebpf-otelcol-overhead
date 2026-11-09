@@ -61,6 +61,9 @@ t_die "gate wait: bad go time" _fio_gate_wait_s "$gw" ""
 t_die "gate wait: blank marker" _fio_gate_wait_s "$gw" 1700000004000000000
 rm -f "$gw"/ready.*
 t_die "gate wait: no marker" _fio_gate_wait_s "$gw" 1700000004000000000
+# under the harness's set -euo pipefail the clear message must still print
+v=$( (set -euo pipefail; _fio_gate_wait_s "$gw" 1700000004000000000) 2>&1 )
+[[ $v == *"no usable ready.* timestamp"* ]] && ok || bad "gate wait: no marker under set -e gave '$v'"
 
 # --- ladder / pilot / capacity rates must divide by FIO_NUMJOBS ---
 ( FIO_NUMJOBS=4 LADDER="1:10000 2:25000" RATES=50000,100000 CAPACITY_RATES=44000 _fio_check_rates ) && ok || bad "even rates rejected"
@@ -124,11 +127,57 @@ done
 v=$(_fio_irq_config); [[ $v == unknown || $v == *CONFIG_IRQ_TIME_ACCOUNTING* ]] && ok || bad "irq config line: $v"
 v=$(_fio_nvme_ps_latency); [[ $v == unknown || $v =~ ^[0-9]+$ ]] && ok || bad "nvme ps latency: $v"
 
-# --- schema: fio constants are frozen, columns unchanged ---
+# --- schema: fio constants are frozen ---
 mkdir -p "$T/s"
 LADDER="1:10000" _schema_freeze "$T/s" perf
 grep -q '"fio_numjobs": 4' "$T/s/schema.json" && ok || bad "schema lacks fio_numjobs"
 grep -q '"fio_rw": "randread"' "$T/s/schema.json" && ok || bad "schema lacks fio_rw"
+
+# --- workload CSV columns (wl_csv_columns): after the shared columns, values from wl.env ---
+FIO_COLS='"fio_runtime_ms","fio_total_ios","fio_ramp_iops","fio_disk_reads_delta","fio_disk_writes_delta","gate_wait_s"'
+_fio_bundle() {  # RD ROLE -> one fio bundle with every shared key, wl.env from the fixture
+  local rd=$1 role=$2 id b col name src key val
+  id=$(run_id fio perf narrow 1 1 "$role"); b="$rd/raw/$id"; mkdir -p "$b/samples"
+  for col in "${CSV_COLUMNS[@]}"; do
+    IFS=: read -r name src key <<<"$col"
+    [[ $src == mech ]] && continue
+    case $key in RUN_ID) val=$id ;; ROLE) val=$role ;; TRACED) val=0 ;; *) val="v_$key" ;; esac
+    kv_put "$b/$(_col_file "$src")" "$key" "$val"
+  done
+  kv_put "$b/run_meta.env" RUN_SCHEMA "$SCHEMA_VERSION"
+  cat "$HERE/fixtures/wl_fio.env" >> "$b/wl.env"
+  touch "$b/DONE"
+  echo "$b"
+}
+_fio_collect() {  # RD -> collect fio perf into RD, quietly
+  local vf
+  vf="$1/raw/$(run_id fio perf narrow 1 1 X)"; vf="${vf%_try1_X}_try1.verdict"
+  [[ -f $vf ]] || kv_put "$vf" VERDICT ok
+  LADDER="1:10000" collect fio perf "$1" >/dev/null 2>&1
+}
+RD="$T/fcsv"; mkdir -p "$RD/raw"; _fio_bundle "$RD" A1 >/dev/null
+_fio_collect "$RD" && ok || bad "fio collect failed"
+csv="$RD/fio_perf.csv"
+shared=""; for c in "${CSV_COLUMNS[@]}"; do shared+="${shared:+,}\"${c%%:*}\""; done
+t_eq "fio header = shared columns then the six fio columns" "$shared,$FIO_COLS" "$(head -1 "$csv")"
+t_eq "fio row values" '"120000","1200000","9999.50","1200123","42","0.731"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
+grep -q "\"gate_wait_s\"\]" "$RD/schema.json" && ok || bad "schema columns lack the fio columns"
+t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"fio_runtime_ms": "ms", "fio_total_ios": "I/Os", "fio_ramp_iops": "IOPS", "fio_disk_reads_delta": "completed requests", "fio_disk_writes_delta": "completed requests", "gate_wait_s": "s"},'
+# restat path: a second collect (what restat.sh runs, after sourcing workload.sh) reproduces the row
+cp "$csv" "$T/fcsv_first.csv"
+_fio_collect "$RD" && cmp -s "$csv" "$T/fcsv_first.csv" && ok || bad "re-collect did not reproduce the fio CSV"
+# fail loudly: missing, blank or malformed values die; no blank cell is written
+_fio_bad() {  # SED_EXPR -> collect on a fresh dir whose wl.env was edited
+  local rd="$T/fbad$RANDOM" b
+  mkdir -p "$rd/raw"; b=$(_fio_bundle "$rd" A1)
+  sed -i "$1" "$b/wl.env"
+  _fio_collect "$rd"
+}
+t_die "fio column missing dies" _fio_bad '/^GATE_WAIT_S=/d'
+t_die "fio column blank dies" _fio_bad "s/^FIO_TOTAL_IOS=.*/FIO_TOTAL_IOS=''/"
+t_die "fio column malformed dies" _fio_bad "s/^FIO_RAMP_IOPS=.*/FIO_RAMP_IOPS='fast'/"
+t_die "fio column negative dies" _fio_bad "s/^FIO_DISK_WRITES_DELTA=.*/FIO_DISK_WRITES_DELTA='-3'/"
+t_die "fio column NA dies" _fio_bad "s/^FIO_RUNTIME_MS=.*/FIO_RUNTIME_MS='NA'/"
 
 # --- eBPF probe file: the shared parts are byte-identical to nginx's ---
 np="$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts/nginx_probes.c"

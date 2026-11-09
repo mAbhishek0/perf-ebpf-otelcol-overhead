@@ -438,6 +438,26 @@ read -r NPASS NFAIL < "$T/pcount" 2>/dev/null || bad "progress block aborted (no
   _schema_freeze "$sd/b" perf
   grep -q '"hook_test": 1,' "$sd/b/schema.json" && ok || bad "wl_schema_json line missing"
   [[ $(grep -vc hook_test "$sd/b/schema.json") == $(wc -l < "$sd/a/schema.json" | tr -d ' ') ]] && ok || bad "hook changed other schema lines"
+  unset -f wl_schema_json
+  # wl_csv_columns absent: the column list is exactly the shared one (nginx)
+  _csv_cols
+  [[ "${CSV_COLS[*]}" == "${CSV_COLUMNS[*]}" ]] && ok || bad "no wl_csv_columns hook changed the columns"
+  # present: its columns follow the shared ones; capacity's bracket_verdict stays last
+  wl_csv_columns() { printf '%s\n' 'x_ms:X_MS:ms' 'y_count:Y_COUNT:I/Os'; }
+  _csv_cols
+  [[ "${CSV_COLS[*]}" == "${CSV_COLUMNS[*]} x_ms:wlcol:X_MS y_count:wlcol:Y_COUNT" ]] && ok || bad "wl_csv_columns order: ${CSV_COLS[*]: -3}"
+  CAPACITY=1 _csv_cols
+  [[ "${CSV_COLS[*]: -3}" == "x_ms:wlcol:X_MS y_count:wlcol:Y_COUNT bracket_verdict:verdict:VERDICT" ]] && ok || bad "capacity verdict not last"
+  CAPACITY=0
+  mkdir -p "$sd/c"; _schema_freeze "$sd/c" perf
+  grep -qxF '  "workload_column_units": {"x_ms": "ms", "y_count": "I/Os"},' "$sd/c/schema.json" && ok || bad "schema lacks workload_column_units"
+  grep -q '"y_count"\]$' "$sd/c/schema.json" && ok || bad "schema columns lack hook columns"
+  # malformed declarations die
+  wl_csv_columns() { echo 'Bad Name:X:ms'; };   t_die "hook: bad column name" _csv_cols
+  wl_csv_columns() { echo 'x_ms:X_MS'; };       t_die "hook: no unit" _csv_cols
+  wl_csv_columns() { echo 'p99_ms:P99_MS:ms'; }; t_die "hook: name clashes with a shared column" _csv_cols
+  wl_csv_columns() { echo 'x_ms:X_MS:m"s'; };   t_die "hook: quote in unit" _csv_cols
+  unset -f wl_csv_columns
   echo "$NPASS $NFAIL" > "$T/hcount"
 )
 read -r NPASS NFAIL < "$T/hcount" 2>/dev/null || bad "hook block aborted (no count file)"
