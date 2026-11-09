@@ -108,7 +108,7 @@ Replace its first line, `# mech.sh — perf mechanism plugin for nginx. Sourced.
 # perf.sh — the perf mechanism plugin, shared by every workload. Sourced
 # through a pair's <workload>/perf/scripts/mech.sh, which first sets
 # PERF_TARGET_DESC (what target_pids holds; used in messages only).
-# Moved here from nginx-wrk2/perf/scripts/mech.sh on 2026-11-10 with no
+# Moved here from nginx-wrk2/perf/scripts/mech.sh on 2026-11-09 with no
 # change to what it records; the nginx matrices ran on the old path.
 ```
 
@@ -327,7 +327,7 @@ Replace the header (everything above `MECH_NAME="ebpf"`) with:
 #   EBPF_PROBES_SRC          the pair's BPF C file (nginx_probes.c, fio_probes.c)
 #   ebpf_preflight_probes    checks the pair's narrow probe targets exist
 #   ebpf_narrow_filter B     sets the array EBPF_NARROW_ARGS (--pids … or --devs …)
-# Moved here from nginx-wrk2/ebpf/scripts/mech.sh on 2026-11-10 with no
+# Moved here from nginx-wrk2/ebpf/scripts/mech.sh on 2026-11-09 with no
 # change to what it records; the nginx matrices ran on the old path.
 #
 # Contract: mech_preflight, mech_attach SCOPE BUNDLE, mech_detach BUNDLE,
@@ -489,7 +489,7 @@ Replace its first two lines with:
 #   collector_want SCOPE     "<receivers> <hostmetrics scrapers>" expected
 #   collector_precheck       pair checks before otelcol starts
 #   mech_sanity BUNDLE       the pair's ingest guard
-# Moved here from nginx-wrk2/collector/scripts/mech.sh on 2026-11-10 with no
+# Moved here from nginx-wrk2/collector/scripts/mech.sh on 2026-11-09 with no
 # change to what it records; the nginx matrices ran on the old path.
 ```
 
@@ -1967,7 +1967,7 @@ Each `fio/<mech>/docs/README.md` is one short paragraph: what narrow and wide me
 Under decision 3.4, add:
 
 ```markdown
-> **Note 2026-11-10 (implementation, README timeline 37).** eBPF narrow filters the two block tracepoints by the test disk's device number, not by fio's PID. A completion runs in the NVMe interrupt, where the current task is whatever was interrupted, so a PID filter would drop most completions. This is the §6 alternate route, taken from the start for that known reason. Each run records the disk's own read and write counts over the window, so I/O from anything other than fio is measured. Also: fio is its own load generator, so for fio `loadgen_cpu_cores` is fio's own CPU.
+> **Note 2026-11-09 (implementation, README timeline 37).** eBPF narrow filters the two block tracepoints by the test disk's device number, not by fio's PID. A completion runs in the NVMe interrupt, where the current task is whatever was interrupted, so a PID filter would drop most completions. This is the §6 alternate route, taken from the start for that known reason. Each run records the disk's own read and write counts over the window, so I/O from anything other than fio is measured. Also: fio is its own load generator, so for fio `loadgen_cpu_cores` is fio's own CPU.
 ```
 
 - [ ] **Step 3: Add README timeline entry 37 and fix the tree line.**
