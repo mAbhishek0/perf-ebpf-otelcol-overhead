@@ -1,0 +1,12 @@
+{
+  "schema_version": "2.1.0",
+  "platform": "L",
+  "workload_cpus": "0,2,4,6", "tracer_cpus": "8,10", "gen_cpus": "12,14", "os_cpus": "12,14",
+  "ramp_s": 30, "steady_s": 120, "warmup_reps": 1, "measured_reps": 6, "drift_pct": 5, "drift_k": 2,
+  "perf_freq_narrow": 99, "perf_freq_wide": 999, "perf_mmap_pages": 512, "perf_trace_mmap_pages": 512,
+  "ebpf_perf_buffer_pages": 512,
+  "otelcol_version": "0.161.0", "collector_mode": "scraper", "otelcol_batch_size": 512, "otelcol_sending_queue_size": 512,
+  "collector_scrape_interval_narrow_s": 15, "collector_scrape_interval_wide_s": 1, "otelcol_telemetry_port": 18888,
+  "ladder": "1:5000 2:10000 3:20000 4:40000",
+  "columns": ["run_id", "platform", "workload", "mechanism", "scope", "level", "rate_target", "try", "role", "traced", "t_start", "window_s", "steady_s", "workload_cpus", "tracer_cpus", "gen_cpus", "throughput", "p50_ms", "p99_ms", "p999_ms", "max_ms", "errors", "tcp_retrans", "tcp_timeouts", "tcp_syn_retrans", "listen_drops", "workload_cpu_usec", "workload_cpu_cores", "tracer_cpu_cores", "loadgen_cpu_cores", "busy_pct_workload", "freq_min_khz", "freq_max_khz", "pkg_watts_mean", "temp_start_c", "temp_max_c", "irq_workload_delta", "irq_dev_delta", "irq_timer_delta", "irq_ipi_delta", "irq_nmi_delta", "irq_pmi_delta", "irq_other_delta", "softirq_net_rx_delta", "softirq_net_tx_delta", "n_samples", "cooldown_s", "cooldown_timed_out", "freq_verdict", "clock_check", "perf_rate_end", "kernel", "bench_trace", "power_source", "mech_events", "mech_lost", "mech_drop_rate", "mech_notes"]
+}
