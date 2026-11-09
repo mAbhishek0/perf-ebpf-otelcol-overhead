@@ -100,6 +100,25 @@ if [[ -n $PY ]]; then
   t_die "wl_parse runtime guard" eval 'STEADY_S=60 wl_parse "$b"'
 fi
 
+# --- fio_parse.py on real fio-3.41 output (fio/check.sh 20261109-224616, ---
+# --- untraced E4 at 36000 IOPS; values match logs/fio-check_20261109-224616.txt) ---
+if [[ -n $PY ]]; then
+  real=$("$PY" -I "$LAPTOP_ROOT/fio/fio_parse.py" "$LAPTOP_ROOT/fio/tests/fixtures/fio_L.json" 30) \
+    && ok || bad "fio_parse.py failed on the real fixture"
+  printf '%s\n' "$real" > "$T/real.env"
+  t_eq "real throughput" 35998.53 "$(kv_get "$T/real.env" THROUGHPUT)"
+  t_eq "real p50" 0.325632 "$(kv_get "$T/real.env" P50_MS)"
+  t_eq "real p99" 1.269760 "$(kv_get "$T/real.env" P99_MS)"
+  t_eq "real p999" 1.892352 "$(kv_get "$T/real.env" P999_MS)"
+  t_eq "real max" 6.764562 "$(kv_get "$T/real.env" MAX_MS)"
+  t_eq "real errors" 0 "$(kv_get "$T/real.env" ERRORS)"
+  t_eq "real runtime" 30001 "$(kv_get "$T/real.env" FIO_RUNTIME_MS)"
+  t_eq "real total ios" 1079992 "$(kv_get "$T/real.env" FIO_TOTAL_IOS)"
+  t_eq "real ramp iops" 35995.20 "$(kv_get "$T/real.env" FIO_RAMP_IOPS)"
+  "$PY" -I "$LAPTOP_ROOT/fio/fio_parse.py" "$LAPTOP_ROOT/fio/tests/fixtures/fio_L.json" 60 >/dev/null 2>&1 \
+    && bad "real fixture: 60 s window accepted" || ok
+fi
+
 # --- wl_cell_prep: fstrim + idle, stubbed ---
 mkdir -p "$T/bin"
 printf '#!/bin/sh\necho /\n' > "$T/bin/findmnt"
