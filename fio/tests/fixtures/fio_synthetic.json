@@ -1,0 +1,21 @@
+{
+  "fio version" : "fio-3.41",
+  "jobs" : [
+    {
+      "jobname" : "ramp", "groupid" : 0, "error" : 0,
+      "read" : {
+        "iops" : 50000.0, "runtime" : 30000, "total_ios" : 1500000,
+        "lat_ns" : { "min" : 50000, "max" : 900000, "mean" : 90000.0, "stddev" : 1.0, "N" : 1500000,
+                     "percentile" : { "50.000000" : 85000, "99.000000" : 160000, "99.900000" : 300000 } }
+      }
+    },
+    {
+      "jobname" : "measure", "groupid" : 1, "error" : 0,
+      "read" : {
+        "iops" : 49998.5, "runtime" : 120001, "total_ios" : 5999820,
+        "lat_ns" : { "min" : 48000, "max" : 2512345, "mean" : 91000.0, "stddev" : 1.0, "N" : 5999820,
+                     "percentile" : { "50.000000" : 86016, "99.000000" : 160768, "99.900000" : 313344 } }
+      }
+    }
+  ]
+}
