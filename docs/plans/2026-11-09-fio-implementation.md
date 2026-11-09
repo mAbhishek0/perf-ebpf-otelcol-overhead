@@ -348,7 +348,7 @@ Replace `EBPF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` with:
 
 ```bash
 EBPF_TRACER="$LAPTOP_ROOT/common/mech/bcc_tracer.py"
-: "${EBPF_PROBES_SRC:?set by the pair's mech.sh before sourcing common/mech/ebpf.sh}"
+: "${EBPF_PROBES_SRC:?set by the pair mech.sh before sourcing common/mech/ebpf.sh}"
 ```
 
 In `mech_preflight`, replace the `for s in tcp_sendmsg tcp_recvmsg; do … done` loop with `ebpf_preflight_probes`, and replace the last check with:
@@ -504,7 +504,7 @@ with
 
 ```bash
 source "$LAPTOP_ROOT/common/mech/collector.env"
-: "${COLLECTOR_TEMPLATE_DIR:?set by the pair's mech.sh before sourcing common/mech/collector.sh}"
+: "${COLLECTOR_TEMPLATE_DIR:?set by the pair mech.sh before sourcing common/mech/collector.sh}"
 ```
 
 Delete the line `_otel_status_url() { … }`.
