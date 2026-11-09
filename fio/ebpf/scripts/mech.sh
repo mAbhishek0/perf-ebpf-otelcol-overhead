@@ -15,6 +15,7 @@ ebpf_preflight_probes() {
   done
 }
 
+# The bundle argument that common/mech/ebpf.sh passes is unused: the device comes from FIO_DEV.
 ebpf_narrow_filter() {
   local dn
   dn=$(cat "/sys/block/${FIO_DEV:?FIO_DEV unset - wl_preflight or wl_start sets it}/dev" 2>/dev/null) \

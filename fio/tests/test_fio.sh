@@ -107,7 +107,7 @@ grep -q 'BPF_HASH(target_devs' "$fp" && ok || bad "no target_devs map (bcc_trace
   done
   echo "$NPASS $NFAIL" > "$T/ccount"
 )
-read -r NPASS NFAIL < "$T/ccount"
+read -r NPASS NFAIL < "$T/ccount" 2>/dev/null || bad "collector templates block aborted (no count file)"
 
 # --- perf and eBPF wrappers load and point at the right things ---
 ( source "$LAPTOP_ROOT/fio/perf/scripts/mech.sh"; [[ $PERF_TARGET_DESC == *fio* ]] && declare -F mech_attach >/dev/null ) \
@@ -148,7 +148,7 @@ PROM
   ( mech_sanity "$cb" ) && ok || bad "fio collector sanity"
   echo "$NPASS $NFAIL" > "$T/ccount2"
 )
-read -r NPASS NFAIL < "$T/ccount2"
+read -r NPASS NFAIL < "$T/ccount2" 2>/dev/null || bad "collector mech_stats block aborted (no count file)"
 
 printf 'fio tests: %s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))

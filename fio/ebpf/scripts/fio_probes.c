@@ -1,4 +1,4 @@
-// fio_probes.c — BPF side of the fio x eBPF pair. Loaded by
+// fio_probes.c â€” BPF side of the fio x eBPF pair. Loaded by
 // common/mech/bcc_tracer.py (BCC) with --devs for the narrow filter.
 //
 // ONE file, two scopes, selected at compile time (exactly one of
@@ -12,7 +12,7 @@
 //           in-kernel to the test disk's device number. Not to fio's PID:
 //           a completion runs in the NVMe interrupt, where the current task
 //           is whatever was interrupted, so a PID filter would drop most
-//           completions (PLAN.md §6 alternate route, taken from the start).
+//           completions (PLAN.md Â§6 alternate route, taken from the start).
 //           fio is the only process doing steady I/O on that disk in a run;
 //           wl.env records the disk's own read/write counts per window, so
 //           any other I/O is measured, not assumed away.

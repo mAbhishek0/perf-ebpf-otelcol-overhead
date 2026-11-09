@@ -428,7 +428,7 @@ fi
   grep -q 'ABORTED: stage=x: boom' "$PROGRESS_FILE" && ok || bad "abort reason: $(cat "$PROGRESS_FILE")"
   echo "$NPASS $NFAIL" > "$T/pcount"
 )
-read -r NPASS NFAIL < "$T/pcount"
+read -r NPASS NFAIL < "$T/pcount" 2>/dev/null || bad "progress block aborted (no count file)"
 
 # --- optional workload hooks: absent = no change, present = included ---
 (
@@ -440,7 +440,7 @@ read -r NPASS NFAIL < "$T/pcount"
   [[ $(grep -vc hook_test "$sd/b/schema.json") == $(wc -l < "$sd/a/schema.json" | tr -d ' ') ]] && ok || bad "hook changed other schema lines"
   echo "$NPASS $NFAIL" > "$T/hcount"
 )
-read -r NPASS NFAIL < "$T/hcount"
+read -r NPASS NFAIL < "$T/hcount" 2>/dev/null || bad "hook block aborted (no count file)"
 
 # --- nginx x collector plugin (its own file; runs standalone too) ---
 source "$LAPTOP_ROOT/nginx-wrk2/collector/tests/test_mech.sh"
