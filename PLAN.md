@@ -1,6 +1,6 @@
 # The plan, in plain words
 
-A reminder for myself of what this project is trying to show, where it stands, and what comes next, in order. Last updated 2026-11-08.
+A reminder for myself of what this project is trying to show, where it stands, and what comes next. **Frozen on 2026-11-09.** Any later change to this plan gets a dated note next to the part it changes, and a README timeline entry. Nothing here is rewritten quietly.
 
 The detailed record of what happened, run by run, is the timeline in [README.md](README.md). The working state for Claude is in [CLAUDE.md](CLAUDE.md) under "State". This file is the overview.
 
@@ -12,110 +12,173 @@ From the brief ([P04](../P04_Overhead_of_eBPF_Observability.md)):
 
 - Run the same workloads under three observability mechanisms: **eBPF** (BCC), **perf**, and an **OpenTelemetry Collector**.
 - **Increase the event rate** and measure three things: **added CPU**, **throughput loss**, and **event-drop rate**.
-- Vary the **trace scope**: a few probes (*narrow*) vs the whole system (*wide*).
+- Vary the **trace scope**: a few probes (*narrow*) against the whole system (*wide*).
 - Summarise overhead **as a function of rate and scope**.
 - End with **guidance on when eBPF's "low overhead" claim holds**, which means also showing where it stops holding.
 
 Three workloads: **nginx** (web server, load from wrk2), **fio** (disk I/O), **redis** (key-value store, load from memtier).
 
-The laptop (Platform L) is the main dataset. The 192-core server (Platform S) appears only as side notes.
+The laptop (Platform L) is the main dataset and, since 2026-11-09, the main goal of the project. The 192-core server (Platform S) is on hold indefinitely. Its finished nginx results appear in the paper only as side notes.
+
+**Deadline: 2026-11-30 for all runs and their analysis.** The paper is written after that.
 
 ---
 
-## 2. Where things stand (2026-11-08)
+## 2. Where things stand (2026-11-09)
 
-**Done: nginx, all three mechanisms, one block each.** Each mechanism ran 8 cells (4 rate levels × 2 scopes), and each cell ran 8 times: 2 runs without tracing (baselines) and 6 with tracing. Results so far, averaged over the 4 rates:
+**nginx is finished on the laptop.** All three mechanisms ran 8 cells each (4 rate levels × 2 scopes), in 2 independent blocks. Each block is 2 untraced runs and 6 traced runs per cell. The two-block test (README timeline 35) found these effects:
 
 | mechanism | narrow scope | wide scope |
 |---|---|---|
-| perf | nothing detected | nginx CPU +64 %, p99 +11 %, p999 +13 % |
-| eBPF | nginx CPU +10 % | nginx CPU +41 %, p99 +23 %, p999 +28 % |
-| collector | nothing detected | nothing detected |
+| perf | nothing detected | nginx CPU +56 to +68 % at every level; tail latency up at some levels |
+| eBPF | nginx CPU +6 to +10 % at every level | every metric up at every level: CPU +34 to +44 %, p99 +11 to +41 %, p999 +17 to +52 % |
+| collector (scraper) | nothing detected | p99 +12 % at one level only (20000 req/s), unexplained |
 
-No mechanism dropped a single event. The analysis script is `analysis/nginx_stats.py`; the full tables are in `analysis/results/nginx_L_stats.md`.
+The capacity test (timeline 32) gave the throughput-loss and drop-rate answers for nginx. Untraced nginx held at least 50000 req/s. perf and eBPF in wide scope each held 44000 req/s. perf starts losing events at 47000 req/s. eBPF lost none, but its limit rests on a single run.
 
----
-
-## 3. Three problems found on 2026-11-08, and the fixes
-
-### Problem 1: too few runs per cell to make claims about a single cell
-With 6 traced runs, the smallest possible p-value is 1/32. After correcting for 96 tests (one per cell and metric), no test can ever pass, not even perf wide's obvious +64 % CPU. The 2 baselines per cell are also too few: if both happen to come out low, the tracer looks guilty (this happened with the collector at 20k).
-
-**Fix: run every cell twice, as 2 separate blocks.** Each block is a full set of 2 baselines + 6 traced runs, run on a different night with the rate levels in a different order. Traced runs are compared only with baselines from their own block, so anything that changed between nights cancels out. The statistics then use a permutation test across both blocks. That makes per-cell results possible (smallest p ≈ 0.0013) and accounts for baseline noise.
-
-**Rule fixed in advance: exactly 2 blocks.** No adding a third block later because a result looks close. The single-block results stay in the record next to the combined ones.
-
-### Problem 2: two of the three required metrics are stuck at zero
-- **Throughput loss** can't appear while the server keeps up: wrk2 sends at a fixed rate, and below saturation every request gets served, traced or not.
-- **Drop rate** stays at zero because every rate level is below the point where the tracers fall behind. At 40k req/s the eBPF and perf readers already use about 0.9 of their one core, so drops probably start around 43–46k req/s, just above our top level.
-
-The ladder stopped at 40k because the load generator (wrk2, on 2 cores) gets saturated above that, not because of the tracers.
-
-**Fix: two small extra experiments for nginx, separate from the main matrix:**
-- **Capacity test** for throughput loss: the highest rate nginx sustains cleanly with no tracer vs with each tracer. The difference is the throughput loss.
-- **Drop-onset test** for drop rate: perf wide and eBPF wide at a few rates above 40k. Either drops appear while everything else is still healthy (good: we can measure where drops start), or nginx or the generator saturates first. That is also a finding: on this machine, CPU cost, not data loss, is the limit.
-
-**For fio and redis: choose the rate ladder so it reaches the point where drops or saturation begin**, which the original plan intended and nginx didn't do.
-
-### Problem 3: fio and redis have not started
-Neither workload script is written yet.
+**Not started:** fio, redis, the nginx OTLP arm, the SMT-on arm.
 
 ---
 
-## 4. The plan, step by step
+## 3. Decisions, each with its reason
 
-### Step 0: fix the protocol (before any new data)
-- [ ] Write down the rules above (2 blocks, ladder reaches drop onset) before running anything new.
-- [ ] Harness: a block label so the second block's run IDs don't collide with the first, and a second seed so the level order differs.
-- [ ] Analysis: extend `nginx_stats.py` to the two-block, per-cell test.
+### 3.1 Every cell runs as exactly 2 blocks
+Each cell is run twice, as 2 blocks on different nights with the rate levels in a different order. No third block is ever added because a result looks close.
 
-### Step 1: finish nginx
-- [ ] **Re-pilot at 40k, 45k, 50k, 55k, 60k** with no tracer (~15 min). The old pilot ran before the wrk2 stall fix, so its numbers above 40k aren't trustworthy.
-- [ ] **Capacity test** (short): highest clean rate, untraced vs each tracer.
-- [ ] **Drop-onset test** (short): perf wide and eBPF wide above 40k.
-- [ ] **Second block** of the perf, eBPF and collector matrices (~3.5 h each, ~10.5 h total; one per night is fine).
-- [ ] Rerun the analysis with both blocks.
+**Why:** with one block, the per-cell test can never reach significance after correcting for 96 tests (the smallest p is 1/32). With two blocks it can (smallest p is about 0.0013). Fixing the count in advance stops us from collecting data until a result appears, which reviewers rightly distrust. Running blocks on different nights also shows whether an effect repeats.
 
-### Step 2: fio (script writing can start while nginx block 2 runs)
-- [ ] Write the fio workload script.
-- [ ] Pilot it, choosing a ladder that reaches drop onset or saturation.
-- [ ] Smoke cell.
-- [ ] perf, eBPF, collector matrices, 2 blocks each.
+### 3.2 fio and redis ladders must reach drop onset or saturation
+The pilot for each workload picks 4 rate levels. The top level must sit where events start dropping, or where the workload or the disk saturates.
 
-### Step 3: redis
-- [ ] Same as fio.
+**Why:** two of the brief's three metrics, throughput loss and drop rate, stay at zero below that point. nginx's ladder stopped short of it and needed a separate capacity test. Building the end point into the ladder answers both metrics inside the main matrix. If the disk or redis saturates before any tracer drops events, that is a finding too: on this machine the limit is CPU or I/O cost, not lost data.
 
-### Step 4: analysis and guidance
-- [ ] Statistics for each workload (same script, extended).
-- [ ] Overhead vs rate, for each mechanism and scope.
-- [ ] The **guidance table**: for each workload and scope, where each mechanism is cheap, where it starts to cost, and where it drops events or saturates.
+### 3.3 fio uses 4K random reads on a file written once beforehand
+`O_DIRECT`, rate set with `rate_iops`. This is a labelled change from the original plan's mixed reads and writes.
 
-### Step 5: last
-- [ ] SMT-on arm (one extra run with hyper-threading on, planned as the final run).
-- [ ] Write the paper. Platform S results appear only as side notes, mainly the finding that putting the load generator on the tracer's cores biases tail latency, in a direction that depends on the mechanism.
+**Why:** the laptop's SSD is a QLC drive with an SLC write cache. Under sustained writes the cache fills and write speed can drop by 40 to 60 % mid-run. That would make baselines drift and wreck the A-B-A checks, so we'd be measuring the drive, not the tracers. Reads of already-written data avoid this, and every read is still one real block I/O event for the tracers to see. `O_DIRECT` keeps the page cache from hiding the disk.
+
+### 3.4 fio's narrow and wide scopes
+- **perf:** narrow samples the fio process at 99 Hz. Wide samples the workload CPUs at 999 Hz and adds `perf trace`.
+- **eBPF:** narrow uses block I/O tracepoints (`block_rq_issue` and `block_rq_complete`), the same pair biolatency uses. Wide traces all system calls on the workload CPUs.
+- **Collector:** narrow scrapes only host disk metrics every 15 s. Wide scrapes all host metrics every 1 s.
+
+**Why:** these follow the plan ([testbed-implementation.md §3](../docs/plan/testbed-implementation.md#3-the-three-instrumentation-setups)) and keep each scope's meaning as close to nginx's as possible: narrow watches the workload's own events, wide watches everything. fio has no metrics endpoint, so host disk metrics are the collector's closest narrow equivalent. That works because fio is the only thing doing disk I/O during a run.
+
+### 3.5 redis uses memtier at a fixed request rate
+memtier's rate limit (`--rate-limiting`) is set per connection, so the total rate is threads × connections × per-connection rate.
+
+**Why:** a fixed rate makes event rate the controlled factor, the same way wrk2's `-R` does for nginx. That keeps the overhead-against-rate curves comparable across workloads. memtier probably does not correct for coordinated omission the way wrk2 does, so its tail latency may be understated near saturation. The paper states this as a limitation.
+
+### 3.6 redis's narrow and wide scopes
+- **perf:** as for fio, targeting the redis server process.
+- **eBPF:** narrow is a uprobe on redis's command handler. Wide traces all system calls on the workload CPUs.
+- **Collector:** narrow is the redis receiver every 15 s. Wide adds all host metrics every 1 s.
+
+**Why:** the same principle as fio. Narrow follows the workload's own unit of work, which for redis is one command. Wide follows everything. These match the plan.
+
+### 3.7 OTLP runs on nginx only, on a newer nginx image
+The OTLP arm uses a pinned official nginx image that includes the OpenTelemetry module. Its traced runs load the module and send one span per request. Its untraced runs use the same image without the module loaded.
+
+**Why:**
+- **It answers the brief's question for the collector.** The scraper's cost does not change with traffic, so it cannot say how the collector's overhead grows with event rate. OTLP's cost does grow with traffic, so it can. This arm is in the original plan.
+- **nginx only:** redis and fio have no built-in way to send spans. Adding one would partly measure our own code. Redis was dropped from the arm on 2026-11-09 for this reason.
+- **Newer image:** the module is only packaged from nginx 1.25.3, and the finished nginx data used 1.24. Building the module for 1.24 costs setup time for little gain. The arm compares traced runs only with its own untraced runs on the same image, so its overhead ratio stays valid. The version difference is a stated limitation.
+- **Lost spans:** counted as requests served minus spans the collector accepted. The nginx module drops spans silently when its queue is full and has no counter for it, so the collector's own counters alone would miss those losses.
+
+### 3.8 Statistics: one correction family per workload, and one for OTLP
+Each workload gets its own family of 96 tests (3 mechanisms × 8 cells × 4 metrics). OTLP gets its own family of 32 tests. The method is the two-block test already in `analysis/nginx_stats.py`; the script gains a workload parameter, and the method does not change.
+
+**Why:** the nginx results are already reported. Adding new tests to the nginx family would change its corrected p-values after the fact. Fixing the families now, before any new data exists, makes them pre-registered. Throughput stays a check that the generator held its rate, not a tested result.
+
+### 3.9 Not in this plan
+- **`bpf_stats`** (eBPF's in-kernel CPU, broken out). eBPF's in-kernel cost already shows up as added workload CPU, so the totals are complete; only the breakdown is missing. The paper states this as a limitation.
+- **Any server work.** The server is on hold.
+- **The paper**, which is written after 2026-11-30.
+
+**Why:** both items cost run time and code that the deadline cannot spare, and neither changes a headline result.
 
 ---
 
-## 5. Rough laptop time
+## 4. Order of work
+
+**Approach: a pipeline.** Each workload's code is written during the day while the previous workload runs overnight. fio goes first.
+
+**Why fio first:** it carries the most risk, because of the disk. Starting with it leaves time for its fallback (section 6) if the pilot goes badly. redis and OTLP reuse more of the existing code, so they are safer to do later.
+
+**Why a pipeline:** writing all the code first would leave the laptop idle for a week, and a late bug would leave no time to recover. Code, not laptop time, is the bottleneck: about 60 h of runs fit easily into 3 weeks of nights, but the code for each workload takes several days.
+
+| dates | day: code and analysis | night: laptop |
+|---|---|---|
+| Mon Nov 9 | freeze this plan; refresh the docs | none |
+| Nov 10–11 | fio workload and its three mechanism plugins; make `pilot.sh` work for any workload; unit tests | Nov 11: fio pilot and smoke cell |
+| Thu Nov 12 | choose the fio ladder from the pilot | fio: perf block 1 + eBPF block 1 |
+| Nov 13–15 | redis workload and its three plugins | Nov 13: fio collector block 1 + perf block 2; Nov 14: fio eBPF block 2 + collector block 2 |
+| Mon Nov 16 | choose the redis ladder | redis pilot and smoke cell |
+| Nov 17–19 | OTLP code; make the analysis script work for any workload | redis: 2 blocks per night, 3 nights |
+| Nov 20–21 | analyse fio | Nov 20: OTLP check + block 1; Nov 21: OTLP block 2 |
+| Sun Nov 22 | SMT-on option | SMT-on arm |
+| Nov 23–27 | analyse redis and OTLP | **buffer** for reruns and failed blocks |
+| Nov 28–30 | final analysis, timeline, freeze | none |
+
+Two blocks of the same mechanism never run on the same night, so the blocks stay independent sessions. Daytime laptop runs can be used whenever the laptop is free, which pulls the schedule earlier.
+
+---
+
+## 5. What gets cut if time runs short
+
+Cut in this order: **SMT-on arm first, then OTLP, then redis. fio is never cut.**
+
+**Why this order:**
+- **SMT-on arm:** a robustness check of the CPU layout, not something the brief asks for.
+- **OTLP:** one extra arm on one workload. Without it, the collector's rate question stays a stated limitation.
+- **redis:** one of the brief's three workloads, so it goes only as a last resort.
+- **fio:** never cut, because without it nginx would be the only workload, and the guidance could not generalise beyond a web server.
+
+**Date triggers:**
+- **fio is not running by Nov 14:** cut the SMT-on arm at once.
+- **redis is not running by Nov 20:** cut OTLP.
+- **redis's six blocks cannot all finish by the night of Nov 27:** cut redis, and record it as a scoping decision in Threats to Validity.
+
+**Why date triggers:** deciding cuts on fixed dates, before results are seen, keeps the choice about time and not about which results look good.
+
+---
+
+## 6. Alternate routes if something blocks
+
+| blocker | alternate route | why it is acceptable |
+|---|---|---|
+| The SSD makes fio baselines drift in the pilot | switch fio to the kernel's `null_blk` memory-backed block device; decide by Nov 12 | it removes hardware noise while keeping real block-layer events; labelled deviation, and the paper notes it is not a physical disk |
+| fio's disk saturates before any tracer drops events | report saturation as the ladder's end point | allowed by decision 3.2; still a finding about where the limit lies |
+| eBPF's narrow fio probe cannot reliably tie I/O completions to the fio process | narrow scope = all block events on the test device | fio is the only process using that device during a run, so the events are still fio's |
+| memtier cannot hold its fixed rate | fixed connection count and pipeline depth (the original plan's knob); throughput becomes a measured result | still sweeps load in 4 levels; labelled deviation |
+| The OTLP check run fails (module image, span counts) | cut OTLP; keep the scraper-only limitation in the paper | follows the cut order; nothing else depends on OTLP |
+| A night fails (thermal, power, crash) | `revert.sh`, then rerun that block on a buffer night | the existing retry and revert machinery already handles this |
+| Buffer nights run out | apply the cut order in section 5 | keeps the deadline fixed and the cuts pre-decided |
+
+---
+
+## 7. Rough laptop time
 
 | item | time |
 |---|---|
-| nginx re-pilot + capacity + drop onset | ~1–2 h |
-| nginx second block | ~10.5 h |
-| fio, 3 mechanisms × 2 blocks | ~20+ h (fio also trims the disk and idles before each cell) |
-| redis, 3 mechanisms × 2 blocks | ~20 h |
-| **total** | **~50–55 h, about 7–8 overnight sessions** |
+| fio pilot + smoke cell | ~2 h |
+| fio, 3 mechanisms × 2 blocks | ~24 h (fio also trims the disk and idles before each cell) |
+| redis pilot + smoke cell | ~2 h |
+| redis, 3 mechanisms × 2 blocks | ~22 h |
+| OTLP check + 2 blocks | ~8 h |
+| SMT-on arm | ~3 h |
+| **total** | **~61 h, about 8 nights out of the 17 available before the buffer ends** |
 
-The semester ends in December, so the runs have to go overnight while scripts and analysis get written during the day.
+One 8-cell block took 3.5 to 3.9 h on nginx.
 
 ---
 
-## 6. Things easy to forget
+## 8. Things easy to forget
 
 - **Every number in the paper must be regenerable** from committed data by a committed script. No hand-copied numbers.
 - **Never call a null result "no overhead".** "Not detected at this sample size" is what it means.
-- **Never add runs because a result looks close.** The number of blocks is fixed at 2 in advance.
-- **A cell where the load generator shares cores with the tracer is biased** (Platform S showed this), and the direction depends on the mechanism. The laptop layout avoids it: nginx on cores 0,2,4,6, tracer on 8,10, generator and OS on 12,14.
+- **Never add runs because a result looks close.** The number of blocks is fixed at 2.
+- **A cell where the load generator shares cores with the tracer is biased** (Platform S showed this), and the direction depends on the mechanism. The laptop layout avoids it: workload on cores 0,2,4,6, tracer on 8,10, generator and OS on 12,14.
 - **On the laptop:** `git pull` before running; after a crash run `sudo bash revert.sh`; if `git push` is rejected, `git pull --rebase` then push (never force).
-- **The collector in scraper mode is rate-invariant by design**: its cost doesn't grow with traffic, so it never drops events from rate. It is not a crossover input.
-- **Throughput under wrk2 is fixed by the generator**, so it is a check that the generator held its rate, not a result. Throughput loss comes only from the capacity test.
+- **The collector in scraper mode is rate-invariant by design.** Its cost doesn't grow with traffic, so it is not a crossover input. OTLP is the collector's rate answer.
+- **Throughput under a fixed-rate generator is fixed by the generator**, so below saturation it is a check, not a result. Throughput loss appears only at or above the saturation point.
