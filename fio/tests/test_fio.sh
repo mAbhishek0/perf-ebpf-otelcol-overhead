@@ -82,5 +82,73 @@ LADDER="1:10000" _schema_freeze "$T/s" perf
 grep -q '"fio_numjobs": 4' "$T/s/schema.json" && ok || bad "schema lacks fio_numjobs"
 grep -q '"fio_rw": "randread"' "$T/s/schema.json" && ok || bad "schema lacks fio_rw"
 
+# --- eBPF probe file: the shared parts are byte-identical to nginx's ---
+np="$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts/nginx_probes.c"
+fp="$LAPTOP_ROOT/fio/ebpf/scripts/fio_probes.c"
+wide() { sed -n '/^#ifdef SCOPE_WIDE/,/^#endif \/\* SCOPE_WIDE \*\//p' "$1"; }
+core() { sed -n '/^struct event_t {/,/^#ifdef SCOPE_NARROW/p' "$1"; }
+[[ -s $fp && "$(wide "$np")" == "$(wide "$fp")" ]] && ok || bad "fio_probes.c wide section differs from nginx_probes.c"
+[[ -s $fp && "$(core "$np")" == "$(core "$fp")" ]] && ok || bad "fio_probes.c event/emit core differs from nginx_probes.c"
+grep -q 'TRACEPOINT_PROBE(block, block_rq_issue)' "$fp" && ok || bad "no block_rq_issue probe"
+grep -q 'TRACEPOINT_PROBE(block, block_rq_complete)' "$fp" && ok || bad "no block_rq_complete probe"
+grep -q 'BPF_HASH(target_devs' "$fp" && ok || bad "no target_devs map (bcc_tracer --devs fills it)"
+
+# --- collector templates: receivers and scrapers, and the shared tail ---
+(
+  source "$LAPTOP_ROOT/fio/collector/scripts/mech.sh"
+  cd_="$LAPTOP_ROOT/fio/collector/scripts"; nd="$LAPTOP_ROOT/nginx-wrk2/collector/scripts"
+  for sc in narrow wide; do
+    _otel_render "$cd_/otelcol_scraper_$sc.yaml.template" 1 "" 18888 512 512 > "$T/$sc.yaml"
+    _otel_unsubstituted "$T/$sc.yaml" && bad "$sc: placeholder left" || ok
+    t_eq "$sc counts" "$(collector_want $sc)" "$(_otel_receiver_count "$T/$sc.yaml") $(_otel_hostmetrics_scrapers "$T/$sc.yaml")"
+    tail_() { sed -n '/^processors:/,$p' "$1"; }
+    [[ "$(tail_ "$cd_/otelcol_scraper_$sc.yaml.template" | grep -v '^ *receivers: \[')" == \
+       "$(tail_ "$nd/otelcol_scraper_$sc.yaml.template" | grep -v '^ *receivers: \[')" ]] && ok || bad "$sc: template tail differs from nginx's"
+  done
+  echo "$NPASS $NFAIL" > "$T/ccount"
+)
+read -r NPASS NFAIL < "$T/ccount"
+
+# --- perf and eBPF wrappers load and point at the right things ---
+( source "$LAPTOP_ROOT/fio/perf/scripts/mech.sh"; [[ $PERF_TARGET_DESC == *fio* ]] && declare -F mech_attach >/dev/null ) \
+  && ok || bad "fio perf wrapper"
+( source "$LAPTOP_ROOT/fio/ebpf/scripts/mech.sh"; [[ $EBPF_PROBES_SRC == */fio_probes.c ]] && declare -F ebpf_narrow_filter >/dev/null ) \
+  && ok || bad "fio eBPF wrapper"
+
+# --- fio collector: mech_stats with hostmetrics only gives nginx points 0, not blank ---
+(
+  source "$LAPTOP_ROOT/fio/collector/scripts/mech.sh"
+  cb="$T/fotel"; mkdir -p "$cb"
+  : > "$cb/mech.meta"
+  for kv in OTEL_MODE=scraper OTEL_SCOPE=narrow OTEL_SCRAPE_INTERVAL_S=15 OTEL_RECEIVER_COUNT=1 \
+            OTEL_HOSTMETRICS_SCRAPERS=1 OTEL_SENDING_QUEUE_SIZE=512 OTEL_BATCH_SIZE=512 \
+            OTEL_VERSION=0.161.0 OTEL_PID=4242 OTEL_ATTACH_S=1.2 OTEL_T_BASELINE=1000.0; do
+    kv_put "$cb/mech.meta" "${kv%%=*}" "${kv#*=}"
+  done
+  : > "$cb/otel_stop.env"; kv_put "$cb/otel_stop.env" OTEL_T_FINAL 1121.5; kv_put "$cb/otel_stop.env" OTEL_EXIT ok
+  cat > "$cb/otel_baseline.prom" <<'PROM'
+otelcol_receiver_accepted_metric_points{receiver="hostmetrics",transport=""} 100
+otelcol_exporter_sent_metric_points{exporter="debug"} 100
+otelcol_scraper_scraped_metric_points{receiver="hostmetrics",scraper="disk"} 50
+otelcol_process_cpu_seconds 2.0
+PROM
+  cat > "$cb/otel_final.prom" <<'PROM'
+otelcol_receiver_accepted_metric_points{receiver="hostmetrics",transport=""} 1000
+otelcol_exporter_sent_metric_points{exporter="debug"} 1000
+otelcol_scraper_scraped_metric_points{receiver="hostmetrics",scraper="disk"} 450
+otelcol_exporter_queue_size{exporter="debug"} 0
+otelcol_exporter_queue_capacity{exporter="debug"} 512
+otelcol_process_memory_rss 2.13e+08
+otelcol_process_cpu_seconds 5.0
+PROM
+  printf '2026-11-07T10:00:00Z\tinfo\tservice@v0.161.0/service.go:1\tEverything is ready.\n' > "$cb/otelcol.log"
+  mech_stats "$cb"
+  t_eq "fio collector: nginx points" 0 "$(kv_get "$cb/mech.stats" OTEL_NGINX_ACCEPTED_METRIC_POINTS)"
+  (( $(kv_get "$cb/mech.stats" OTEL_HOSTMETRICS_ACCEPTED_METRIC_POINTS) > 0 )) && ok || bad "fio collector: hostmetrics points"
+  ( mech_sanity "$cb" ) && ok || bad "fio collector sanity"
+  echo "$NPASS $NFAIL" > "$T/ccount2"
+)
+read -r NPASS NFAIL < "$T/ccount2"
+
 printf 'fio tests: %s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))
