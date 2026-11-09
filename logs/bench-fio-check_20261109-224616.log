@@ -1,0 +1,77 @@
+22:46:16 [fio-check|preflight] preflight
+22:46:16 [fio-check|preflight]   [ok]   on AC power
+22:46:16 [fio-check|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+22:46:16 [fio-check|preflight]   [ok]   TLP not active
+22:46:16 [fio-check|preflight]   [ok]   unattended-upgrades not active
+22:46:16 [fio-check|preflight]   [ok]   no noisy processes
+22:46:16 [fio-check|preflight] WARN: graphical session running (ALLOW_GUI=1)
+22:46:16 [fio-check|preflight]   [ok]   package 48 °C
+22:46:16 [fio-check|preflight]   [ok]   52688 MB free
+22:46:16 [fio-check|preflight]   [ok]   BPF JIT on
+22:46:16 [fio-check|preflight]   [ok]   docker reachable
+22:46:16 [fio-check|preflight]   [ok]   fio-3.41
+22:46:16 [fio-check|preflight]   [ok]   fio engine libaio
+22:46:16 [fio-check|preflight]   [ok]   data file /var/tmp/bench-fio/fio.dat (17179869184 bytes, prepared 2026-11-09T21:41:06+05:30)
+22:46:16 [fio-check|preflight]   [ok]   fio target on nvme0n1
+22:46:16 [fio-check|preflight]   [ok]   nvme0n1 non-rotational
+22:46:16 [fio-check|preflight]   [ok]   nvme0n1 scheduler none
+22:46:16 [fio-check|preflight]   [ok]   no fio running
+22:46:16 [fio-check|preflight]   [ok]   /usr/bin/python3 for fio_parse.py
+22:46:16 [fio-check|preflight]   [ok]   fio 4 jobs x iodepth 32
+22:46:16 [fio-check|preflight]   [ok]   every ladder / pilot / capacity rate divides by 4 jobs
+22:46:16 [fio-check|preflight]   [ok]   perf version 7.0.14
+22:46:16 [fio-check|preflight]   [ok]   BCC python bindings (0.35.0)
+22:46:16 [fio-check|preflight]   [ok]   tracepoint block:block_rq_issue
+22:46:16 [fio-check|preflight]   [ok]   tracepoint block:block_rq_complete
+22:46:16 [fio-check|preflight]   [ok]   tracepoint raw_syscalls
+22:46:16 [fio-check|preflight]   [ok]   bpf_jit_enable=1
+22:46:16 [fio-check|preflight]   [ok]   bpf_jit_harden=0
+22:46:16 [fio-check|preflight]   [ok]   tracer sources present (fio_probes.c)
+22:46:16 [fio-check|preflight]   [ok]   otelcol: otelcol-contrib version 0.161.0
+22:46:17 [fio-check|preflight]   [ok]   collector mode scraper
+22:46:17 [fio-check|preflight]   [ok]   otelcol templates present
+22:46:17 [fio-check|preflight]   [ok]   port 18888 free
+22:46:17 [fio-check|preflight]   [ok]   no otelcol-contrib running
+22:46:17 [fio-check|preflight] preflight passed
+22:46:17 [fio-check|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+22:46:17 [fio-check|host setup] clock floor requested at 2900000 kHz
+22:46:17 [fio-check|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+22:46:18 [fio-check|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+22:46:22 [fio-check|host setup] clock under load: 2894473 kHz (ok)
+22:46:22 [fio-check|host setup] host configured
+22:46:22 [fio-check|host setup] === none base E1 (4500 IOPS) ===
+22:47:03 [fio-check|none base E1 load] === perf narrow E1 (4500 IOPS) ===
+22:47:46 [fio-check|perf narrow E1 detach] === perf wide E1 (4500 IOPS) ===
+22:48:30 [fio-check|perf wide E1 detach] === ebpf narrow E1 (4500 IOPS) ===
+22:49:14 [fio-check|ebpf narrow E1 detach] === ebpf wide E1 (4500 IOPS) ===
+22:49:58 [fio-check|ebpf wide E1 detach] === collector narrow E1 (4500 IOPS) ===
+22:50:40 [fio-check|collector narrow E1 detach] === collector wide E1 (4500 IOPS) ===
+22:51:22 [fio-check|collector wide E1 detach] === none base E4 (36000 IOPS) ===
+22:52:03 [fio-check|none base E4 load] === perf narrow E4 (36000 IOPS) ===
+22:52:47 [fio-check|perf narrow E4 detach] === perf wide E4 (36000 IOPS) ===
+22:53:31 [fio-check|perf wide E4 detach] === ebpf narrow E4 (36000 IOPS) ===
+22:54:14 [fio-check|ebpf narrow E4 detach] === ebpf wide E4 (36000 IOPS) ===
+22:54:58 [fio-check|ebpf wide E4 detach] === collector narrow E4 (36000 IOPS) ===
+22:55:40 [fio-check|collector narrow E4 detach] === collector wide E4 (36000 IOPS) ===
+# fio check 20261109-224616  kernel 7.0.0-43-generic  fio-3.41  jobs 4  iodepth 32  disk nvme0n1
+# 10s ramp + 30s load per row; not a measurement
+mech      scope  lvl    rate attach_s     events ev_per_io      lost drop_rate  tracer  wl_cpu   p99_ms      iops    fio_ios    disk_rd    disk_wr   fio_s notes
+none      base   E1     4500       NA         NA      NA        NA        NA      NA 0.128435 0.337920   4499.85     135000     135000         70 30.001000 -
+perf      narrow E1     4500 1.233185        311 0.002304         0  0.000000  0.0000 0.120307 0.342016   4499.85     135000     135003        137 30.001000 none
+perf      wide   E1     4500 1.229539     950852 7.043348         0  0.000000  0.0978 0.191895 0.350208   4499.85     135000     135000        184 30.001000 none
+ebpf      narrow E1     4500 2.186143     270241 2.001785         0  0.000000  0.1477 0.142221 0.346112   4499.85     135000     135000        107 30.001000 none
+ebpf      wide   E1     4500 2.182355     415585 3.078407         0  0.000000  0.1638 0.169077 0.313344   4499.85     135000     135000         83 30.001000 submit_failed=2;unaccounted=2;
+collector narrow E1     4500 0.306827        572 0.004237         0  0.000000  0.0007 0.131248 0.337920   4499.85     135000     135016        105 30.001000 scraper_rate_invariant
+collector wide   E1     4500 0.302731      13860 0.102667         0  0.000000  0.0642 0.122265 0.309248   4499.85     135000     135005         63 30.001000 scraper_rate_invariant
+none      base   E4    36000       NA         NA      NA        NA        NA      NA 0.561417 1.269760  35998.53    1079992    1079992         63 30.001000 -
+perf      narrow E4    36000 1.233439       1571 0.001455         0  0.000000  0.0000 0.609389 1.662976  35998.70    1079997    1079997         64 30.001000 none
+perf      wide   E4    36000 1.230271    4558834 4.221279         0  0.000000  0.4012 0.966556 1.482752  35997.63    1079965    1079965        240 30.001000 none
+ebpf      narrow E4    36000 2.191067    2158257 1.998449         0  0.000000  0.4975 0.725432 1.302528  35997.67    1079966    1079966         91 30.001000 none
+ebpf      wide   E4    36000 2.187623    2231004 2.065762         0  0.000000  0.5517 0.795255 1.384448  35998.50    1079991    1079991        116 30.001000 none
+collector narrow E4    36000 0.303023        572 0.000530         0  0.000000  0.0007 0.599496 1.302528  35997.23    1079989    1079989         77 30.002000 scraper_rate_invariant
+collector wide   E4    36000 0.303216      13860 0.012833         0  0.000000  0.0639 0.564254 1.302528  35997.33    1079992    1079993         65 30.002000 scraper_rate_invariant
+# attach_s: mech_attach time; events: MECH_EVENTS; ev_per_io: events / fio I/Os
+# tracer: tracer userspace cores (sampler); wl_cpu: fio scope cgroup cores
+# disk_rd, disk_wr: whole-disk reads and writes completed in the window (/sys/block/<disk>/stat); fio_s: fio's measured runtime
+22:56:23 [fio-check|host revert] host reverted
+22:56:23 [fio-check|host revert] done — summary in /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/fio-check_20261109-224616.txt
