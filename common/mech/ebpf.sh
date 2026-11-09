@@ -88,22 +88,35 @@ mech_detach() {
 
 # Loss accounting, the same definition as every mechanism (schema 2.0.0):
 #   MECH_EVENTS = records delivered to userspace (perf buffer callback)
-#   MECH_LOST   = records the perf buffer dropped (lost callback, in records)
+#   MECH_LOST   = records dropped = the larger of two counts (2026-11-09):
+#                 the userspace lost callback (EBPF_USER_LOST, in records) and
+#                 the kernel's count of failed perf_submit calls
+#                 (EBPF_KERNEL_SUBMIT_FAILED). They normally agree. The
+#                 callback can miss a loss whose notice is still unread when
+#                 the tracer stops (seen once: fio check 20261109-224616,
+#                 eBPF wide E1, 2 kernel failures, 0 in userspace), so taking
+#                 the larger keeps the drop rate from reading 0 while the
+#                 kernel knows events were lost. Before this change MECH_LOST
+#                 was the callback count alone; every nginx eBPF row had the
+#                 two equal, so its CSVs are unchanged (restat gate: 0 files).
 #   MECH_DROP_RATE = MECH_LOST / (MECH_EVENTS + MECH_LOST)
-# Cross-check: the kernel's own count of submits should equal delivered + lost;
-# the difference is recorded (EBPF_UNACCOUNTED) and noted, never hidden.
+# Cross-check: the kernel's own count of submits should equal delivered +
+# userspace lost; the difference is recorded (EBPF_UNACCOUNTED) and noted,
+# never hidden. Both raw loss counts stay in mech.stats.
 mech_stats() {
   local b=$1
-  local f="$b/ebpf_stats.env" s="$b/mech.stats" k rec lost sub fail filt una notes=""
+  local f="$b/ebpf_stats.env" s="$b/mech.stats" k rec lost ulost sub fail filt una notes=""
   [[ -f $f ]] || die "no $f — tracer never wrote its stats (see $b/ebpf_tracer.log)"
   [[ "$(kv_get "$f" EBPF_EXIT)" == ok ]] \
     || die "BCC tracer did not stop cleanly: EBPF_EXIT=$(kv_get "$f" EBPF_EXIT) (see $b/ebpf_tracer.log)"
   rec=$(kv_get "$f" EBPF_EVENTS_RECEIVED); lost=$(kv_get "$f" EBPF_EVENTS_LOST)
   sub=$(kv_get "$f" EBPF_KERNEL_SUBMITTED); fail=$(kv_get "$f" EBPF_KERNEL_SUBMIT_FAILED)
   filt=$(kv_get "$f" EBPF_KERNEL_FILTERED)
-  una=$(( sub - rec - lost ))
+  ulost=$lost
+  (( fail > lost )) && lost=$fail
+  una=$(( sub - rec - ulost ))
   (( lost > 0 )) && notes+="ebpf_lost=$lost;"
-  (( fail != lost )) && notes+="submit_failed=$fail;"
+  (( fail != ulost )) && notes+="submit_failed=$fail;"
   (( una != 0 )) && notes+="unaccounted=$una;"
   kv_has "$b/mech.meta" DETACH_KILLED && notes+="detach_killed;"
   : > "$s"
@@ -115,6 +128,7 @@ mech_stats() {
     kv_put "$s" "$k" "$(kv_get "$f" "$k")"
   done
   kv_put "$s" EBPF_UNACCOUNTED "$una"
+  kv_put "$s" EBPF_USER_LOST "$ulost"
   # Discards per kept event: the in-kernel-filter asymmetry vs perf (S: 15.7:1 wide).
   kv_put "$s" EBPF_FILTERED_PER_SUBMIT "$(awk -v f="$filt" -v s="$sub" 'BEGIN{ printf "%.4f", (s ? f/s : 0) }')"
   kv_put "$s" MECH_NOTES "${notes:-none}"

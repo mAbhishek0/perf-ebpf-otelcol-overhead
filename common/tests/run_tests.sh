@@ -358,6 +358,17 @@ t_eq "ebpf notes" "ebpf_lost=100;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
 t_ok "ebpf sanity" mech_sanity "$eb"
 mk_ebpf_stats 990 0 1000 0 ok; mech_stats "$eb"
 t_eq "ebpf unaccounted noted" "unaccounted=10;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
+# kernel submit failures the userspace callback missed count as lost (fio check 20261109-224616)
+mk_ebpf_stats 415585 0 415587 2 ok; mech_stats "$eb"
+t_eq "ebpf kernel-only loss counted" 2 "$(kv_get "$eb/mech.stats" MECH_LOST)"
+t_eq "ebpf kernel-only drop rate" 0.000005 "$(kv_get "$eb/mech.stats" MECH_DROP_RATE)"
+t_eq "ebpf user lost kept raw" 0 "$(kv_get "$eb/mech.stats" EBPF_USER_LOST)"
+t_eq "ebpf kernel-only unaccounted" 2 "$(kv_get "$eb/mech.stats" EBPF_UNACCOUNTED)"
+t_eq "ebpf kernel-only notes" "ebpf_lost=2;submit_failed=2;unaccounted=2;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
+# the larger count wins when userspace saw more
+mk_ebpf_stats 900 100 1000 50 ok; mech_stats "$eb"
+t_eq "ebpf user loss larger wins" 100 "$(kv_get "$eb/mech.stats" MECH_LOST)"
+t_eq "ebpf user loss larger notes" "ebpf_lost=100;submit_failed=50;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
 mk_ebpf_stats 0 0 0 0 ok; mech_stats "$eb"
 t_die "ebpf saw nothing dies" mech_sanity "$eb"
 mk_ebpf_stats 900 0 900 0 stopped_max_window
