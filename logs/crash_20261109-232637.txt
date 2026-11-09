@@ -1,0 +1,208 @@
+CRASH REPORT  2026-11-10T00:54:24+05:30  exit=1  stage=L_fio_perf_narrow_E1_try3_A2 stop+parse  unit=bench-fio
+run in flight: /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/smoke/raw/L_fio_perf_narrow_E1_try3_A2 (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+23:26:46 rc=1 stage=host setup cmd=[[ -w $d/pwm${n}_enable ]] stack=_fan_enable_state@host.sh:66 host_save_prior@host.sh:26 host_setup@host.sh:102 main@run_workload.sh:117 
+00:54:24 die stage=L_fio_perf_narrow_E1_try3_A2 stop+parse: cell L_fio_perf_narrow_E1 failed drift on all 3 tries (in bracket)
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-fio_20261109-232626.log'
+23:56:27 [run|L_fio_perf_narrow_E1_try1_A2 stop+parse] WARN: cell L_fio_perf_narrow_E1 try 1: drift p99 0.0000% (limit 7.1856%, B spread 3.5928%) cpu 22.7198% (limit 5%) — rerunning bracket
+23:56:27 [run|L_fio_perf_narrow_E1_try1_A2 stop+parse] === cell L_fio_perf_narrow_E1 try 2 ===
+23:57:27 [run|L_fio_perf_narrow_E1 try 2 prep] run L_fio_perf_narrow_E1_try2_W1 (rate 4500, traced=0)
+23:57:28 [run|L_fio_perf_narrow_E1_try2_W1 cooldown] cooldown 0s -> start at 35 C (limit 43 C, idle 38 C)
+23:59:59 [run|L_fio_perf_narrow_E1_try2_W1 stop+parse] run L_fio_perf_narrow_E1_try2_W2 (rate 4500, traced=0)
+23:59:59 [run|L_fio_perf_narrow_E1_try2_W2 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:02:30 [run|L_fio_perf_narrow_E1_try2_W2 stop+parse] run L_fio_perf_narrow_E1_try2_W3 (rate 4500, traced=0)
+00:02:30 [run|L_fio_perf_narrow_E1_try2_W3 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:05:01 [run|L_fio_perf_narrow_E1_try2_W3 stop+parse] run L_fio_perf_narrow_E1_try2_A1 (rate 4500, traced=0)
+00:05:02 [run|L_fio_perf_narrow_E1_try2_A1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:07:33 [run|L_fio_perf_narrow_E1_try2_A1 stop+parse] run L_fio_perf_narrow_E1_try2_B1 (rate 4500, traced=1)
+00:07:33 [run|L_fio_perf_narrow_E1_try2_B1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:10:06 [run|L_fio_perf_narrow_E1_try2_B1 stop+parse] run L_fio_perf_narrow_E1_try2_B2 (rate 4500, traced=1)
+00:10:06 [run|L_fio_perf_narrow_E1_try2_B2 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:12:40 [run|L_fio_perf_narrow_E1_try2_B2 stop+parse] run L_fio_perf_narrow_E1_try2_B3 (rate 4500, traced=1)
+00:12:40 [run|L_fio_perf_narrow_E1_try2_B3 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:15:13 [run|L_fio_perf_narrow_E1_try2_B3 stop+parse] run L_fio_perf_narrow_E1_try2_B4 (rate 4500, traced=1)
+00:15:13 [run|L_fio_perf_narrow_E1_try2_B4 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:17:47 [run|L_fio_perf_narrow_E1_try2_B4 stop+parse] run L_fio_perf_narrow_E1_try2_B5 (rate 4500, traced=1)
+00:17:47 [run|L_fio_perf_narrow_E1_try2_B5 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:20:20 [run|L_fio_perf_narrow_E1_try2_B5 stop+parse] run L_fio_perf_narrow_E1_try2_B6 (rate 4500, traced=1)
+00:20:21 [run|L_fio_perf_narrow_E1_try2_B6 cooldown] cooldown 1s -> start at 36 C (limit 43 C, idle 38 C)
+00:22:54 [run|L_fio_perf_narrow_E1_try2_B6 stop+parse] run L_fio_perf_narrow_E1_try2_A2 (rate 4500, traced=0)
+00:22:54 [run|L_fio_perf_narrow_E1_try2_A2 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:25:25 [run|L_fio_perf_narrow_E1_try2_A2 stop+parse] WARN: cell L_fio_perf_narrow_E1 try 2: drift p99 15.4839% (limit 5.0000%, B spread 1.1905%) cpu 0.9944% (limit 5%) — rerunning bracket
+00:25:25 [run|L_fio_perf_narrow_E1_try2_A2 stop+parse] === cell L_fio_perf_narrow_E1 try 3 ===
+00:26:26 [run|L_fio_perf_narrow_E1 try 3 prep] run L_fio_perf_narrow_E1_try3_W1 (rate 4500, traced=0)
+00:26:26 [run|L_fio_perf_narrow_E1_try3_W1 cooldown] cooldown 0s -> start at 35 C (limit 43 C, idle 38 C)
+00:28:57 [run|L_fio_perf_narrow_E1_try3_W1 stop+parse] run L_fio_perf_narrow_E1_try3_W2 (rate 4500, traced=0)
+00:28:57 [run|L_fio_perf_narrow_E1_try3_W2 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:31:28 [run|L_fio_perf_narrow_E1_try3_W2 stop+parse] run L_fio_perf_narrow_E1_try3_W3 (rate 4500, traced=0)
+00:31:29 [run|L_fio_perf_narrow_E1_try3_W3 cooldown] cooldown 1s -> start at 37 C (limit 43 C, idle 38 C)
+00:34:00 [run|L_fio_perf_narrow_E1_try3_W3 stop+parse] run L_fio_perf_narrow_E1_try3_A1 (rate 4500, traced=0)
+00:34:00 [run|L_fio_perf_narrow_E1_try3_A1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:36:31 [run|L_fio_perf_narrow_E1_try3_A1 stop+parse] run L_fio_perf_narrow_E1_try3_B1 (rate 4500, traced=1)
+00:36:31 [run|L_fio_perf_narrow_E1_try3_B1 cooldown] cooldown 0s -> start at 37 C (limit 43 C, idle 38 C)
+00:39:05 [run|L_fio_perf_narrow_E1_try3_B1 stop+parse] run L_fio_perf_narrow_E1_try3_B2 (rate 4500, traced=1)
+00:39:05 [run|L_fio_perf_narrow_E1_try3_B2 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:41:38 [run|L_fio_perf_narrow_E1_try3_B2 stop+parse] run L_fio_perf_narrow_E1_try3_B3 (rate 4500, traced=1)
+00:41:38 [run|L_fio_perf_narrow_E1_try3_B3 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:44:12 [run|L_fio_perf_narrow_E1_try3_B3 stop+parse] run L_fio_perf_narrow_E1_try3_B4 (rate 4500, traced=1)
+00:44:12 [run|L_fio_perf_narrow_E1_try3_B4 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:46:45 [run|L_fio_perf_narrow_E1_try3_B4 stop+parse] run L_fio_perf_narrow_E1_try3_B5 (rate 4500, traced=1)
+00:46:46 [run|L_fio_perf_narrow_E1_try3_B5 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:49:19 [run|L_fio_perf_narrow_E1_try3_B5 stop+parse] run L_fio_perf_narrow_E1_try3_B6 (rate 4500, traced=1)
+00:49:19 [run|L_fio_perf_narrow_E1_try3_B6 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:51:53 [run|L_fio_perf_narrow_E1_try3_B6 stop+parse] run L_fio_perf_narrow_E1_try3_A2 (rate 4500, traced=0)
+00:51:53 [run|L_fio_perf_narrow_E1_try3_A2 cooldown] cooldown 0s -> start at 36 C (limit 43 C, idle 38 C)
+00:54:24 [run|L_fio_perf_narrow_E1_try3_A2 stop+parse] WARN: cell L_fio_perf_narrow_E1 try 3: drift p99 0.0000% (limit 5.0000%, B spread 1.1834%) cpu 15.9494% (limit 5%) — rerunning bracket
+00:54:24 [run|L_fio_perf_narrow_E1_try3_A2 stop+parse] FAIL: cell L_fio_perf_narrow_E1 failed drift on all 3 tries
+
+##### docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+##### docker logs --tail 100 bench-nginx
+Error response from daemon: No such container: bench-nginx
+
+##### dmesg -T | tail -n 60
+[Mon Nov  9 23:07:01 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Mon Nov  9 23:07:01 2026] NVRM: No NVIDIA GPU found.
+[Mon Nov  9 23:07:01 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Mon Nov  9 23:07:02 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Mon Nov  9 23:07:02 2026] NVRM: No NVIDIA GPU found.
+[Mon Nov  9 23:07:02 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Mon Nov  9 23:23:05 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=798 DF PROTO=TCP SPT=59474 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:23:06 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=799 DF PROTO=TCP SPT=59474 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:23:08 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=800 DF PROTO=TCP SPT=59474 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:23:12 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=801 DF PROTO=TCP SPT=59474 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:23:20 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=802 DF PROTO=TCP SPT=59474 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:26:40 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.384:399): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136350 comm="fusermount3" capability=1  capname="dac_override"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.384:400): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136350 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.385:401): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136352 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.393:402): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136351 comm="fusermount3" capability=1  capname="dac_override"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.393:403): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136351 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.393:404): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136356 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.398:405): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=136357 comm="fusermount3" flags="rw, rprivate"
+[Mon Nov  9 23:26:40 2026] rfkill: input handler enabled
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.626:406): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136471 comm="fusermount3" capability=1  capname="dac_override"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.626:407): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136471 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:40 2026] audit: type=1400 audit(1794247000.626:408): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=136472 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 1 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 3 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 5 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 7 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 9 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 11 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 13 is now offline
+[Mon Nov  9 23:26:47 2026] smpboot: CPU 15 is now offline
+[Mon Nov  9 23:26:47 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Mon Nov  9 23:26:47 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+[Mon Nov  9 23:26:52 2026] kauditd_printk_skb: 6 callbacks suppressed
+[Mon Nov  9 23:26:52 2026] audit: type=1400 audit(1794247012.223:415): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=137762 comm="fusermount3" capability=1  capname="dac_override"
+[Mon Nov  9 23:26:52 2026] audit: type=1400 audit(1794247012.223:416): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=137762 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:52 2026] audit: type=1400 audit(1794247012.223:417): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=137765 comm="fusermount3" capability=7  capname="setuid"
+[Mon Nov  9 23:26:52 2026] audit: type=1400 audit(1794247012.234:418): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=137766 comm="fusermount3" flags="rw, rprivate"
+[Mon Nov  9 23:43:07 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=803 DF PROTO=TCP SPT=64436 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:43:08 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=804 DF PROTO=TCP SPT=64436 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:43:10 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=805 DF PROTO=TCP SPT=64436 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:43:14 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=806 DF PROTO=TCP SPT=64436 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Mon Nov  9 23:43:22 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=807 DF PROTO=TCP SPT=64436 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:03:09 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=811 DF PROTO=TCP SPT=55904 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:03:10 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=812 DF PROTO=TCP SPT=55904 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:03:12 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=813 DF PROTO=TCP SPT=55904 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:03:16 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=814 DF PROTO=TCP SPT=55904 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:03:24 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=815 DF PROTO=TCP SPT=55904 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:23:11 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=819 DF PROTO=TCP SPT=64595 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:23:12 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=820 DF PROTO=TCP SPT=64595 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:23:14 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=821 DF PROTO=TCP SPT=64595 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:23:18 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=822 DF PROTO=TCP SPT=64595 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:23:26 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=823 DF PROTO=TCP SPT=64595 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:43:13 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=824 DF PROTO=TCP SPT=65063 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:43:14 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=825 DF PROTO=TCP SPT=65063 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:43:16 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=826 DF PROTO=TCP SPT=65063 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:43:20 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=827 DF PROTO=TCP SPT=65063 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:43:28 2026] [UFW BLOCK] IN=wlp3s0 OUT= MAC=48:e7:da:31:5f:dd:10:68:38:c1:3f:d8:08:00 SRC=192.168.1.65 DST=192.168.1.66 LEN=52 TOS=0x00 PREC=0x00 TTL=128 ID=828 DF PROTO=TCP SPT=65063 DPT=7680 WINDOW=65535 RES=0x00 SYN URGP=0 
+[Tue Nov 10 00:48:18 2026] audit: type=1400 audit(1794251898.339:419): apparmor="DENIED" operation="open" class="file" profile="/usr/sbin/cupsd" name="/etc/paperspecs" pid=295784 comm="cupsd" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+[Tue Nov 10 00:48:18 2026] audit: type=1400 audit(1794251898.344:420): apparmor="DENIED" operation="capable" class="cap" profile="/usr/sbin/cupsd" pid=295784 comm="cupsd" capability=12  capname="net_admin"
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+0
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2884639
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2894711
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 37000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+ 136280       1  12  0.1 Ss      01:27:47 bash
+ 263441    4133  14  0.0 S          21:50 sleep
+ 308277       1  12  0.0 S          00:00 sleep
+ 308484  308482  12  0.0 S          00:00 bash
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887         937       11213          51        3100       13949
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   51G   52G  50% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=
+
+##### ls -la '/home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/smoke/raw/L_fio_perf_narrow_E1_try3_A2'
+total 112
+drwxr-xr-x  3 root root  4096 Nov 10 00:54 .
+drwxr-xr-x 35 root root  4096 Nov 10 00:54 ..
+-rw-r--r--  1 root root     0 Nov 10 00:54 DONE
+-rw-r--r--  1 root root    46 Nov 10 00:52 cgroup_path
+-rw-r--r--  1 root root    56 Nov 10 00:51 cooldown.env
+-rw-r--r--  1 root root   158 Nov 10 00:54 diskstat_after.txt
+-rw-r--r--  1 root root   158 Nov 10 00:52 diskstat_before.txt
+-rw-r--r--  1 root root   575 Nov 10 00:51 fio.job
+-rw-r--r--  1 root root 12448 Nov 10 00:54 fio.json
+-rw-r--r--  1 root root     0 Nov 10 00:51 fio.log
+-rw-r--r--  1 root root     0 Nov 10 00:54 fio_parse.err
+-rw-r--r--  1 root root     7 Nov 10 00:51 fio_pid
+-rw-r--r--  1 root root   536 Nov 10 00:51 gate.sh
+-rw-r--r--  1 root root     5 Nov 10 00:52 gate_wait_s
+-rw-r--r--  1 root root     0 Nov 10 00:52 go
+-rw-r--r--  1 root root     0 Nov 10 00:52 measure.prerun.txt
+-rw-r--r--  1 root root  7388 Nov 10 00:54 net_after.txt
+-rw-r--r--  1 root root  7388 Nov 10 00:52 net_before.txt
+-rw-r--r--  1 root root     7 Nov 10 00:52 pids.sampler
+-rw-r--r--  1 root root    87 Nov 10 00:54 power.env
+-rw-r--r--  1 root root    20 Nov 10 00:52 ready.304112
+-rw-r--r--  1 root root    20 Nov 10 00:52 ready.304113
+-rw-r--r--  1 root root    20 Nov 10 00:52 ready.304114
+-rw-r--r--  1 root root    20 Nov 10 00:52 ready.304115
+-rw-r--r--  1 root root   565 Nov 10 00:54 run_meta.env
+drwxr-xr-x  2 root root  4096 Nov 10 00:54 samples
+-rw-r--r--  1 root root     0 Nov 10 00:51 started
+-rw-r--r--  1 root root     7 Nov 10 00:51 target_pids
+-rw-r--r--  1 root root   254 Nov 10 00:54 wl.env
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/smoke/raw/L_fio_perf_narrow_E1_try3_A2/fio.log'
