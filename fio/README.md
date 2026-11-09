@@ -65,7 +65,7 @@ Run these on the laptop, after `git pull`.
 2. Run `sudo bash fio/prepare.sh`. Then leave the laptop idle for 30 minutes, so the drive can move the new data out of its SLC cache.
 3. Run `sudo bash pilot.sh fio`. It takes about 1 hour. Read `fio/pilot/pilot_report.txt`. Then write `fio/pilot.env` by hand. It sets `LADDER`, `FIO_NUMJOBS` and `FIO_IODEPTH`. The top of `LADDER` must be the highest rate fio sustains without a tracer (PLAN.md decision 3.2). If no rate saturates, repeat with higher `--rates` and `--out pilot-2`.
 4. Run `sudo bash fio/check.sh`. It takes about 15 minutes. Push `logs/fio-check_*.txt`. Copy one real `fio.json` from `state/fio-check/<ts>/` to `fio/tests/fixtures/fio_L.json`. Add a test that parses it.
-5. Run `sudo bash run_workload.sh fio --mech perf --smoke`. Check by hand that warm-ups 2 and 3 match A1.
+5. Run `sudo bash run_workload.sh fio --mech perf --smoke`. Check by hand that warm-ups 2 and 3 match A1. First attempt 2026-11-10: **failed** A1-against-A2 drift on all 3 tries, from CPU noise at 4500 IOPS and p99 histogram steps, not from tracing (README timeline 41). Repeat this step after the drift rule and the gate wait are decided.
 6. Run the matrix nights as in PLAN.md §4. Perf and eBPF block 1 on Nov 12. Collector block 1 and perf block 2 on Nov 13. eBPF and collector block 2 on Nov 14. A block 1 command is `sudo bash run_workload.sh fio --mech <m>`. A block 2 command adds `--block 2`.
 
 If the pilot shows the baselines drifting (A1 and A2 p99 far apart on untraced runs), PLAN.md §6 applies. Switch to `null_blk`. Decide this by Nov 12.
