@@ -1,0 +1,27 @@
+pilot fio  FIO_NUMJOBS=4 FIO_IODEPTH=32  ramp=30s  kernel=7.0.0-43-generic  2026-11-09T22:07:06+05:30
+
+120 s windows (untraced)
+    rate   achieved   p50_ms   p99_ms  p999_ms errors   wl_cpu  gen_cpu   busy%
+   10000    9999.92    0.119    0.342    0.444      0    0.284    0.284     5.6
+   25000   24999.78    0.173    0.518    0.750      0    0.626    0.627    14.3
+   50000   41610.20    1.860   16.908  196.084      0    0.470    0.470    10.1
+  100000   41671.08    1.843   17.695  191.889      0    0.468    0.468    10.0
+  150000   41692.19    1.843   19.530  185.598      0    0.469    0.469    10.1
+  200000   41764.76    1.827   22.151  181.404      0    0.471    0.472    10.1
+
+Gate 1: 60 s vs 120 s (p99 and throughput each within DRIFT_PCT=5%)
+    rate    p99_120     p99_60 p99_diff%  tp_diff%   tp_120    tp_60 verdict
+   10000      0.342      0.346    1.1905    0.0009  9999.92  9999.83 PASS
+   25000      0.518      0.518    0.0000    0.0008 24999.78 24999.57 PASS
+   50000     16.908     17.433    3.0534    0.0498 41610.20 41630.92 PASS
+  100000     17.695     18.743    5.7554    0.0243 41671.08 41660.94 FAIL
+  150000     19.530     21.103    7.7419    0.0504 41692.19 41671.19 FAIL
+  200000     22.151     22.675    2.3392    0.0537 41764.76 41742.35 PASS
+Gate 1 overall: FAIL (judge it on the rates you intend to freeze; a saturated rate may fail for other reasons)
+
+Highest usable rate (p99 < 10x p99@10000=0.342016 ms, errors 0, achieved >= 99%): 25000
+Suggested (NOT written):
+  LADDER="1:6000 2:13000 3:19000 4:25000"
+  FIO_NUMJOBS=4
+  FIO_IODEPTH=32
+Review the table, then write fio/pilot.env by hand: freezing the ladder is a human decision.

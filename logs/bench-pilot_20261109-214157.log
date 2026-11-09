@@ -1,0 +1,88 @@
+21:42:12 [pilot|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+21:42:12 [pilot|preflight] preflight
+21:42:12 [pilot|preflight]   [ok]   on AC power
+21:42:12 [pilot|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+21:42:12 [pilot|preflight]   [ok]   TLP not active
+21:42:12 [pilot|preflight]   [ok]   unattended-upgrades not active
+21:42:12 [pilot|preflight]   [ok]   no noisy processes
+21:42:12 [pilot|preflight]   [ok]   no graphical session
+21:42:12 [pilot|preflight]   package 63 °C > 55 °C — waiting up to 900s to cool
+21:42:16 [pilot|preflight]   cooled for 4s, now 55 °C
+21:42:16 [pilot|preflight]   [ok]   package 55 °C
+21:42:16 [pilot|preflight]   [ok]   52692 MB free
+21:42:16 [pilot|preflight]   [ok]   BPF JIT on
+21:42:17 [pilot|preflight]   [ok]   docker reachable
+21:42:17 [pilot|preflight]   [ok]   fio-3.41
+21:42:17 [pilot|preflight]   [ok]   fio engine libaio
+21:42:17 [pilot|preflight]   [ok]   data file /var/tmp/bench-fio/fio.dat (17179869184 bytes, prepared 2026-11-09T21:41:06+05:30)
+21:42:17 [pilot|preflight]   [ok]   fio target on nvme0n1
+21:42:17 [pilot|preflight]   [ok]   nvme0n1 non-rotational
+21:42:17 [pilot|preflight]   [ok]   nvme0n1 scheduler none
+21:42:17 [pilot|preflight]   [ok]   no fio running
+21:42:17 [pilot|preflight]   [ok]   /usr/bin/python3 for fio_parse.py
+21:42:17 [pilot|preflight]   [ok]   fio 4 jobs x iodepth 32
+21:42:17 [pilot|preflight]   [ok]   every ladder / pilot / capacity rate divides by 4 jobs
+21:42:17 [pilot|preflight] preflight passed
+21:42:17 [pilot|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+21:42:18 [pilot|host setup] clock floor requested at 2900000 kHz
+21:42:18 [pilot|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+21:42:18 [pilot|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+21:42:22 [pilot|host setup] clock under load: 2894475 kHz (ok)
+21:42:22 [pilot|host setup] host configured
+21:42:52 [pilot|host setup] idle package temp 40 C (min of 15 samples over 30 s)
+21:42:52 [pilot|host setup] pilot 10000:120: rate 10000 for 120s
+21:42:52 [pilot|pilot 10000:120 cooldown] cooldown 0s -> start at 40 C (limit 45 C, idle 40 C)
+21:45:23 [pilot|pilot 10000:120 measure] pilot 10000:60: rate 10000 for 60s
+21:45:24 [pilot|pilot 10000:60 cooldown] cooldown 1s -> start at 40 C (limit 45 C, idle 40 C)
+21:46:55 [pilot|pilot 10000:60 measure] pilot 25000:120: rate 25000 for 120s
+21:46:55 [pilot|pilot 25000:120 cooldown] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+21:49:26 [pilot|pilot 25000:120 measure] pilot 25000:60: rate 25000 for 60s
+21:49:26 [pilot|pilot 25000:60 cooldown] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+21:50:57 [pilot|pilot 25000:60 measure] pilot 50000:120: rate 50000 for 120s
+21:50:57 [pilot|pilot 50000:120 cooldown] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+21:53:28 [pilot|pilot 50000:120 measure] pilot 50000:60: rate 50000 for 60s
+21:53:28 [pilot|pilot 50000:60 cooldown] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+21:54:59 [pilot|pilot 50000:60 measure] pilot 100000:120: rate 100000 for 120s
+21:54:59 [pilot|pilot 100000:120 cooldown] cooldown 0s -> start at 38 C (limit 45 C, idle 40 C)
+21:57:30 [pilot|pilot 100000:120 measure] pilot 100000:60: rate 100000 for 60s
+21:57:30 [pilot|pilot 100000:60 cooldown] cooldown 0s -> start at 39 C (limit 45 C, idle 40 C)
+21:59:01 [pilot|pilot 100000:60 measure] pilot 150000:120: rate 150000 for 120s
+21:59:01 [pilot|pilot 150000:120 cooldown] cooldown 0s -> start at 38 C (limit 45 C, idle 40 C)
+22:01:32 [pilot|pilot 150000:120 measure] pilot 150000:60: rate 150000 for 60s
+22:01:32 [pilot|pilot 150000:60 cooldown] cooldown 0s -> start at 38 C (limit 45 C, idle 40 C)
+22:03:04 [pilot|pilot 150000:60 measure] pilot 200000:120: rate 200000 for 120s
+22:03:04 [pilot|pilot 200000:120 cooldown] cooldown 0s -> start at 38 C (limit 45 C, idle 40 C)
+22:05:35 [pilot|pilot 200000:120 measure] pilot 200000:60: rate 200000 for 60s
+22:05:35 [pilot|pilot 200000:60 cooldown] cooldown 0s -> start at 38 C (limit 45 C, idle 40 C)
+pilot fio  FIO_NUMJOBS=4 FIO_IODEPTH=32  ramp=30s  kernel=7.0.0-43-generic  2026-11-09T22:07:06+05:30
+
+120 s windows (untraced)
+    rate   achieved   p50_ms   p99_ms  p999_ms errors   wl_cpu  gen_cpu   busy%
+   10000    9999.92    0.119    0.342    0.444      0    0.284    0.284     5.6
+   25000   24999.78    0.173    0.518    0.750      0    0.626    0.627    14.3
+   50000   41610.20    1.860   16.908  196.084      0    0.470    0.470    10.1
+  100000   41671.08    1.843   17.695  191.889      0    0.468    0.468    10.0
+  150000   41692.19    1.843   19.530  185.598      0    0.469    0.469    10.1
+  200000   41764.76    1.827   22.151  181.404      0    0.471    0.472    10.1
+
+Gate 1: 60 s vs 120 s (p99 and throughput each within DRIFT_PCT=5%)
+    rate    p99_120     p99_60 p99_diff%  tp_diff%   tp_120    tp_60 verdict
+   10000      0.342      0.346    1.1905    0.0009  9999.92  9999.83 PASS
+   25000      0.518      0.518    0.0000    0.0008 24999.78 24999.57 PASS
+   50000     16.908     17.433    3.0534    0.0498 41610.20 41630.92 PASS
+  100000     17.695     18.743    5.7554    0.0243 41671.08 41660.94 FAIL
+  150000     19.530     21.103    7.7419    0.0504 41692.19 41671.19 FAIL
+  200000     22.151     22.675    2.3392    0.0537 41764.76 41742.35 PASS
+Gate 1 overall: FAIL (judge it on the rates you intend to freeze; a saturated rate may fail for other reasons)
+
+Highest usable rate (p99 < 10x p99@10000=0.342016 ms, errors 0, achieved >= 99%): 25000
+Suggested (NOT written):
+  LADDER="1:6000 2:13000 3:19000 4:25000"
+  FIO_NUMJOBS=4
+  FIO_IODEPTH=32
+Review the table, then write fio/pilot.env by hand: freezing the ladder is a human decision.
+22:07:06 [pilot|pilot 200000:60 measure] report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/pilot/pilot_report.txt
+22:07:06 [pilot|pilot 200000:60 measure] no machine-state drift
+22:07:07 [pilot|host revert] host reverted
+22:07:08 [pilot|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+22:07:08 [pilot|restore services] done
