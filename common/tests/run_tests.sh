@@ -362,7 +362,7 @@ t_eq "ebpf unaccounted noted" "unaccounted=10;" "$(kv_get "$eb/mech.stats" MECH_
 mk_ebpf_stats 415585 0 415587 2 ok; mech_stats "$eb"
 t_eq "ebpf kernel-only loss counted" 2 "$(kv_get "$eb/mech.stats" MECH_LOST)"
 t_eq "ebpf kernel-only drop rate" 0.000005 "$(kv_get "$eb/mech.stats" MECH_DROP_RATE)"
-t_eq "ebpf user lost kept raw" 0 "$(kv_get "$eb/mech.stats" EBPF_USER_LOST)"
+t_eq "ebpf user lost kept raw" 0 "$(kv_get "$eb/ebpf_stats.env" EBPF_EVENTS_LOST)"
 t_eq "ebpf kernel-only unaccounted" 2 "$(kv_get "$eb/mech.stats" EBPF_UNACCOUNTED)"
 t_eq "ebpf kernel-only notes" "ebpf_lost=2;submit_failed=2;unaccounted=2;" "$(kv_get "$eb/mech.stats" MECH_NOTES)"
 # the larger count wins when userspace saw more

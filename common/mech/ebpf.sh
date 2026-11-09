@@ -89,7 +89,7 @@ mech_detach() {
 # Loss accounting, the same definition as every mechanism (schema 2.0.0):
 #   MECH_EVENTS = records delivered to userspace (perf buffer callback)
 #   MECH_LOST   = records dropped = the larger of two counts (2026-11-09):
-#                 the userspace lost callback (EBPF_USER_LOST, in records) and
+#                 the userspace lost callback (EBPF_EVENTS_LOST in ebpf_stats.env) and
 #                 the kernel's count of failed perf_submit calls
 #                 (EBPF_KERNEL_SUBMIT_FAILED). They normally agree. The
 #                 callback can miss a loss whose notice is still unread when
@@ -102,7 +102,8 @@ mech_detach() {
 #   MECH_DROP_RATE = MECH_LOST / (MECH_EVENTS + MECH_LOST)
 # Cross-check: the kernel's own count of submits should equal delivered +
 # userspace lost; the difference is recorded (EBPF_UNACCOUNTED) and noted,
-# never hidden. Both raw loss counts stay in mech.stats.
+# never hidden. The raw userspace count stays in ebpf_stats.env, and the
+# kernel count in mech.stats, so mech.stats of earlier runs rebuilds unchanged.
 mech_stats() {
   local b=$1
   local f="$b/ebpf_stats.env" s="$b/mech.stats" k rec lost ulost sub fail filt una notes=""
@@ -128,7 +129,6 @@ mech_stats() {
     kv_put "$s" "$k" "$(kv_get "$f" "$k")"
   done
   kv_put "$s" EBPF_UNACCOUNTED "$una"
-  kv_put "$s" EBPF_USER_LOST "$ulost"
   # Discards per kept event: the in-kernel-filter asymmetry vs perf (S: 15.7:1 wide).
   kv_put "$s" EBPF_FILTERED_PER_SUBMIT "$(awk -v f="$filt" -v s="$sub" 'BEGIN{ printf "%.4f", (s ? f/s : 0) }')"
   kv_put "$s" MECH_NOTES "${notes:-none}"

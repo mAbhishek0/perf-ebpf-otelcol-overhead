@@ -24,9 +24,13 @@ only; `sys_exit` is attached and counted, not submitted (one syscall = one event
 
 ## Columns
 
-- `mech_events` records delivered to the Python poller; `mech_lost` records the perf buffer
-  dropped; `mech_drop_rate` = lost ÷ (delivered + lost) — the schema 2.0.0 definition every
-  mechanism uses.
+- `mech_events` records delivered to the Python poller; `mech_lost` records dropped, taken as
+  the larger of the userspace lost callback (`EBPF_EVENTS_LOST` in `ebpf_stats.env`) and the
+  kernel's failed-submit count (`EBPF_KERNEL_SUBMIT_FAILED`); `mech_drop_rate` = lost ÷
+  (delivered + lost) — the schema 2.0.0 definition every mechanism uses. The two loss counts
+  normally agree. Taking the larger was added on 2026-11-09 (laptop README timeline 40), after
+  the fio check showed 2 kernel failures that the callback never reported. Every nginx eBPF row
+  had the two equal, so its results are unchanged.
 - `tracer_cpu_cores` is the Python poller only. The BPF programs run in the context of the task
   that hit the probe, so their cost is in `workload_cpu_cores` (and, wide, in other tasks on
   the workload CPUs). `kernel.bpf_stats_enabled` stays 0, so in-kernel BPF time is not measured
@@ -34,7 +38,7 @@ only; `sys_exit` is attached and counted, not submitted (one syscall = one event
 - Per bundle in `mech.stats`: `EBPF_KERNEL_SUBMITTED`, `EBPF_KERNEL_SUBMIT_FAILED`,
   `EBPF_KERNEL_FILTERED` (probe fired, discarded by the scope filter — the asymmetry with
   perf's attach-time filter; S measured 15.7 discards per kept event at wide),
-  `EBPF_FILTERED_PER_SUBMIT`, `EBPF_UNACCOUNTED` (submitted − delivered − lost; noted in
+  `EBPF_FILTERED_PER_SUBMIT`, `EBPF_UNACCOUNTED` (submitted − delivered − userspace lost; noted in
   `mech_notes` when non-zero). Wide runs also leave `ebpf_syscalls.txt` (per-syscall counts).
 
 ## Guards
