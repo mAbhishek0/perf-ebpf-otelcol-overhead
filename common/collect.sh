@@ -111,6 +111,9 @@ _schema_freeze() {  # RDIR MECH
     printf '  "perf_freq_narrow": %s, "perf_freq_wide": %s, "perf_mmap_pages": %s, "perf_trace_mmap_pages": %s,\n' \
       "$PERF_FREQ_NARROW" "$PERF_FREQ_WIDE" "$PERF_MMAP_PAGES" "$PERF_TRACE_MMAP_PAGES"
     printf '  "ebpf_perf_buffer_pages": %s,\n' "$EBPF_PERF_BUFFER_PAGES"
+    # Workload constants, only for workloads that define the hook (fio):
+    # nginx defines none, so its frozen schema.json files are unchanged.
+    if declare -F wl_schema_json >/dev/null; then wl_schema_json; fi
     # Collector constants only in collector dirs: adding them everywhere would
     # change the frozen schema.json of the finished perf and eBPF matrices.
     if [[ $mech == collector ]]; then

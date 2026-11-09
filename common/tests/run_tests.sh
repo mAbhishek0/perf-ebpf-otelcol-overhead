@@ -430,6 +430,18 @@ fi
 )
 read -r NPASS NFAIL < "$T/pcount"
 
+# --- optional workload hooks: absent = no change, present = included ---
+(
+  sd="$T/hook_schema"; mkdir -p "$sd/a" "$sd/b"
+  _schema_freeze "$sd/a" perf
+  wl_schema_json() { printf '  "hook_test": 1,\n'; }
+  _schema_freeze "$sd/b" perf
+  grep -q '"hook_test": 1,' "$sd/b/schema.json" && ok || bad "wl_schema_json line missing"
+  [[ $(grep -vc hook_test "$sd/b/schema.json") == $(wc -l < "$sd/a/schema.json" | tr -d ' ') ]] && ok || bad "hook changed other schema lines"
+  echo "$NPASS $NFAIL" > "$T/hcount"
+)
+read -r NPASS NFAIL < "$T/hcount"
+
 # --- nginx x collector plugin (its own file; runs standalone too) ---
 source "$LAPTOP_ROOT/nginx-wrk2/collector/tests/test_mech.sh"
 
