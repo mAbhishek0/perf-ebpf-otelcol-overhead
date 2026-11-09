@@ -23,7 +23,7 @@ shortened; their non-comment lines are byte-identical to S's (checked with `diff
 
 Both scopes: `batch` processor (`send_batch_size` 512), `debug` exporter (verbosity `basic`)
 with `sending_queue` 512 items, self-telemetry at `level: detailed` on 127.0.0.1:18888
-(pull reader). Constants in [collector.env](../scripts/collector.env), all S values.
+(pull reader). Constants in [collector.env](../../../common/mech/collector.env), all S values.
 
 otelcol-contrib **0.161.0** from `/opt/otelcol/otelcol-contrib` (install_build.sh: release
 tarball, sha256-verified, not the .deb). It runs as a host process pinned to `TRACER_CPUS`

@@ -1,0 +1,47 @@
+# otelcol-contrib config, scraper mode, WIDE scope — fio, Platform L.
+# Rendered per run by common/mech/collector.sh (_otel_render) into
+# BUNDLE/otelcol.yaml. Placeholders: __SCRAPE_INTERVAL__, __TELEMETRY_PORT__,
+# __QUEUE_SIZE__, __BATCH_SIZE__ (values in common/mech/collector.env).
+#
+# Wide is every host metric the nginx wide config scrapes (8 scrapers), every 1 s; fio has no receiver of its own.
+# The pipeline receiver list must stay flow style ("receivers: [a, b]"):
+# collector.sh counts receivers from that one line.
+receivers:
+  hostmetrics:
+    collection_interval: __SCRAPE_INTERVAL__s
+    scrapers:
+      cpu:
+      memory:
+      disk:
+      network:
+      load:
+      filesystem:
+      paging:
+      processes:
+
+processors:
+  batch:
+    send_batch_size: __BATCH_SIZE__
+
+exporters:
+  debug:
+    verbosity: basic
+    sending_queue:
+      enabled: true
+      queue_size: __QUEUE_SIZE__
+
+service:
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 127.0.0.1
+                port: __TELEMETRY_PORT__
+  pipelines:
+    metrics:
+      receivers: [hostmetrics]
+      processors: [batch]
+      exporters: [debug]

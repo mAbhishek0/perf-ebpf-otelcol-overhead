@@ -64,6 +64,8 @@ The pilot for each workload picks 4 rate levels. The top level must sit where ev
 
 **Why:** these follow the plan ([testbed-implementation.md §3](../docs/plan/testbed-implementation.md#3-the-three-instrumentation-setups)) and keep each scope's meaning as close to nginx's as possible: narrow watches the workload's own events, wide watches everything. fio has no metrics endpoint, so host disk metrics are the collector's closest narrow equivalent. That works because fio is the only thing doing disk I/O during a run.
 
+> **Note 2026-11-09 (implementation, README timeline 37).** eBPF narrow filters the two block tracepoints by the test disk's device number, not by fio's PID. A completion runs in the NVMe interrupt, where the current task is whatever was interrupted, so a PID filter would drop most completions. This is the §6 alternate route, taken from the start for that known reason. Each run records the disk's own read and write counts over the window, so I/O from anything other than fio is measured. Also: fio is its own load generator, so for fio `loadgen_cpu_cores` is fio's own CPU. Also: for fio the collector's wide scope has the single receiver `hostmetrics` (8 scrapers, 1 s), while nginx's wide scope has two receivers, `nginx` and `hostmetrics`. So the wide collector cell differs by one receiver between the two workloads.
+
 ### 3.5 redis uses memtier at a fixed request rate
 memtier's rate limit (`--rate-limiting`) is set per connection, so the total rate is threads × connections × per-connection rate.
 

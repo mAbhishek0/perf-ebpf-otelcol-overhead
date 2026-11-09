@@ -35,6 +35,8 @@ provenance_write() {
   kv_put "$f.partial" WRK2_AE_FIX "$([[ -e /usr/local/share/wrk2-ae-timeout-fix ]] && echo yes || echo no)"
   kv_put "$f.partial" DOCKER_VERSION "$(_prov_cmd docker version --format '{{.Server.Version}}')"
   kv_put "$f.partial" NGINX_IMAGE_ID "$(_prov_cmd docker image inspect --format '{{.Id}}' "${NGINX_IMAGE:-nginx:1.24}")"
+  # Workload-specific provenance (fio: data file, device, firmware).
+  if declare -F wl_provenance >/dev/null; then wl_provenance "$f.partial"; fi
   mv "$f.partial" "$f"
   log "provenance: $f"
 }

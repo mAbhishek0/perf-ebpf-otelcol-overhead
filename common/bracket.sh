@@ -40,6 +40,13 @@ bracket() {
       continue
     fi
     log "=== cell $cell try $try ==="
+    # Optional per-cell preparation (fio: fstrim, then idle). The file name
+    # is <cell>_try<n>.prep, never <cell>_try<n>_*: that is the run-dir
+    # pattern the crash check above globs for.
+    if declare -F wl_cell_prep >/dev/null; then
+      stage "$cell try $try prep"
+      wl_cell_prep "$rdir/raw/${cell}_try${try}.prep"
+    fi
     for (( w=1; w<=WARMUP_REPS; w++ )); do _br_run $(( w - 1 )) "$wl" "$mech" "$scope" "$level" "$try" "W$w" "$rdir"; done
     _br_run "$WARMUP_REPS" "$wl" "$mech" "$scope" "$level" "$try" A1 "$rdir"
     for (( r=1; r<=MEASURED_REPS; r++ )); do _br_run $(( WARMUP_REPS + r )) "$wl" "$mech" "$scope" "$level" "$try" "B$r" "$rdir"; done

@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # pilot.sh — rate calibration and the 60 s-vs-120 s gate. Entry point.
 #
-#   sudo bash pilot.sh nginx [--rates 5000,10000,20000,40000,80000,120000] [--threads 2] [--conns 100] [--out pilot]
-#   --out names the directory under nginx-wrk2/ (default pilot); it must not exist,
+#   sudo bash pilot.sh nginx|fio [--rates a,b,c] [--set KNOB=N]... [--out pilot]
+#   nginx also takes --threads N / --conns N (= --set WRK2_THREADS=N / WRK2_CONNS=N).
+#   Knobs a workload accepts: WL_KNOBS in its workload.sh. Default rates: WL_PILOT_RATES.
+#   --out names the directory under <workload dir>/ (default pilot); it must not exist,
 #   so a repeat pilot (e.g. --out pilot-2) never overwrites an earlier one.
 #
 # Untraced runs only: per rate one 120 s window and one 60 s window (wrk2
 # cannot split a run, so the gate compares two runs). Writes
-# nginx-wrk2/pilot/pilot_report.txt. It does NOT write pilot.env: freezing the
+# <workload dir>/<out>/pilot_report.txt. It does NOT write pilot.env: freezing the
 # ladder, threads and connections is a human decision made after reading the
-# report. Bundles: nginx-wrk2/pilot/raw/R<rate>/ (120 s) and R<rate>_60s/.
+# report. Bundles: <workload dir>/<out>/raw/R<rate>/ (120 s) and R<rate>_60s/.
 
 set -euo pipefail
 LAPTOP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,14 +23,20 @@ need_root
 # Same reason as run_workload.sh: transient service in bench.slice (lib.sh bench_detach).
 bench_detach "bench-pilot" "$0" "$@"
 
-WL=${1:?usage: pilot.sh nginx [--rates a,b,c] [--threads N] [--conns N] [--out DIR]}; shift
-[[ $WL == nginx ]] || die "pilot supports nginx only (got $WL)"
-RATES="5000,10000,20000,40000,80000,120000" THREADS="" CONNS="" OUT="pilot"
+WL=${1:?usage: pilot.sh nginx|fio [--rates a,b,c] [--set KNOB=N]... [--out DIR]}; shift
+case $WL in
+  nginx) WL_DIRNAME=nginx-wrk2 ;;
+  fio)   WL_DIRNAME=fio ;;
+  *) die "pilot supports nginx and fio (got $WL)" ;;
+esac
+RATES="" OUT="pilot"
+declare -a SETS=()
 while (( $# )); do
   case $1 in
     --rates) RATES=$2; shift 2 ;;
-    --threads) THREADS=$2; shift 2 ;;
-    --conns) CONNS=$2; shift 2 ;;
+    --set) SETS+=("$2"); shift 2 ;;
+    --threads) SETS+=("WRK2_THREADS=$2"); shift 2 ;;
+    --conns) SETS+=("WRK2_CONNS=$2"); shift 2 ;;
     --out) OUT=$2; shift 2 ;;
     *) die "unknown option $1" ;;
   esac
@@ -39,9 +47,15 @@ crash_init
 # The harness itself (bash, docker CLI, perf report, zstd) stays off the
 # workload and tracer CPUs; children inherit this, explicit taskset overrides it.
 taskset -cp "$OS_CPUS" $$ >/dev/null || die "cannot pin harness to $OS_CPUS"
-source "$LAPTOP_ROOT/nginx-wrk2/workload.sh"
-[[ -n $THREADS ]] && WRK2_THREADS=$THREADS
-[[ -n $CONNS ]] && WRK2_CONNS=$CONNS
+source "$LAPTOP_ROOT/$WL_DIRNAME/workload.sh"
+RATES=${RATES:-$WL_PILOT_RATES}
+for kv in "${SETS[@]}"; do
+  k=${kv%%=*} v=${kv#*=}
+  [[ " $WL_KNOBS " == *" $k "* ]] || die "--set $k: not a $WL knob (knobs: $WL_KNOBS)"
+  [[ $v =~ ^[1-9][0-9]*$ ]] || die "--set $kv: not a positive integer"
+  printf -v "$k" '%s' "$v"
+done
+knobs_line() { local k; for k in $WL_KNOBS; do printf '%s=%s ' "$k" "${!k}"; done; }
 
 [[ $OUT =~ ^[A-Za-z0-9._-]+$ ]] || die "bad --out '$OUT' (a plain directory name)"
 PILOT_DIR="$WL_DIR/$OUT"
@@ -89,21 +103,22 @@ pilot_point() {
   [[ -e $b ]] && die "$b already exists"
   mkdir -p "$b"
   PILOT_BUNDLE=$b PILOT_ACTIVE=1
+  # Before wl_ramp: fio writes its runtime into the job file there.
+  STEADY_S=$steady
   log "pilot $key: rate $rate for ${steady}s"
   stage "pilot $key cooldown"; cooldown_wait "$b"
   stage "pilot $key start";    wl_start "$b"
   stage "pilot $key ramp";     wl_ramp "$rate" "$b"
   u0=$(cgroup_usec "$(cat "$b/cgroup_path")")
   stage "pilot $key measure"; sample_start "$b"
-  STEADY_S=$steady
   t0=$(date +%s.%N)
   wl_measure "$rate" "$b"
   t1=$(date +%s.%N)
   sample_stop "$b"
   u1=$(cgroup_usec "$(cat "$b/cgroup_path")")
-  STEADY_S=$STEADY_PILOT
   wl_stop
-  wl_parse "$b"
+  wl_parse "$b"          # fio checks its measured runtime against STEADY_S
+  STEADY_S=$STEADY_PILOT
   s="$b/samples/summary.env"
   TP[$key]=$(kv_get "$b/wl.env" THROUGHPUT)
   P50[$key]=$(kv_get "$b/wl.env" P50_MS)
@@ -126,10 +141,9 @@ done
 # --- report ---
 REPORT="$PILOT_DIR/pilot_report.txt"
 {
-  printf 'pilot nginx  threads=%s conns=%s  ramp=%ss  kernel=%s  %s\n\n' \
-    "$WRK2_THREADS" "$WRK2_CONNS" "$RAMP_S" "$(uname -r)" "$(date -Is)"
+  printf 'pilot %s  %s ramp=%ss  kernel=%s  %s\n\n' "$WL" "$(knobs_line)" "$RAMP_S" "$(uname -r)" "$(date -Is)"
   printf '120 s windows (untraced)\n'
-  printf '%8s %10s %8s %8s %8s %6s %8s %8s %7s\n' rate achieved p50_ms p99_ms p999_ms errors ngx_cpu gen_cpu busy%
+  printf '%8s %10s %8s %8s %8s %6s %8s %8s %7s\n' rate achieved p50_ms p99_ms p999_ms errors wl_cpu gen_cpu busy%
   for r in "${RATE_LIST[@]}"; do
     k="$r:120"
     printf '%8s %10s %8.3f %8.3f %8.3f %6s %8.3f %8.3f %7.1f\n' "$r" "${TP[$k]}" "${P50[$k]}" "${P99[$k]}" \
@@ -163,19 +177,22 @@ REPORT="$PILOT_DIR/pilot_report.txt"
       x=$(awk -v h="$best" -v q="$q" 'BEGIN{ v=int(h*q/100/1000+0.5)*1000; if (v<1) v=1; print v }')
       ladder+="${ladder:+ }$lv:$x"
     done
-    printf 'Suggested (NOT written):\n  LADDER="%s"\n  WRK2_THREADS=%s\n  WRK2_CONNS=%s\n' "$ladder" "$WRK2_THREADS" "$WRK2_CONNS"
-    printf 'Review the table, then write nginx-wrk2/pilot.env by hand: freezing the ladder is a human decision.\n'
+    printf 'Suggested (NOT written):\n  LADDER="%s"\n' "$ladder"; for k in $WL_KNOBS; do printf '  %s=%s\n' "$k" "${!k}"; done
+    printf 'Review the table, then write %s/pilot.env by hand: freezing the ladder is a human decision.\n' "$WL_DIRNAME"
   else
     printf 'No rate qualified; lower --rates and repeat. Do not write pilot.env.\n'
   fi
-  maxg=0
-  for k in "${!LGEN[@]}"; do
-    if gt "${LGEN[$k]}" "$maxg"; then maxg=${LGEN[$k]}; fi
-  done
-  if gt 0.6 "$maxg"; then
-    printf 'Generator check: max loadgen CPU %s cores < 0.6 — GEN fits on one CPU (CPU 14 could become the OS core).\n' "$maxg"
-  else
-    printf 'Generator check: max loadgen CPU %s cores >= 0.6 — keep both GEN CPUs.\n' "$maxg"
+  # fio is its own generator (loadgen_cpu_cores = fio's CPU), so the check is nginx-only.
+  if [[ $WL == nginx ]]; then
+    maxg=0
+    for k in "${!LGEN[@]}"; do
+      if gt "${LGEN[$k]}" "$maxg"; then maxg=${LGEN[$k]}; fi
+    done
+    if gt 0.6 "$maxg"; then
+      printf 'Generator check: max loadgen CPU %s cores < 0.6 — GEN fits on one CPU (CPU 14 could become the OS core).\n' "$maxg"
+    else
+      printf 'Generator check: max loadgen CPU %s cores >= 0.6 — keep both GEN CPUs.\n' "$maxg"
+    fi
   fi
 } | tee "$REPORT"
 log "report: $REPORT"

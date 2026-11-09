@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""bcc_tracer.py — userspace half of the nginx x eBPF pair (BCC).
+"""bcc_tracer.py — userspace half of the eBPF (BCC) plugin, shared by every workload.
 
 Ported from the Platform S pipeline (docs/drafts/nginx-perf-pipeline-server/
 ebpf/bcc_tracer.py). Same probes, buffer and filter checks; three changes for
@@ -11,9 +11,12 @@ the laptop harness:
   * no bpf_stats arm (kernel.bpf_stats_enabled stays 0, see LESSONS), so no
     bpftool calls.
 
-Usage (from mech.sh):
-  bcc_tracer.py --scope narrow|wide --stats OUT --ready FILE --buffer-pages N
-                [--pids 1,2] [--cpus 0,2] [--summary-out FILE] --max-window S
+Usage (from common/mech/ebpf.sh):
+  bcc_tracer.py --scope narrow|wide --src PROBES.c --stats OUT --ready FILE
+                --buffer-pages N --max-window S
+                [--pids 1,2 | --devs MAJ:MIN,...] [--cpus 0,2] [--summary-out FILE]
+The probe file is the pair's (nginx_probes.c, fio_probes.c); everything
+else here is identical for every workload.
 """
 import argparse
 import ctypes
@@ -22,13 +25,15 @@ import signal
 import sys
 import time
 
-TRACED_CPUS_SLOTS = 1024          # BPF_ARRAY(traced_cpus, u8, 1024) in nginx_probes.c
+TRACED_CPUS_SLOTS = 1024          # BPF_ARRAY(traced_cpus, u8, 1024) in the probe files (nginx_probes.c, fio_probes.c)
 CTR_SUBMITTED, CTR_SUBMIT_FAIL, CTR_FILTERED, CTR_SECONDARY, CTR_SLOTS = 0, 1, 2, 3, 4
 
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--scope", required=True, choices=("narrow", "wide"))
+    p.add_argument("--src", required=True)
+    p.add_argument("--devs", default="")
     p.add_argument("--stats", required=True)
     p.add_argument("--ready", required=True)
     p.add_argument("--buffer-pages", required=True, type=int)
@@ -69,6 +74,36 @@ def check_cpus(cpus):
                              "as 'not traced'" % (cpu, TRACED_CPUS_SLOTS))
 
 
+MINORBITS = 20                    # kernel dev_t = major << 20 | minor
+
+
+def parse_dev_list(raw):
+    """'259:0,8:16' -> kernel dev_t values, as block tracepoints report them.
+    A malformed entry is a hard failure, never skipped."""
+    out = []
+    for piece in raw.split(","):
+        piece = piece.strip()
+        if not piece:
+            continue
+        parts = piece.split(":")
+        if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
+            raise SystemExit("bcc_tracer: --devs entry %r is not MAJOR:MINOR" % piece)
+        major, minor = int(parts[0]), int(parts[1])
+        if major >= 1 << 12 or minor >= 1 << MINORBITS:
+            raise SystemExit("bcc_tracer: --devs entry %r is out of dev_t range" % piece)
+        out.append((major << MINORBITS) | minor)
+    if not out:
+        raise SystemExit("bcc_tracer: --devs is empty; a filter matching nothing reads as "
+                         "'eBPF costs nothing'")
+    return out
+
+
+def check_narrow_filter(args):
+    """Narrow needs exactly one filter: worker PIDs (nginx) or devices (fio)."""
+    if args.scope == "narrow" and bool(args.pids) == bool(args.devs):
+        raise SystemExit("bcc_tracer: narrow needs exactly one of --pids or --devs")
+
+
 def kv_lines(pairs):
     """The harness's kv format; quotes are stripped from values as kv_put does."""
     return "".join("%s='%s'\n" % (k, str(v).replace("'", "")) for k, v in pairs)
@@ -97,7 +132,10 @@ class Tracer(object):
             from bcc import BPF
         except ImportError as exc:
             raise SystemExit("bcc_tracer: cannot import bcc (%s)" % exc)
-        src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nginx_probes.c")
+        check_narrow_filter(a)
+        src = a.src
+        if not os.path.isfile(src):
+            raise SystemExit("bcc_tracer: probe source %s not found" % src)
         cflag = "-DSCOPE_NARROW" if a.scope == "narrow" else "-DSCOPE_WIDE"
         bpf = BPF(src_file=src, cflags=[cflag])
         try:
@@ -130,7 +168,16 @@ class Tracer(object):
     def _populate_filter(self, bpf):
         """Write the scope filter and verify every entry took."""
         a = self.args
-        if a.scope == "narrow":
+        if a.scope == "narrow" and a.devs:
+            devs = parse_dev_list(a.devs)
+            table = bpf["target_devs"]
+            for dev in devs:
+                table[ctypes.c_uint(dev)] = ctypes.c_ubyte(1)
+            stored = sum(1 for _ in table.items())
+            if stored != len(devs):
+                raise SystemExit("bcc_tracer: %d devices asked, map holds %d" % (len(devs), stored))
+            self.filter_size = len(devs)
+        elif a.scope == "narrow":
             pids = parse_id_list(a.pids, "--pids")
             table = bpf["target_pids"]
             for pid in pids:

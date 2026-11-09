@@ -281,7 +281,7 @@ t_eq "matrix mode still skips drift" "matrix skips drift 0" "$(sed -n 6p "$T/cap
     cmp -s "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" && echo ok || echo "bad $m: $(diff "$T/sch_$m/schema.json" "$LAPTOP_ROOT/nginx-wrk2/$m/results/schema.json" | grep "^[<>]" | cut -c1-120 | tr "
 " " ")"
   done
-  source "$LAPTOP_ROOT/nginx-wrk2/collector/scripts/collector.env"
+  source "$LAPTOP_ROOT/common/mech/collector.env"
   mkdir -p "$T/sch_c"; _schema_freeze "$T/sch_c" collector >/dev/null 2>&1
   grep -q '"otelcol_version": "0.161.0"' "$T/sch_c/schema.json" && grep -q '"collector_scrape_interval_wide_s": 1,' "$T/sch_c/schema.json" && echo ok || echo "bad collector"
 ) > "$T/sch.out"
@@ -381,9 +381,23 @@ except SystemExit: pass
 try: t.check_cpus([0, 1024]); raise AssertionError("1024")
 except SystemExit: pass
 assert t.kv_lines([("A", 1), ("B", "x'"'"'y")]) == "A='"'"'1'"'"'\nB='"'"'xy'"'"'\n"
-a = t.parse_args(["--scope", "wide", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
-assert a.max_window == 9 and a.scope == "wide"
-print("ok")' "$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts" 2>&1)"
+a = t.parse_args(["--scope", "wide", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
+assert a.max_window == 9 and a.scope == "wide" and a.src == "p.c"
+import contextlib, io  # argparse prints its usage to stderr; the harness captures 2>&1
+try:
+    with contextlib.redirect_stderr(io.StringIO()): t.parse_args(["--scope", "wide", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"])
+    raise AssertionError("no --src")
+except SystemExit: pass
+assert t.parse_dev_list("259:0") == [259 << 20]
+assert t.parse_dev_list("259:1, 8:0") == [(259 << 20) | 1, 8 << 20]
+for bad in ("", "259", "a:b", "4096:0", "8:1048576"):
+    try: t.parse_dev_list(bad); raise AssertionError(bad)
+    except SystemExit: pass
+for argv in (["--pids", "1", "--devs", "8:0"], []):
+    try: t.check_narrow_filter(t.parse_args(["--scope", "narrow", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9"] + argv)); raise AssertionError(argv)
+    except SystemExit: pass
+t.check_narrow_filter(t.parse_args(["--scope", "narrow", "--src", "p.c", "--stats", "s", "--ready", "r", "--buffer-pages", "512", "--max-window", "9", "--devs", "8:0"]))
+print("ok")' "$LAPTOP_ROOT/common/mech" 2>&1)"
 fi
 
 # --- progress.sh (pure parts + a full cell with no console) ---
@@ -414,10 +428,49 @@ fi
   grep -q 'ABORTED: stage=x: boom' "$PROGRESS_FILE" && ok || bad "abort reason: $(cat "$PROGRESS_FILE")"
   echo "$NPASS $NFAIL" > "$T/pcount"
 )
-read -r NPASS NFAIL < "$T/pcount"
+read -r NPASS NFAIL < "$T/pcount" 2>/dev/null || bad "progress block aborted (no count file)"
+
+# --- optional workload hooks: absent = no change, present = included ---
+(
+  sd="$T/hook_schema"; mkdir -p "$sd/a" "$sd/b"
+  _schema_freeze "$sd/a" perf
+  wl_schema_json() { printf '  "hook_test": 1,\n'; }
+  _schema_freeze "$sd/b" perf
+  grep -q '"hook_test": 1,' "$sd/b/schema.json" && ok || bad "wl_schema_json line missing"
+  [[ $(grep -vc hook_test "$sd/b/schema.json") == $(wc -l < "$sd/a/schema.json" | tr -d ' ') ]] && ok || bad "hook changed other schema lines"
+  unset -f wl_schema_json
+  # wl_csv_columns absent: the column list is exactly the shared one (nginx)
+  _csv_cols
+  [[ "${CSV_COLS[*]}" == "${CSV_COLUMNS[*]}" ]] && ok || bad "no wl_csv_columns hook changed the columns"
+  # present: its columns follow the shared ones; capacity's bracket_verdict stays last
+  wl_csv_columns() { printf '%s\n' 'x_ms:X_MS:ms' 'y_count:Y_COUNT:I/Os'; }
+  _csv_cols
+  [[ "${CSV_COLS[*]}" == "${CSV_COLUMNS[*]} x_ms:wlcol:X_MS y_count:wlcol:Y_COUNT" ]] && ok || bad "wl_csv_columns order: ${CSV_COLS[*]: -3}"
+  CAPACITY=1 _csv_cols
+  [[ "${CSV_COLS[*]: -3}" == "x_ms:wlcol:X_MS y_count:wlcol:Y_COUNT bracket_verdict:verdict:VERDICT" ]] && ok || bad "capacity verdict not last"
+  CAPACITY=0
+  mkdir -p "$sd/c"; _schema_freeze "$sd/c" perf
+  grep -qxF '  "workload_column_units": {"x_ms": "ms", "y_count": "I/Os"},' "$sd/c/schema.json" && ok || bad "schema lacks workload_column_units"
+  grep -q '"y_count"\]$' "$sd/c/schema.json" && ok || bad "schema columns lack hook columns"
+  # malformed declarations die
+  wl_csv_columns() { echo 'Bad Name:X:ms'; };   t_die "hook: bad column name" _csv_cols
+  wl_csv_columns() { echo 'x_ms:X_MS'; };       t_die "hook: no unit" _csv_cols
+  wl_csv_columns() { echo 'p99_ms:P99_MS:ms'; }; t_die "hook: name clashes with a shared column" _csv_cols
+  wl_csv_columns() { echo 'x_ms:X_MS:m"s'; };   t_die "hook: quote in unit" _csv_cols
+  unset -f wl_csv_columns
+  echo "$NPASS $NFAIL" > "$T/hcount"
+)
+read -r NPASS NFAIL < "$T/hcount" 2>/dev/null || bad "hook block aborted (no count file)"
 
 # --- nginx x collector plugin (its own file; runs standalone too) ---
 source "$LAPTOP_ROOT/nginx-wrk2/collector/tests/test_mech.sh"
+
+# --- fio workload (own file and counters: it sources fio/workload.sh, whose
+# wl_* would replace nginx's in this shell) ---
+bash "$LAPTOP_ROOT/fio/tests/test_fio.sh" >/dev/null 2>&1 && ok || bad "fio/tests/test_fio.sh (run it alone for details)"
+if [[ -n $PY ]]; then
+  "$PY" -I "$LAPTOP_ROOT/fio/tests/test_fio_parse.py" >/dev/null 2>&1 && ok || bad "fio/tests/test_fio_parse.py (run it alone for details)"
+fi
 
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))

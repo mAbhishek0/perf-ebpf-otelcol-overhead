@@ -16,6 +16,8 @@ WL_DIR="${LAPTOP_ROOT}/nginx-wrk2"
 WRK2_THREADS=${WRK2_THREADS:-2}
 WRK2_CONNS=${WRK2_CONNS:-100}
 URL="http://127.0.0.1:${NGINX_PORT}/"
+WL_KNOBS="WRK2_THREADS WRK2_CONNS"                         # pilot.sh --set (and --threads/--conns)
+WL_PILOT_RATES="5000,10000,20000,40000,80000,120000"     # pilot.sh default --rates
 
 wl_preflight() {
   local u id
