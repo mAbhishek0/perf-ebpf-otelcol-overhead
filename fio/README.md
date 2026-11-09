@@ -50,7 +50,7 @@ fio adds six columns of its own. They come after all the shared columns, so the 
 
 - `fio_runtime_ms` (`FIO_RUNTIME_MS`): how long the measured part of the run lasted, in milliseconds. The parser refuses a run where this is more than 2 % away from the planned window.
 - `fio_total_ios` (`FIO_TOTAL_IOS`): how many I/Os fio completed in the measured window, as a count.
-- `fio_ramp_iops` (`FIO_RAMP_IOPS`): the I/Os per second of the warm-up part before the window. It is discarded from the results and kept only for the record.
+- `fio_ramp_iops` (`FIO_RAMP_IOPS`): the I/Os per second of the untraced ramp group (`RAMP_S`) before the window. It is discarded from the results and kept only for the record.
 - `fio_disk_reads_delta` (`FIO_DISK_READS_DELTA`): how many read requests the whole disk completed during the window, as a count. This includes reads by any program, not only fio.
 - `fio_disk_writes_delta` (`FIO_DISK_WRITES_DELTA`): the same for write requests. fio itself writes nothing, so this counts other programs' writes.
 - `gate_wait_s` (`GATE_WAIT_S`): how long the disk sat idle at the gate before the window, in seconds. It runs from the first job reaching the gate to the moment the harness lets the jobs go.

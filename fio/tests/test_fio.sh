@@ -178,6 +178,10 @@ t_die "fio column blank dies" _fio_bad "s/^FIO_TOTAL_IOS=.*/FIO_TOTAL_IOS=''/"
 t_die "fio column malformed dies" _fio_bad "s/^FIO_RAMP_IOPS=.*/FIO_RAMP_IOPS='fast'/"
 t_die "fio column negative dies" _fio_bad "s/^FIO_DISK_WRITES_DELTA=.*/FIO_DISK_WRITES_DELTA='-3'/"
 t_die "fio column NA dies" _fio_bad "s/^FIO_RUNTIME_MS=.*/FIO_RUNTIME_MS='NA'/"
+# a wl_csv_columns hook that exits non-zero makes collect die (not a silent short list)
+_hook_fails() { wl_csv_columns() { echo 'x_ms:X_MS:ms'; return 1; }; _csv_cols; }
+t_die "wl_csv_columns hook exits non-zero dies" _hook_fails
+unset -f _hook_fails
 
 # --- eBPF probe file: the shared parts are byte-identical to nginx's ---
 np="$LAPTOP_ROOT/nginx-wrk2/ebpf/scripts/nginx_probes.c"

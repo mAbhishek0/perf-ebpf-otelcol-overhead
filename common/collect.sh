@@ -59,19 +59,21 @@ LATE_KEYS=" IRQ_DEV_DELTA IRQ_TIMER_DELTA IRQ_IPI_DELTA IRQ_NMI_DELTA IRQ_PMI_DE
 # workload_column_units. This hook is the one place a workload column is
 # declared: the CSV header, the row and schema.json's columns all come from it.
 _csv_cols() {
-  local e names=" "
+  local e names=" " hook_out
   CSV_COLS=("${CSV_COLUMNS[@]}")
   WL_COL_UNITS=()
   if declare -F wl_csv_columns >/dev/null; then
     for e in "${CSV_COLUMNS[@]}"; do names+="${e%%:*} "; done
-    while IFS= read -r e; do
+    hook_out=$(wl_csv_columns) || die "wl_csv_columns failed"
+    # an empty hook output declares no columns (the loop is skipped)
+    [[ -n $hook_out ]] && while IFS= read -r e; do
       [[ $e =~ ^([a-z][a-z0-9_]*):([A-Z][A-Z0-9_]*):([^:\"]+)$ ]] \
         || die "wl_csv_columns: bad entry '$e' (want name:KEY:unit)"
       [[ $names == *" ${BASH_REMATCH[1]} "* ]] && die "wl_csv_columns: column ${BASH_REMATCH[1]} already exists"
       names+="${BASH_REMATCH[1]} "
       CSV_COLS+=("${BASH_REMATCH[1]}:wlcol:${BASH_REMATCH[2]}")
       WL_COL_UNITS+=("${BASH_REMATCH[1]}:${BASH_REMATCH[3]}")
-    done < <(wl_csv_columns)
+    done <<< "$hook_out"
   fi
   (( ${CAPACITY:-0} )) && CSV_COLS+=(bracket_verdict:verdict:VERDICT)
   return 0
@@ -108,6 +110,7 @@ collect() {
         elif [[ $LATE_KEYS == *" $key "* ]] && ! kv_has "$b/run_meta.env" RUN_SCHEMA; then val=NA
         else val=$(kv_get "$f" "$key") || die "collect: $b lacks $key"
         fi
+        # hook columns must be non-negative plain decimal numbers; a future text column needs this rule widened
         if [[ $src == wlcol && ! $val =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
           die "collect: $b $key='$val' is not a non-negative number"
         fi
