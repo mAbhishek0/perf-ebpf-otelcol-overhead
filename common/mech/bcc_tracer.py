@@ -17,8 +17,11 @@ Usage (from common/mech/ebpf.sh):
                 [--pids 1,2 | --devs MAJ:MIN,...] [--cpus 0,2] [--summary-out FILE]
                 [--uprobe BINARY:SYMBOL:FN]
 --uprobe (narrow only, at most once; added 2026-11-11 for redis, plan R13):
-attach the probe function FN of the BPF file to SYMBOL in BINARY, limited to
-the first --pids entry. Kprobes and tracepoints are auto-attached by BCC from
+attach the probe function FN of the BPF file to SYMBOL in BINARY
+with pid=-1 (decision 2026-11-11: with a pid libbcc may resolve the
+module inside that process's mount namespace, where a host path
+/proc/PID/root/... does not exist; the in-kernel target_pids filter still
+restricts records to the process). Kprobes and tracepoints are auto-attached by BCC from
 the function's name, but a uprobe needs a path and a symbol that the C file
 cannot know, so it is attached explicitly here. A failed attach is fatal and
 leaves the ready file unwritten. Without --uprobe nothing changes (nginx, fio).
@@ -236,7 +239,9 @@ class Tracer(object):
         BCC raises on a missing symbol or an unattachable path; either way
         the run must die here, before the ready file exists."""
         binary, symbol, fn = uprobe
-        pid = parse_id_list(self.args.pids, "--pids")[0] if self.args.pids else -1
+        # pid=-1 on purpose: the uprobe is on the binary's inode; the in-kernel
+        # target_pids filter restricts records to the process (see header).
+        pid = -1
         try:
             bpf.attach_uprobe(name=binary, sym=symbol, fn_name=fn, pid=pid)
         except Exception as exc:

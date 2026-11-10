@@ -24,7 +24,7 @@
 //
 // Attach: unlike the kprobes in nginx_probes.c, a uprobe is NOT auto-attached
 // from the function name. bcc_tracer.py attaches on_call to the symbol given
-// by --uprobe BINARY:SYMBOL:FN, restricted to the redis-server pid; the path
+// by --uprobe BINARY:SYMBOL:FN, attached with pid=-1 (the binary's inode, which only the bench-redis container runs; the target_pids filter below restricts records to the redis tgid); the path
 // is /proc/<pid>/root/usr/local/bin/redis-server because redis runs in a
 // container (redis-memtier/ebpf/scripts/mech.sh holds the constants).
 //
@@ -40,8 +40,8 @@
 //
 // Where the analogy to perf is imperfect (stated, not hidden):
 //   1. The pid filter runs in the kernel AFTER the probe fired, as in
-//      nginx_probes.c. CTR_FILTERED counts the discards. With a pid-limited
-//      uprobe this should stay near 0 in narrow.
+//      nginx_probes.c. CTR_FILTERED counts the discards. It is expected near 0
+//      in narrow because only redis runs that binary (to be confirmed by check.sh).
 //   2. perf narrow samples at 99 Hz; this uprobe fires once per command, and
 //      each hit is a user-to-kernel trap (about a microsecond or more). So
 //      the cost GROWS with the request rate. That is the measurement, not a
@@ -114,7 +114,7 @@ static inline int emit(void *ctx, u32 kind, u32 payload, u32 pid)
 BPF_HASH(target_pids, u32, u8, 64);
 
 // Attached by bcc_tracer.py (--uprobe), not auto-attached by name. The probe
-// is pid-limited at attach time too; this lookup is the same in-kernel filter
+// is not pid-limited at attach time (pid=-1); this lookup is the same in-kernel filter
 // nginx uses, kept so CTR_FILTERED means the same thing in every pair.
 int on_call(struct pt_regs *ctx)
 {

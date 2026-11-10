@@ -17,16 +17,29 @@ REDIS_UPROBE_SYMBOL=call
 # exactly $REDIS_UPROBE_SYMBOL. The binary is copied out of the image without
 # starting redis (docker create + cp + rm), so this works before the
 # workload's own preflight. The temporary container is always removed.
+# The work is in _redis_symcheck; this wrapper only guarantees cleanup on
+# every path, under set -euo pipefail, without a trap (the entry script owns
+# the EXIT trap). readelf writes to a FILE that awk then reads to the end: an
+# early-exit awk in a pipe would SIGPIPE readelf on a large symbol table, and
+# pipefail + set -e would kill the preflight even with the symbol present.
 ebpf_preflight_probes() {
-  local tmp cname=bench-redis-symcheck line
+  local tmp cname=bench-redis-symcheck
   command -v readelf >/dev/null 2>&1 || { pf_fail "readelf not found (apt install binutils)"; return 0; }
   tmp=$(mktemp -d)
   docker rm -f "$cname" >/dev/null 2>&1 || true        # a leftover from a killed earlier check
-  if docker create --name "$cname" "$REDIS_IMAGE" >/dev/null 2>&1 \
-     && docker cp "$cname:$REDIS_SERVER_BIN_IN_IMAGE" "$tmp/redis-server" >/dev/null 2>&1; then
-    line=$(readelf -sW "$tmp/redis-server" 2>/dev/null \
-           | awk -v s="$REDIS_UPROBE_SYMBOL" '$4=="FUNC" && $8==s {print $2 " size " $3; exit}')
+  _redis_symcheck "$tmp" "$cname" || true
+  docker rm -f "$cname" >/dev/null 2>&1 || true
+  rm -rf "$tmp"
+}
+
+_redis_symcheck() {
+  local tmp=$1 cname=$2 line
+  if docker create --name "$cname" "$REDIS_IMAGE" >/dev/null 2>&1      && docker cp "$cname:$REDIS_SERVER_BIN_IN_IMAGE" "$tmp/redis-server" >/dev/null 2>&1; then
+    readelf -sW "$tmp/redis-server" > "$tmp/symbols.txt" 2>/dev/null || true
+    # No exit in awk: it reads the whole file; first match only.
+    line=$(awk -v s="$REDIS_UPROBE_SYMBOL" '!d && $4=="FUNC" && $8==s {print $2 " size " $3; d=1}' "$tmp/symbols.txt" || true)
     if [[ -n $line ]]; then
+      # The address is only reported: BCC converts the symbol to a file offset itself (PIE binary).
       pf_ok "uprobe target $REDIS_UPROBE_SYMBOL: FUNC at 0x$line in $REDIS_IMAGE"
     else
       pf_fail "no FUNC symbol '$REDIS_UPROBE_SYMBOL' in $REDIS_IMAGE:$REDIS_SERVER_BIN_IN_IMAGE (stripped or renamed): use the fallback in redis_probes.c (processCommand, then tcp kprobes), as a labelled deviation"
@@ -34,8 +47,6 @@ ebpf_preflight_probes() {
   else
     pf_fail "cannot extract $REDIS_SERVER_BIN_IN_IMAGE from image $REDIS_IMAGE (docker create/cp failed)"
   fi
-  docker rm -f "$cname" >/dev/null 2>&1 || true
-  rm -rf "$tmp"
 }
 
 # The bundle's target_pids holds the redis-server PID (written by wl_start).

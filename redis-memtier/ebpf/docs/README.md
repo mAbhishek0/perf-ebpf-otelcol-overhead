@@ -47,6 +47,11 @@ the workload wrote to `target_pids`. It refuses to start if the PID is empty or 
 missing. The tracer attaches the uprobe itself (BCC does not attach uprobes from a function
 name as it does for kprobes) and fails, without writing the ready file, if the attach fails.
 
+The uprobe is attached to the binary itself (no pid), so it fires for every process that runs
+that file; the tgid filter in the BPF program keeps only redis. The symbol address that
+preflight prints is only reported: BCC converts the symbol to a file offset itself (the binary is
+PIE, position-independent).
+
 The binary path and the symbol are two constants at the top of `mech.sh`:
 `REDIS_SERVER_BIN_IN_IMAGE` and `REDIS_UPROBE_SYMBOL`.
 
@@ -70,7 +75,7 @@ and the event count would read low.
   with the request rate. That is the measurement, not a bug. Only drop-rate trends compare
   across mechanisms.
 - The filter runs in the kernel after the probe fired. The counter `EBPF_KERNEL_FILTERED` counts
-  the discards. With the probe limited to one process it should stay near zero in narrow.
+  the discards. It is expected to stay near zero in narrow, because only redis runs that binary. check.sh must confirm it.
 - `tracer_cpu_cores` is the Python poller only. The BPF program runs inside the redis thread
   that hit the probe, so its cost shows up in `workload_cpu_cores`. `kernel.bpf_stats_enabled`
   stays 0, as for every eBPF pair.

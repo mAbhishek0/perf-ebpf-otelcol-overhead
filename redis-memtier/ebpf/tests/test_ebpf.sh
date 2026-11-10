@@ -88,6 +88,26 @@ PF_FAILS=(); PATH="$NOREAD" ebpf_preflight_probes >/dev/null 2>&1
 t_eq "readelf missing: fails" 1 "${#PF_FAILS[@]}"
 [[ ${PF_FAILS[0]:-} == *readelf* ]] && ok || bad "missing readelf not named"
 
+# Large symbol table, match first, under the harness's set -euo pipefail: an
+# early-exit awk in a pipe would SIGPIPE readelf and abort the preflight.
+cat > "$STUB/docker" <<'SH'
+#!/usr/bin/env bash
+echo "docker $*" >> "$DOCKER_LOG"
+if [[ $1 == cp ]]; then echo ELF > "$3"; fi
+exit 0
+SH
+cat > "$STUB/readelf" <<'SH'
+#!/usr/bin/env bash
+echo "    41: 0000000000123456   812 FUNC    GLOBAL DEFAULT   14 call"
+yes "    99: 0000000000000000     8 FUNC    GLOBAL DEFAULT   14 filler_symbol_name_to_make_lines_long" | head -c 3000000
+exit 0
+SH
+: > "$DOCKER_LOG"
+( set -euo pipefail; PF_FAILS=(); PATH="$STUB:$PATH" ebpf_preflight_probes >"$T/pfbig.out" 2>&1
+  [[ ${#PF_FAILS[@]} -eq 0 ]] ) && ok || bad "large readelf output under set -euo pipefail failed the preflight"
+grep -q '0x0000000000123456 size 812' "$T/pfbig.out" && ok || bad "large readelf: symbol not reported"
+grep -q '^docker rm' "$DOCKER_LOG" && ok || bad "large readelf: docker rm not called"
+
 # --- narrow filter ---
 b="$T/bundle"; mkdir -p "$b"
 echo 4242 > "$b/target_pids"
