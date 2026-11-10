@@ -1,0 +1,66 @@
+11:54:24 [run|-] smoke cell: E1 narrow with 3 warm-ups (gate: do warm-ups 2-3 match A1?)
+11:54:30 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+11:54:30 [run|quiesce] progress shown on tty8 (blanking off)
+11:54:30 [run|preflight] preflight
+11:54:30 [run|preflight]   [ok]   on AC power
+11:54:30 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+11:54:30 [run|preflight]   [ok]   TLP not active
+11:54:30 [run|preflight]   [ok]   unattended-upgrades not active
+11:54:30 [run|preflight]   [ok]   no noisy processes
+11:54:30 [run|preflight]   [ok]   no graphical session
+11:54:30 [run|preflight]   package 60 °C > 55 °C — waiting up to 900s to cool
+11:54:39 [run|preflight]   cooled for 9s, now 55 °C
+11:54:39 [run|preflight]   [ok]   package 55 °C
+11:54:39 [run|preflight]   [ok]   52349 MB free
+11:54:39 [run|preflight]   [ok]   BPF JIT on
+11:54:39 [run|preflight]   [ok]   docker reachable
+11:54:39 [run|preflight]   [ok]   fio-3.41
+11:54:39 [run|preflight]   [ok]   fio engine libaio
+11:54:39 [run|preflight]   [ok]   data file /var/tmp/bench-fio/fio.dat (17179869184 bytes, prepared 2026-11-09T21:41:06+05:30)
+11:54:39 [run|preflight]   [ok]   fio target on nvme0n1
+11:54:39 [run|preflight]   [ok]   nvme0n1 non-rotational
+11:54:39 [run|preflight]   [ok]   nvme0n1 scheduler none
+11:54:39 [run|preflight]   [ok]   no fio running
+11:54:39 [run|preflight]   [ok]   /usr/bin/python3 for fio_parse.py
+11:54:39 [run|preflight]   [ok]   fio 4 jobs x iodepth 32
+11:54:39 [run|preflight]   [ok]   every ladder / pilot / capacity rate divides by 4 jobs
+11:54:39 [run|preflight]   [ok]   perf version 7.0.14
+11:54:39 [run|preflight] preflight passed
+11:54:40 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+11:54:40 [run|host setup] clock floor requested at 2900000 kHz
+11:54:40 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+11:54:40 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+11:54:44 [run|host setup] clock under load: 2894486 kHz (ok)
+11:54:44 [run|host setup] host configured
+11:55:14 [run|host setup] idle package temp 41 C (min of 15 samples over 30 s)
+11:55:16 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/smoke/provenance/20261110-115514_perf.env
+11:55:16 [run|host setup] ### fio x perf: level order 1
+11:55:16 [run|host setup] === cell L_fio_perf_narrow_E1 try 1 ===
+11:56:20 [run|L_fio_perf_narrow_E1 try 1 prep] run L_fio_perf_narrow_E1_try1_W1 (rate 4500, traced=0)
+11:56:20 [run|L_fio_perf_narrow_E1_try1_W1 cooldown] cooldown 0s -> start at 36 C (limit 46 C, idle 41 C)
+11:58:53 [run|L_fio_perf_narrow_E1_try1_W1 stop+parse] run L_fio_perf_narrow_E1_try1_W2 (rate 4500, traced=0)
+11:58:53 [run|L_fio_perf_narrow_E1_try1_W2 cooldown] cooldown 0s -> start at 37 C (limit 46 C, idle 41 C)
+12:01:26 [run|L_fio_perf_narrow_E1_try1_W2 stop+parse] run L_fio_perf_narrow_E1_try1_W3 (rate 4500, traced=0)
+12:01:26 [run|L_fio_perf_narrow_E1_try1_W3 cooldown] cooldown 0s -> start at 36 C (limit 46 C, idle 41 C)
+12:03:59 [run|L_fio_perf_narrow_E1_try1_W3 stop+parse] run L_fio_perf_narrow_E1_try1_A1 (rate 4500, traced=0)
+12:03:59 [run|L_fio_perf_narrow_E1_try1_A1 cooldown] cooldown 0s -> start at 36 C (limit 46 C, idle 41 C)
+12:06:32 [run|L_fio_perf_narrow_E1_try1_A1 stop+parse] run L_fio_perf_narrow_E1_try1_B1 (rate 4500, traced=1)
+12:06:32 [run|L_fio_perf_narrow_E1_try1_B1 cooldown] cooldown 0s -> start at 36 C (limit 46 C, idle 41 C)
+12:09:07 [run|L_fio_perf_narrow_E1_try1_B1 stop+parse] run L_fio_perf_narrow_E1_try1_B2 (rate 4500, traced=1)
+12:09:07 [run|L_fio_perf_narrow_E1_try1_B2 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:11:41 [run|L_fio_perf_narrow_E1_try1_B2 stop+parse] run L_fio_perf_narrow_E1_try1_B3 (rate 4500, traced=1)
+12:11:41 [run|L_fio_perf_narrow_E1_try1_B3 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:14:15 [run|L_fio_perf_narrow_E1_try1_B3 stop+parse] run L_fio_perf_narrow_E1_try1_B4 (rate 4500, traced=1)
+12:14:15 [run|L_fio_perf_narrow_E1_try1_B4 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:16:49 [run|L_fio_perf_narrow_E1_try1_B4 stop+parse] run L_fio_perf_narrow_E1_try1_B5 (rate 4500, traced=1)
+12:16:49 [run|L_fio_perf_narrow_E1_try1_B5 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:19:24 [run|L_fio_perf_narrow_E1_try1_B5 stop+parse] run L_fio_perf_narrow_E1_try1_B6 (rate 4500, traced=1)
+12:19:24 [run|L_fio_perf_narrow_E1_try1_B6 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:21:58 [run|L_fio_perf_narrow_E1_try1_B6 stop+parse] run L_fio_perf_narrow_E1_try1_A2 (rate 4500, traced=0)
+12:21:58 [run|L_fio_perf_narrow_E1_try1_A2 cooldown] cooldown 0s -> start at 35 C (limit 46 C, idle 41 C)
+12:24:31 [run|L_fio_perf_narrow_E1_try1_A2 stop+parse] cell L_fio_perf_narrow_E1 try 1 ok (p50 0.0000% <= 5.0000%, cpu 1.2430% <= 35.1726%)
+12:24:35 [run|collect fio perf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/smoke/fio_perf.csv
+12:24:35 [run|collect fio perf] no machine-state drift
+12:24:36 [run|host revert] host reverted
+12:25:07 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+12:25:07 [run|restore services] done
