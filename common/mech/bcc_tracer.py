@@ -15,6 +15,13 @@ Usage (from common/mech/ebpf.sh):
   bcc_tracer.py --scope narrow|wide --src PROBES.c --stats OUT --ready FILE
                 --buffer-pages N --max-window S
                 [--pids 1,2 | --devs MAJ:MIN,...] [--cpus 0,2] [--summary-out FILE]
+                [--uprobe BINARY:SYMBOL:FN]
+--uprobe (narrow only, at most once; added 2026-11-11 for redis, plan R13):
+attach the probe function FN of the BPF file to SYMBOL in BINARY, limited to
+the first --pids entry. Kprobes and tracepoints are auto-attached by BCC from
+the function's name, but a uprobe needs a path and a symbol that the C file
+cannot know, so it is attached explicitly here. A failed attach is fatal and
+leaves the ready file unwritten. Without --uprobe nothing changes (nginx, fio).
 The probe file is the pair's (nginx_probes.c, fio_probes.c); everything
 else here is identical for every workload.
 """
@@ -41,7 +48,29 @@ def parse_args(argv=None):
     p.add_argument("--cpus", default="")
     p.add_argument("--summary-out", default="")
     p.add_argument("--max-window", required=True, type=int)
+    p.add_argument("--uprobe", action="append", default=None, metavar="BINARY:SYMBOL:FN")
     return p.parse_args(argv)
+
+
+def parse_uprobe(raw):
+    """'BINARY:SYMBOL:FN' -> (binary, symbol, fn). Split from the right, so a
+    colon inside the path survives; an empty part is a hard failure, since an
+    uprobe attached to nothing would read as 'eBPF costs nothing'."""
+    parts = raw.rsplit(":", 2)
+    if len(parts) != 3 or not all(part.strip() for part in parts):
+        raise SystemExit("bcc_tracer: --uprobe %r is not BINARY:SYMBOL:FN" % raw)
+    return parts[0], parts[1], parts[2]
+
+
+def check_uprobe_args(args):
+    """Returns the parsed uprobe or None; refuses uses that cannot work."""
+    if not args.uprobe:
+        return None
+    if len(args.uprobe) > 1:
+        raise SystemExit("bcc_tracer: --uprobe may be given only once")
+    if args.scope != "narrow":
+        raise SystemExit("bcc_tracer: --uprobe is for narrow scope only")
+    return parse_uprobe(args.uprobe[0])
 
 
 def parse_id_list(raw, what):
@@ -133,6 +162,9 @@ class Tracer(object):
         except ImportError as exc:
             raise SystemExit("bcc_tracer: cannot import bcc (%s)" % exc)
         check_narrow_filter(a)
+        uprobe = check_uprobe_args(a)
+        if uprobe is not None and not os.path.exists(uprobe[0]):
+            raise SystemExit("bcc_tracer: uprobe binary %s not found" % uprobe[0])
         src = a.src
         if not os.path.isfile(src):
             raise SystemExit("bcc_tracer: probe source %s not found" % src)
@@ -140,6 +172,8 @@ class Tracer(object):
         bpf = BPF(src_file=src, cflags=[cflag])
         try:
             self._populate_filter(bpf)
+            if uprobe is not None:
+                self._attach_uprobe(bpf, uprobe)
             bpf["events"].open_perf_buffer(self.on_event, page_cnt=a.buffer_pages,
                                            lost_cb=self.on_lost)
             self._handle_signals()
@@ -196,6 +230,20 @@ class Tracer(object):
                 if table[ctypes.c_int(cpu)].value != 1:
                     raise SystemExit("bcc_tracer: traced_cpus[%d] did not read back as 1" % cpu)
             self.filter_size = len(cpus)
+
+    def _attach_uprobe(self, bpf, uprobe):
+        """After the filter is filled, so no event can pass an empty filter.
+        BCC raises on a missing symbol or an unattachable path; either way
+        the run must die here, before the ready file exists."""
+        binary, symbol, fn = uprobe
+        pid = parse_id_list(self.args.pids, "--pids")[0] if self.args.pids else -1
+        try:
+            bpf.attach_uprobe(name=binary, sym=symbol, fn_name=fn, pid=pid)
+        except Exception as exc:
+            raise SystemExit("bcc_tracer: cannot attach uprobe %s:%s -> %s (pid %s): %s"
+                             % (binary, symbol, fn, pid, exc))
+        print("bcc_tracer: uprobe attached: %s:%s -> %s (pid %s)" % (binary, symbol, fn, pid),
+              flush=True)
 
     def _handle_signals(self):
         def stop(signum, _frame):

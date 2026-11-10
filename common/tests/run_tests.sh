@@ -494,6 +494,9 @@ if [[ -n $PY ]]; then
   "$PY" -I "$LAPTOP_ROOT/redis-memtier/tests/test_memtier_parse.py" >/dev/null 2>&1 && ok || bad "redis-memtier/tests/test_memtier_parse.py (run it alone for details)"
 fi
 
+# --- redis x eBPF plugin (own process: its mech.sh defines mech_* too) ---
+bash "$LAPTOP_ROOT/redis-memtier/ebpf/tests/test_ebpf.sh" >/dev/null 2>&1 && ok || bad "redis-memtier/ebpf/tests/test_ebpf.sh (run it alone for details)"
+
 # --- redis x collector plugin (own process: its mech.sh redefines mech_stats etc.) ---
 bash "$LAPTOP_ROOT/redis-memtier/collector/tests/test_mech.sh" >/dev/null 2>&1 && ok || bad "redis-memtier/collector/tests/test_mech.sh (run it alone for details)"
 
