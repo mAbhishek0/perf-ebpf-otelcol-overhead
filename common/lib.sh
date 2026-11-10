@@ -59,6 +59,11 @@ sysw() {
 # Arithmetic on decimals (bash has none).
 calc() { awk "BEGIN{ printf \"%.6f\", $* }"; }
 pct_diff() { awk -v a="$1" -v b="$2" 'BEGIN{ m=(a+b)/2; if (m==0) {print 0; exit} d=a-b; if (d<0) d=-d; printf "%.4f", 100*d/m }'; }
+# cpu_drift_limit A1 A2 FLOOR_CORES PCT -> the CPU drift limit in percent:
+# max(PCT, FLOOR_CORES as a percent of mean(A1, A2)), the same mean pct_diff
+# uses. So a cell passes if A1 and A2 differ by at most PCT percent OR by at
+# most FLOOR_CORES cores. FLOOR_CORES=0 gives the plain PCT (nginx).
+cpu_drift_limit() { awk -v a="$1" -v b="$2" -v f="$3" -v p="$4" 'BEGIN{ m=(a+b)/2; l=(m>0) ? 100*f/m : 0; printf "%.4f", (l>p ? l : p) }'; }
 # rel_spread v1 v2 ...  — (max - min) / mean x 100; 0 when the mean is 0.
 rel_spread() { printf '%s\n' "$@" | awk 'NR==1{mn=mx=$1} {s+=$1; if($1<mn)mn=$1; if($1>mx)mx=$1} END{m=s/NR; printf "%.4f", (m ? 100*(mx-mn)/m : 0)}'; }
 # rel_spread_trimmed v1 v2 ...  — drop the lowest and highest value (when there

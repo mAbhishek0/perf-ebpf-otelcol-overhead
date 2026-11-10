@@ -151,6 +151,7 @@ mkdir -p "$T/s"
 LADDER="1:10000" _schema_freeze "$T/s" perf
 grep -q '"fio_numjobs": 4' "$T/s/schema.json" && ok || bad "schema lacks fio_numjobs"
 grep -q '"fio_rw": "randread"' "$T/s/schema.json" && ok || bad "schema lacks fio_rw"
+grep -q '"fio_gate_min_s": 2.0, "drift_lat_key": "P50_MS", "drift_cpu_floor_cores": 0.044' "$T/s/schema.json" && ok || bad "schema lacks the fio drift and gate settings"
 
 # --- workload CSV columns (wl_csv_columns): after the shared columns, values from wl.env ---
 FIO_COLS='"fio_runtime_ms","fio_total_ios","fio_ramp_iops","fio_disk_reads_delta","fio_disk_writes_delta","gate_wait_s"'

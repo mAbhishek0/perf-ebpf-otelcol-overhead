@@ -63,6 +63,11 @@ t_eq "shuffle permutation" "1 2 3 4 5 6 " "$(sort <<<"$a" | tr '\n' ' ')"
 t_eq "pct_diff" 9.5238 "$(pct_diff 100 110)"
 t_eq "pct_diff symmetric" "$(pct_diff 110 100)" "$(pct_diff 100 110)"
 t_eq "pct_diff equal" 0.0000 "$(pct_diff 5 5)"
+# --- cpu_drift_limit (fio CPU floor) ---
+t_eq "cpu limit no floor = pct" 5.0000 "$(cpu_drift_limit 1.0 1.1 0 5)"
+t_eq "cpu limit floor wins at low CPU" 35.2000 "$(cpu_drift_limit 0.12 0.13 0.044 5)"
+t_eq "cpu limit pct wins at high CPU" 5.0000 "$(cpu_drift_limit 1.0 1.0 0.044 5)"
+t_eq "cpu limit zero mean" 5.0000 "$(cpu_drift_limit 0 0 0.044 5)"
 # --- rel_spread (p99 drift calibration) ---
 t_eq "rel_spread" 20.0000 "$(rel_spread 0.9 1.0 1.1)"
 t_eq "rel_spread flat" 0.0000 "$(rel_spread 2 2 2)"

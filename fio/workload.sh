@@ -209,11 +209,19 @@ wl_ramp() {
 }
 
 wl_measure() {
-  local b=$2 pid rc=0 t_go
+  local b=$2 pid rc=0 t_go w
   pid=$(cat "$b/fio_pid")
   echo "$pid" > "$b/pids.gen"          # fio is its own generator (header)
   cat "/sys/block/$FIO_DEV/stat" > "$b/diskstat_before.txt"
+  # Equal gate wait (FIO_GATE_MIN_S): hold the go until the oldest ready
+  # marker is that old, so traced and untraced windows follow the same idle
+  # time. A slower tracer attach than that shows up as a larger GATE_WAIT_S.
   t_go=$(date +%s%N)
+  w=$(_fio_gate_wait_s "$b" "$t_go")
+  if gt "$FIO_GATE_MIN_S" "$w"; then
+    sleep "$(awk -v m="$FIO_GATE_MIN_S" -v w="$w" 'BEGIN{ printf "%.3f", m - w }')"
+    t_go=$(date +%s%N)
+  fi
   : > "$b/go"
   _fio_gate_wait_s "$b" "$t_go" > "$b/gate_wait_s"   # dies, rather than leave a blank
   wait "$pid" || rc=$?
@@ -310,4 +318,6 @@ wl_schema_json() {
     "$FIO_ENGINE" "$FIO_RW" "$FIO_BS" "$FIO_NUMJOBS" "$FIO_IODEPTH"
   printf '  "fio_file_bytes": %s, "fio_randseed": %s, "fio_cell_trim": %s, "fio_cell_idle_s": %s,\n' \
     "$FIO_FILE_BYTES" "$FIO_RANDSEED" "$FIO_CELL_TRIM" "$FIO_CELL_IDLE_S"
+  printf '  "fio_gate_min_s": %s, "drift_lat_key": "%s", "drift_cpu_floor_cores": %s,
+'     "$FIO_GATE_MIN_S" "$DRIFT_LAT_KEY" "$DRIFT_CPU_FLOOR_CORES"
 }
