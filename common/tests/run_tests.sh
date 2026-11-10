@@ -494,5 +494,8 @@ if [[ -n $PY ]]; then
   "$PY" -I "$LAPTOP_ROOT/redis-memtier/tests/test_memtier_parse.py" >/dev/null 2>&1 && ok || bad "redis-memtier/tests/test_memtier_parse.py (run it alone for details)"
 fi
 
+# --- redis x collector plugin (own process: its mech.sh redefines mech_stats etc.) ---
+bash "$LAPTOP_ROOT/redis-memtier/collector/tests/test_mech.sh" >/dev/null 2>&1 && ok || bad "redis-memtier/collector/tests/test_mech.sh (run it alone for details)"
+
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))
