@@ -1,0 +1,64 @@
+# redis workload — implementation plan (2026-11-11)
+
+Branch `redis` (from master `e812358`). Written overnight while fio block 2 ran on the laptop, so **nothing here has run on hardware**. Every decision below that depends on the laptop has a named check that confirms or overturns it before the matrix (section 4).
+
+Follow the fio pattern exactly: `docs/plans/2026-11-09-fio-implementation.md` (structure), `fio/workload.sh` (hooks), `nginx-wrk2/workload.sh` (docker workload with a network load generator — redis is closest to nginx). Read `LESSONS.md` and `laptop/CLAUDE.md` before changing anything. Never copy engine logic into a pair folder.
+
+## 1. Decisions, each with its reason
+
+PLAN.md decisions 3.5 (memtier at a fixed rate) and 3.6 (scopes) already fix the shape. These are the open details, decided here.
+
+| # | Decision | Reason |
+|---|---|---|
+| R1 | **One redis server, default threading** (`io-threads` 1), container `redis:7.4` pinned by image id, `--network host`, `--cgroup-parent bench.slice`, `--cpuset-cpus WORKLOAD_CPUS`. | Default single-threaded redis is how redis is normally deployed, and it saturates near one core, so the ladder can reach saturation inside the main matrix (PLAN 3.2). Same container setup as nginx, so the cgroup CPU accounting and networking are already proven. |
+| R2 | **Persistence off:** `--save "" --appendonly no`. Also `--protected-mode no --bind 127.0.0.1 --port 6379`. | No fork, no background disk writes. fio showed how disk activity disturbs baselines; a background save would land in some windows and not others. |
+| R3 | **Data set:** 1,000,000 keys (`memtier-1` … `memtier-1000000`), 32-byte values, loaded before every run with memtier itself (`--ratio=1:0 --key-pattern=P:P -n allkeys`), then checked with `DBSIZE` (must equal the key count). | Every GET then hits (a miss is a different code path). ~100 MB, larger than the 16 MB L3, so the run is not cache-resident. A fresh container per run (as nginx) keeps runs independent; preload is a few seconds. memtier's own preload splits key ranges per client; `DBSIZE` catches any gap. |
+| R4 | **Traffic:** memtier defaults made explicit — `--ratio=1:10` (SET:GET), `--key-pattern=R:R`, `--data-size=32`, `--pipeline=1`, `--distinct-client-seed`, no `--randomize`. | Defaults are what other papers report. Without `--randomize` the seed is a constant, so runs are deterministic. `--distinct-client-seed` gives each connection its own (deterministic) key stream, so 50 connections do not request the same keys in lock-step. |
+| R5 | **Generator:** `memtier_benchmark` 2.5.2 (pinned, preflight checks), `--threads 2` (one per GEN CPU), `--clients 25` per thread = 50 connections; pilot knobs `MEMTIER_THREADS`, `MEMTIER_CLIENTS`. Pinned with `taskset -c GEN_CPUS`; its PID goes to `pids.gen` (`loadgen_cpu_cores`). | Same generator placement as wrk2. 50 connections matches the order of wrk2's 100 while keeping per-connection rates whole. |
+| R6 | **Rate rule:** total rate ÷ (threads × clients) must be a whole multiple of 50 per second; preflight refuses any ladder, pilot or capacity rate that is not (as fio's divisibility check). With 50 connections, rates are multiples of 2500. | memtier 2.5.2 refills each connection's budget every 20 ms (ceil(rate/50) requests per tick); any per-connection rate that is not a multiple of 50 comes out slightly low (75/s gives 74/s). A multiple of 50 makes the rate exact. Consequence, stated in the README: requests leave in small bursts every 20 ms per connection, not evenly spaced. |
+| R7 | **Ramp and window are two memtier processes** (ramp `RAMP_S`, then window `STEADY_S`, `--test-time`), as wrk2. Between them, **an equal idle gap of at least `REDIS_GAP_MIN_S` = 2.0 s in every run**, traced or not; the actual gap is a CSV column `gap_s`. | fio showed perf attach takes ~1.2–1.4 s and eBPF up to 2.4 s, so without a floor traced windows open after a longer idle than untraced ones (fio timeline 42). Equal from the start, not retrofitted. |
+| R8 | **Latency comes from memtier's JSON** (`--json-out-file`, `--print-percentiles 50,99,99.9`): `ALL STATS → Totals → Ops/sec`, `Percentile Latencies → p50.000/p99.000/p99.900` (ms), `Max Latency`, `Connection Errors`, `Count`. Parsed by `redis-memtier/memtier_parse.py` (stdlib, `python3 -I`), as fio_parse.py. | JSON keys verified in memtier 2.5.2's `run_stats.cpp`. memtier exits 0 even after connection errors, so `ERRORS` = `Connection Errors`, never the exit code alone. |
+| R9 | **Coordinated omission:** memtier measures latency from the actual send time, not the scheduled time. Stated as a limitation in the README (tails near saturation are understated); not corrected. | Verified in `shard_connection.cpp`. Matches PLAN 3.5's expectation. |
+| R10 | **redis's own counts over the window**, read with `redis-cli INFO stats` just before and just after the window: `redis_cmds_delta` (`total_commands_processed`), `redis_misses_delta` (`keyspace_misses`). | Like fio's whole-disk counts: an independent count of the work done, and a check that GETs hit (misses should be 0). The two INFO calls and the collector's own INFO scrapes are counted too; that is a few hundred commands against millions, stated. |
+| R11 | **Drift check:** nginx's rule (p99, 5 %, no CPU floor) by default, overridable in `redis.env` (`DRIFT_LAT_KEY`, `DRIFT_CPU_FLOOR_CORES`). | redis is a network workload like nginx. fio needed p50 and a CPU floor because of NVMe interrupt noise and histogram steps; redis has neither. **Laptop check:** the smoke cell. If it fails on untraced noise, recalibrate from its untraced runs exactly as fio did (timeline 42) before any matrix. |
+| R12 | **perf:** narrow `-p` the redis-server PID (all its threads) at 99 Hz; wide unchanged (workload CPUs, 999 Hz + `perf trace`). | PLAN 3.6. |
+| R13 | **eBPF narrow: uprobe on redis's `call()`**, filtered in-kernel to the redis-server PID (tgid). One event per executed command. Wide: the shared raw_syscalls program, byte-identical to nginx's and fio's. The binary is reached through `/proc/<pid>/root/usr/local/bin/redis-server`. | `call()` is where redis counts `stat_numcommands`, once per executed command (redis 7.4 `server.c`); `processCommand` misses commands run inside EXEC or scripts (none here, but `call` is the exact unit). The docker-library build does not strip the binary. **Risk:** redis builds with LTO at -O3, so a copy of `call` could be inlined into a caller and some commands never hit the probe. **Laptop check:** `check.sh` reports eBPF narrow events per command (`MECH_EVENTS ÷ redis_cmds_delta`); it must be about 1.0 (as fio's 2.00 per I/O). Preflight refuses if the image's binary has no `call` FUNC symbol. Fallback if the check fails: `processCommand` (one per received command); second fallback: nginx's tcp kprobes filtered by redis PID — a labelled deviation either way. |
+| R14 | **Collector:** narrow = receiver `redis` (INFO all) every 15 s; wide = `redis` + `hostmetrics` (8 scrapers) every 1 s; `collector_want` narrow `1 0`, wide `2 8` — same shape as nginx. `mech_sanity` requires redis points accepted > 0 in both scopes, hostmetrics > 0 in wide. | PLAN 3.6. redisreceiver is in otelcol-contrib 0.161.0; plain TCP is its default (`tls.insecure` defaults true). ~30–40 points per scrape (estimate; `check.sh` measures). |
+| R15 | **Extra CSV columns** (`wl_csv_columns`, after the shared ones): `memtier_runtime_ms`, `memtier_ops`, `memtier_ramp_ops_per_sec`, `redis_cmds_delta`, `redis_misses_delta`, `gap_s`. Constants frozen into redis's `schema.json` (`wl_schema_json`): image, threads, clients, ratio, key count, data size, key pattern, pipeline, gap, drift key and floor. | Same mechanism as fio; nginx and fio schemas stay byte-identical (gate: 0 changed files). |
+| R16 | **Pilot:** `pilot.sh redis` (add redis to its case, and to the generator check, which today is nginx-only). Default rates `25000,50000,100000,150000,200000,250000`. The suggested ladder rounds to a multiple of the workload's rate step (new optional hook `wl_rate_step`, redis: threads × clients × 50; default 1000 keeps nginx and fio unchanged). | PLAN 3.2: the top must reach saturation or drop onset. The report already shows generator CPU, so it tells whether memtier or redis saturates first. |
+
+Not decided here (the user's call, after the pilot): the frozen ladder; whether memtier's 2 cores are enough at the top rate.
+
+## 2. Files
+
+```
+config.env                        + REDIS_IMAGE, REDIS_IMAGE_ID (sha256:4fa24486…, README tools table), REDIS_PORT=6379, REDIS_CONTAINER=bench-redis, MEMTIER_BIN
+redis-memtier/redis.env           constants of R2–R11 (`:=` defaults, as fio.env)
+redis-memtier/workload.sh         wl_* and the four hooks + wl_rate_step
+redis-memtier/memtier_parse.py    JSON -> KEY=value lines (THROUGHPUT, P50_MS, P99_MS, P999_MS, MAX_MS, ERRORS, MEMTIER_RUNTIME_MS, MEMTIER_OPS)
+redis-memtier/check.sh            as fio/check.sh: E-lowest and E-highest, untraced + narrow + wide per mech; reports events per command
+redis-memtier/README.md           as fio/README.md sections 1–6
+redis-memtier/{perf,ebpf,collector}/scripts/{run.sh,mech.sh}, docs/README.md
+redis-memtier/ebpf/scripts/redis_probes.c
+redis-memtier/collector/scripts/otelcol_scraper_{narrow,wide}.yaml.template
+redis-memtier/tests/test_redis.sh, test_memtier_parse.py, fixtures/memtier_synthetic.json
+common/mech/bcc_tracer.py         + optional --uprobe BINARY:SYMBOL:FN (narrow only); nginx/fio paths untouched
+pilot.sh                          + redis; wl_rate_step rounding; generator check for redis
+common/tests/run_tests.sh         + runs the redis suite as one test (as fio)
+```
+
+## 3. Tasks (each: implement, `bash -n`, unit tests, WSL gate, commit, review)
+
+1. **Workload core.** config.env, redis.env, workload.sh, memtier_parse.py (+ synthetic fixture shaped exactly like memtier 2.5.2's JSON, marked synthetic), unit tests, pilot.sh support, run_tests.sh hook. wl_start: docker run, wait for `PING`→`PONG`, preload, check DBSIZE, find the cgroup (as nginx), write `target_pids` (redis-server PID from `docker inspect`), `cgroup_path`. wl_ramp: memtier for RAMP_S, then record the ramp end time. wl_measure: sleep to reach REDIS_GAP_MIN_S since ramp end, INFO before, memtier window (PID to pids.gen), INFO after. wl_preflight: memtier version, image id, port free, redis-cli present, python, rate rule (R6).
+2. **perf and collector pairs.** Thin wrappers as nginx's; collector templates (non-comment lines identical to nginx's except the receiver), `collector_status_url` / `collector_precheck` adapted (redis PING through redis-cli), `mech_sanity` per receiver; test as nginx's `test_mech.sh`.
+3. **eBPF pair.** `--uprobe` in bcc_tracer.py; redis_probes.c (narrow: uprobe, record + counters + emit path identical to nginx_probes.c's; wide: copy of the shared wide program, byte-identical); `ebpf_preflight_probes` (extract the image binary with `docker create` + `docker cp` to a temp dir, `readelf -sW` must show FUNC `call`); `ebpf_narrow_filter` (`--pids` redis PID + `--uprobe /proc/PID/root/usr/local/bin/redis-server:call:on_call`). Test that nginx and fio tracer invocations are unchanged.
+4. **check.sh and documents.** check.sh; redis/README.md; three pair READMEs; laptop README timeline entry 47 and CLAUDE.md State (written by the lead, not the implementer).
+
+## 4. Hardware steps, in order (after fio block 2 is pushed; never while a matrix runs)
+
+1. `git pull`, `sudo bash install_build.sh` is not needed (memtier 2.5.2 and redis:7.4 are installed); confirm with `memtier_benchmark --version` and `docker image inspect --format '{{.Id}}' redis:7.4`.
+2. **Symbol check (R13):** `sudo bash redis-memtier/check.sh` runs preflight first; or by hand: `docker create --name t redis:7.4 && docker cp t:/usr/local/bin/redis-server /tmp/rs && docker rm t && readelf -sW /tmp/rs | awk '$4=="FUNC" && $8=="call"'`.
+3. `sudo bash pilot.sh redis` (~1 h), read `redis-memtier/pilot/pilot_report.txt`, choose the ladder together, write `redis-memtier/pilot.env`.
+4. `sudo bash redis-memtier/check.sh` (~15 min): eBPF narrow events per command ≈ 1.0 (R13), misses 0 (R3/R10), collector points per scrape, drops at the top rate. Copy one real memtier JSON to `redis-memtier/tests/fixtures/memtier_L.json` with a test.
+5. `sudo bash run_workload.sh redis --mech perf --smoke`; warm-ups 2–3 match A1; drift rule holds (R11).
+6. Matrices: block 1 per mechanism, then block 2 (`--block 2`), one mechanism per session.
