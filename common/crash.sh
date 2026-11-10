@@ -43,6 +43,7 @@ crash_report() {
     [[ -n ${BENCH_LOG:-} ]] && _sec "tail -n 50 '$BENCH_LOG'" 50
     _sec "docker ps -a"
     _sec "docker logs --tail 100 $NGINX_CONTAINER" 100
+    _sec "docker logs --tail 100 ${REDIS_CONTAINER:-bench-redis}" 100
     _sec "dmesg -T | tail -n 60" 60
     _sec "cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost"
     _sec "grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq"

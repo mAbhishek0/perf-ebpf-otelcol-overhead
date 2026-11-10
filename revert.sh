@@ -11,6 +11,7 @@ source "$LAPTOP_ROOT/common/progress.sh"
 LOG_TAG=revert
 need_root
 docker rm -f "$NGINX_CONTAINER" >/dev/null 2>&1 || true
+docker rm -f "${REDIS_CONTAINER:-bench-redis}" >/dev/null 2>&1 || true   # redis runs leave bench-redis (pinned, port 6379) after a crash
 host_revert
 give_back
 quiet_off         # undoes a diag_stall.sh "quiet" variant cut short
