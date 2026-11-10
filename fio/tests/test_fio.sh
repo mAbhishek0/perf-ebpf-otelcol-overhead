@@ -79,6 +79,8 @@ cp "$LAPTOP_ROOT/fio/tests/fixtures/fio_synthetic.json" "$b/fio.json"
 echo "1000 0 8000 50 200 0 1600 70 0 900 120 0 0 0 0 0 0" > "$b/diskstat_before.txt"
 echo "6001000 0 48008000 300000 230 0 1840 80 0 120900 300120 0 0 0 0 0 0" > "$b/diskstat_after.txt"
 echo 0.412 > "$b/gate_wait_s"
+echo 41850 > "$b/disktemp_before.txt"
+echo 44000 > "$b/disktemp_after.txt"
 if [[ -n $PY ]]; then
   ( wl_parse "$b" ) && ok || bad "wl_parse failed"
   t_eq "parse throughput" 49998.50 "$(kv_get "$b/wl.env" THROUGHPUT)"
@@ -86,6 +88,17 @@ if [[ -n $PY ]]; then
   t_eq "disk reads delta" 6000000 "$(kv_get "$b/wl.env" FIO_DISK_READS_DELTA)"
   t_eq "disk writes delta" 30 "$(kv_get "$b/wl.env" FIO_DISK_WRITES_DELTA)"
   t_eq "gate wait in wl.env" 0.412 "$(kv_get "$b/wl.env" GATE_WAIT_S)"
+  t_eq "drive temp at start" 41.9 "$(kv_get "$b/wl.env" FIO_DISK_TEMP_START_C)"
+  t_eq "drive temp at end" 44.0 "$(kv_get "$b/wl.env" FIO_DISK_TEMP_END_C)"
+  rm -f "$b/disktemp_after.txt"
+  t_die "wl_parse without an end drive temp" wl_parse "$b"
+  echo "" > "$b/disktemp_after.txt"
+  t_die "wl_parse blank drive temp" wl_parse "$b"
+  echo "-1000" > "$b/disktemp_after.txt"
+  t_die "wl_parse negative drive temp" wl_parse "$b"
+  echo "hot" > "$b/disktemp_before.txt"; echo 44000 > "$b/disktemp_after.txt"
+  t_die "wl_parse malformed start drive temp" wl_parse "$b"
+  echo 41850 > "$b/disktemp_before.txt"
   cp "$b/diskstat_after.txt" "$b/ds_ok"
   echo "garbage" > "$b/diskstat_after.txt"
   t_die "wl_parse bad disk reads" wl_parse "$b"
@@ -143,6 +156,22 @@ pv="$T/prov.env"; : > "$pv"
 for k in KERNEL_CONFIG_IRQ_TIME_ACCOUNTING KERNEL_CMDLINE NVME_DEFAULT_PS_MAX_LATENCY_US; do
   kv_has "$pv" "$k" && [[ -n "$(kv_get "$pv" "$k")" ]] && ok || bad "provenance lacks or blanks $k"
 done
+# drive temperature sensor lookup, on a fake sysfs tree
+fs="$T/sysfs"
+mkdir -p "$fs/block/nvme0n1/device/hwmon3" "$fs/class/nvme/nvme1/hwmon5"
+echo 38850 > "$fs/block/nvme0n1/device/hwmon3/temp1_input"
+echo 40000 > "$fs/class/nvme/nvme1/hwmon5/temp1_input"
+t_eq "temp sensor under the block device" "$fs/block/nvme0n1/device/hwmon3/temp1_input" "$(FIO_SYSFS=$fs _fio_temp_input nvme0n1)"
+t_eq "temp sensor via the controller class" "$fs/class/nvme/nvme1/hwmon5/temp1_input" "$(FIO_SYSFS=$fs _fio_temp_input nvme1n1)"
+( FIO_SYSFS=$fs _fio_temp_input nvme2n1 >/dev/null ) && bad "temp sensor found for a missing drive" || ok
+_fio_temp_mc "$fs/block/nvme0n1/device/hwmon3/temp1_input"; t_eq "read millidegrees" 38850 "$REPLY"
+t_eq "millidegrees to degrees C, half rounds up" 38.9 "$(_fio_mc_to_c 38850)"
+t_eq "millidegrees to degrees C, rounds down" 38.8 "$(_fio_mc_to_c 38849)"
+t_eq "zero millidegrees" 0.0 "$(_fio_mc_to_c 0)"
+t_die "temp from a missing file dies" _fio_temp_mc "$fs/none"
+for k in FIO_DEVICE_TEMP_INPUT; do
+  kv_has "$pv" "$k" && [[ -n "$(kv_get "$pv" "$k")" ]] && ok || bad "provenance lacks or blanks $k"
+done
 v=$(_fio_irq_config); [[ $v == unknown || $v == *CONFIG_IRQ_TIME_ACCOUNTING* ]] && ok || bad "irq config line: $v"
 v=$(_fio_nvme_ps_latency); [[ $v == unknown || $v =~ ^[0-9]+$ ]] && ok || bad "nvme ps latency: $v"
 
@@ -154,7 +183,7 @@ grep -q '"fio_rw": "randread"' "$T/s/schema.json" && ok || bad "schema lacks fio
 grep -q '"fio_gate_min_s": 2.0, "drift_lat_key": "P50_MS", "drift_cpu_floor_cores": 0.044' "$T/s/schema.json" && ok || bad "schema lacks the fio drift and gate settings"
 
 # --- workload CSV columns (wl_csv_columns): after the shared columns, values from wl.env ---
-FIO_COLS='"fio_runtime_ms","fio_total_ios","fio_ramp_iops","fio_disk_reads_delta","fio_disk_writes_delta","gate_wait_s"'
+FIO_COLS='"fio_runtime_ms","fio_total_ios","fio_ramp_iops","fio_disk_reads_delta","fio_disk_writes_delta","gate_wait_s","fio_disk_temp_start_c","fio_disk_temp_end_c"'
 _fio_bundle() {  # RD ROLE -> one fio bundle with every shared key, wl.env from the fixture
   local rd=$1 role=$2 id b col name src key val
   id=$(run_id fio perf narrow 1 1 "$role"); b="$rd/raw/$id"; mkdir -p "$b/samples"
@@ -179,10 +208,10 @@ RD="$T/fcsv"; mkdir -p "$RD/raw"; _fio_bundle "$RD" A1 >/dev/null
 _fio_collect "$RD" && ok || bad "fio collect failed"
 csv="$RD/fio_perf.csv"
 shared=""; for c in "${CSV_COLUMNS[@]}"; do shared+="${shared:+,}\"${c%%:*}\""; done
-t_eq "fio header = shared columns then the six fio columns" "$shared,$FIO_COLS" "$(head -1 "$csv")"
-t_eq "fio row values" '"120000","1200000","9999.50","1200123","42","0.731"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
-grep -q "\"gate_wait_s\"\]" "$RD/schema.json" && ok || bad "schema columns lack the fio columns"
-t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"fio_runtime_ms": "ms", "fio_total_ios": "I/Os", "fio_ramp_iops": "IOPS", "fio_disk_reads_delta": "completed requests", "fio_disk_writes_delta": "completed requests", "gate_wait_s": "s"},'
+t_eq "fio header = shared columns then the eight fio columns" "$shared,$FIO_COLS" "$(head -1 "$csv")"
+t_eq "fio row values" '"120000","1200000","9999.50","1200123","42","0.731","41.9","44.0"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
+grep -q "\"fio_disk_temp_end_c\"\]" "$RD/schema.json" && ok || bad "schema columns lack the fio columns"
+t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"fio_runtime_ms": "ms", "fio_total_ios": "I/Os", "fio_ramp_iops": "IOPS", "fio_disk_reads_delta": "completed requests", "fio_disk_writes_delta": "completed requests", "gate_wait_s": "s", "fio_disk_temp_start_c": "degC", "fio_disk_temp_end_c": "degC"},'
 # restat path: a second collect (what restat.sh runs, after sourcing workload.sh) reproduces the row
 cp "$csv" "$T/fcsv_first.csv"
 _fio_collect "$RD" && cmp -s "$csv" "$T/fcsv_first.csv" && ok || bad "re-collect did not reproduce the fio CSV"
@@ -194,6 +223,7 @@ _fio_bad() {  # SED_EXPR -> collect on a fresh dir whose wl.env was edited
   _fio_collect "$rd"
 }
 t_die "fio column missing dies" _fio_bad '/^GATE_WAIT_S=/d'
+t_die "drive temp column missing dies" _fio_bad '/^FIO_DISK_TEMP_END_C=/d'
 t_die "fio column blank dies" _fio_bad "s/^FIO_TOTAL_IOS=.*/FIO_TOTAL_IOS=''/"
 t_die "fio column malformed dies" _fio_bad "s/^FIO_RAMP_IOPS=.*/FIO_RAMP_IOPS='fast'/"
 t_die "fio column negative dies" _fio_bad "s/^FIO_DISK_WRITES_DELTA=.*/FIO_DISK_WRITES_DELTA='-3'/"

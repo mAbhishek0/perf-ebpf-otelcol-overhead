@@ -44,6 +44,32 @@ FIO_IODEPTH=${FIO_IODEPTH:-32}
 WL_KNOBS="FIO_NUMJOBS FIO_IODEPTH"                          # pilot.sh --set
 WL_PILOT_RATES="10000,25000,50000,100000,150000,200000"    # pilot.sh default --rates (IOPS)
 FIO_DEV=${FIO_DEV:-}
+FIO_SYSFS=${FIO_SYSFS:-/sys}      # sysfs root; the unit tests point it at a fake tree
+FIO_TEMP_INPUT=${FIO_TEMP_INPUT:-}
+
+# _fio_temp_input DEV -> path of the drive's composite temperature (NVMe hwmon
+# temp1_input, millidegrees C). The drive's own sensor, not the CPU package's:
+# common/cooldown.sh gates on the CPU, so this is the only record of disk heat.
+_fio_temp_input() {
+  local f
+  for f in "$FIO_SYSFS"/block/"$1"/device/hwmon*/temp1_input "$FIO_SYSFS"/class/nvme/"${1%n[0-9]*}"/hwmon*/temp1_input; do
+    [[ -r $f ]] && { printf '%s' "$f"; return 0; }
+  done
+  return 1
+}
+
+# _fio_temp_mc FILE -> the millidegrees in FILE; dies unless FILE holds one
+# non-negative integer. Call it directly, never inside $(...): a die there
+# would end only the subshell and leave a blank value behind.
+_fio_temp_mc() {
+  local v
+  v=$(cat "$1" 2>/dev/null || true)
+  [[ $v =~ ^[0-9]+$ ]] || die "drive temperature '$v' in $1 is not a non-negative integer (millidegrees C)"
+  REPLY=$v
+}
+# _fio_mc_to_c MILLIDEGREES -> degrees C, one decimal, half rounded up in
+# integer arithmetic (awk's %.1f would round 41850 to 41.8 via binary floats).
+_fio_mc_to_c() { local t=$(( ($1 + 50) / 100 )); printf '%d.%d' $(( t / 10 )) $(( t % 10 )); }
 
 # _fio_device -> whole-disk name under FIO_DIR (nvme0n1p6 -> nvme0n1)
 _fio_device() {
@@ -165,6 +191,13 @@ wl_preflight() {
   FIO_DEV=$dev
   [[ "$(cat "/sys/block/$dev/queue/rotational" 2>/dev/null)" == 0 ]] && pf_ok "$dev non-rotational" \
     || pf_fail "$dev rotational or unreadable"
+  local tin tv
+  if tin=$(_fio_temp_input "$dev") && tv=$(cat "$tin" 2>/dev/null) && [[ $tv =~ ^[0-9]+$ ]]; then
+    FIO_TEMP_INPUT=$tin
+    pf_ok "$dev temperature $(_fio_mc_to_c "$tv") °C ($tin)"
+  else
+    pf_fail "$dev temperature unreadable (no hwmon temp1_input under /sys/block/$dev/device or /sys/class/nvme)"
+  fi
   sched=$(cat "/sys/block/$dev/queue/scheduler" 2>/dev/null || echo unreadable)
   [[ $sched == *"[none]"* ]] && pf_ok "$dev scheduler none" || pf_fail "$dev scheduler '$sched' (probed: [none])"
   if pgrep -x fio >/dev/null 2>&1; then pf_fail "a fio process is already running"; else pf_ok "no fio running"; fi
@@ -212,7 +245,9 @@ wl_measure() {
   local b=$2 pid rc=0 t_go w
   pid=$(cat "$b/fio_pid")
   echo "$pid" > "$b/pids.gen"          # fio is its own generator (header)
+  [[ -n $FIO_TEMP_INPUT ]] || FIO_TEMP_INPUT=$(_fio_temp_input "$FIO_DEV") || die "$FIO_DEV temperature unreadable"
   cat "/sys/block/$FIO_DEV/stat" > "$b/diskstat_before.txt"
+  cat "$FIO_TEMP_INPUT" > "$b/disktemp_before.txt"
   # Equal gate wait (FIO_GATE_MIN_S): hold the go until the oldest ready
   # marker is that old, so traced and untraced windows follow the same idle
   # time. A slower tracer attach than that shows up as a larger GATE_WAIT_S.
@@ -226,6 +261,7 @@ wl_measure() {
   _fio_gate_wait_s "$b" "$t_go" > "$b/gate_wait_s"   # dies, rather than leave a blank
   wait "$pid" || rc=$?
   cat "/sys/block/$FIO_DEV/stat" > "$b/diskstat_after.txt"
+  cat "$FIO_TEMP_INPUT" > "$b/disktemp_after.txt"
   rm -f "$b/pids.gen"
   (( rc == 0 )) || die "fio exited $rc (see $b/fio.log)"
 }
@@ -238,16 +274,22 @@ wl_parse() {
     || die "cannot parse $b/fio.json: $(cat "$b/fio_parse.err")"
   # Whole-disk reads and writes completed during the window (/sys/block/<dev>/stat
   # fields 1 and 5): fio's I/O plus anyone else's, e.g. the harness's own writes.
-  local rd wr gw
+  local rd wr gw t0 t1
   rd=$(awk 'NR==FNR{r=$1; next} {print $1-r}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")
   wr=$(awk 'NR==FNR{w=$5; next} {print $5-w}' "$b/diskstat_before.txt" "$b/diskstat_after.txt")
   [[ $rd =~ ^[0-9]+$ ]] || die "disk reads delta '$rd' is not a non-negative integer (see $b/diskstat_*.txt)"
   [[ $wr =~ ^[0-9]+$ ]] || die "disk writes delta '$wr' is not a non-negative integer (see $b/diskstat_*.txt)"
   gw=$(cat "$b/gate_wait_s" 2>/dev/null || true)
   [[ $gw =~ ^[0-9]+\.[0-9]+$ ]] || die "no gate wait in $b/gate_wait_s (got '$gw')"
+  # Drive temperature just before the go and just after fio exits: the window's
+  # start and end. Read once each (the sampler does not poll it).
+  _fio_temp_mc "$b/disktemp_before.txt"; t0=$(_fio_mc_to_c "$REPLY")
+  _fio_temp_mc "$b/disktemp_after.txt";  t1=$(_fio_mc_to_c "$REPLY")
   kv_put "$e.partial" FIO_DISK_READS_DELTA "$rd"
   kv_put "$e.partial" FIO_DISK_WRITES_DELTA "$wr"
   kv_put "$e.partial" GATE_WAIT_S "$gw"
+  kv_put "$e.partial" FIO_DISK_TEMP_START_C "$t0"
+  kv_put "$e.partial" FIO_DISK_TEMP_END_C "$t1"
   mv "$e.partial" "$e"
 }
 
@@ -287,6 +329,15 @@ wl_provenance() {
   kv_put "$f" FIO_DEVICE_MODEL "$(_prov_cmd cat "/sys/block/$d/device/model")"
   kv_put "$f" FIO_DEVICE_FIRMWARE "$(_prov_cmd cat "/sys/block/$d/device/firmware_rev")"
   kv_put "$f" FIO_DEVICE_SCHEDULER "$(_prov_cmd cat "/sys/block/$d/queue/scheduler")"
+  # The drive's temperature sensor and its throttle thresholds (millidegrees C;
+  # NA when absent), so a reader can tell how close a run came to throttling.
+  local tin; tin=$(_fio_temp_input "$d" 2>/dev/null) || tin=""
+  kv_put "$f" FIO_DEVICE_TEMP_INPUT "${tin:-NA}"
+  if [[ -n $tin ]]; then
+    kv_put "$f" FIO_DEVICE_TEMP_LABEL "$(_prov_cmd cat "${tin%_input}_label")"
+    kv_put "$f" FIO_DEVICE_TEMP_MAX_MC "$(_prov_cmd cat "${tin%_input}_max")"
+    kv_put "$f" FIO_DEVICE_TEMP_CRIT_MC "$(_prov_cmd cat "${tin%_input}_crit")"
+  fi
   # IRQ time accounting decides whether interrupt time (the eBPF narrow
   # completion probe) reaches workload_cpu_cores; tsc=noirqtime turns it off at
   # run time. The NVMe power-state latency limit gates deep idle states.
@@ -303,6 +354,8 @@ wl_provenance() {
 #   fio_disk_reads_delta  whole-disk reads completed during the window, by anyone
 #   fio_disk_writes_delta whole-disk writes completed during the window, by anyone
 #   gate_wait_s           oldest ready.* marker to go: how long the disk sat idle
+#   fio_disk_temp_start_c drive's own temperature just before the go (NVMe hwmon)
+#   fio_disk_temp_end_c   drive's own temperature just after fio exits
 wl_csv_columns() {
   printf '%s\n' \
     'fio_runtime_ms:FIO_RUNTIME_MS:ms' \
@@ -310,7 +363,7 @@ wl_csv_columns() {
     'fio_ramp_iops:FIO_RAMP_IOPS:IOPS' \
     'fio_disk_reads_delta:FIO_DISK_READS_DELTA:completed requests' \
     'fio_disk_writes_delta:FIO_DISK_WRITES_DELTA:completed requests' \
-    'gate_wait_s:GATE_WAIT_S:s'
+    'gate_wait_s:GATE_WAIT_S:s'     'fio_disk_temp_start_c:FIO_DISK_TEMP_START_C:degC'     'fio_disk_temp_end_c:FIO_DISK_TEMP_END_C:degC'
 }
 
 wl_schema_json() {
