@@ -1,0 +1,30 @@
+# fio job — rendered per run by fio/workload.sh; do not edit.
+[global]
+ioengine=libaio
+direct=1
+rw=randread
+bs=4k
+filename=/var/tmp/bench-fio/fio.dat
+size=17179869184
+thread
+numjobs=4
+iodepth=32
+rate_iops=2250
+randrepeat=1
+randseed=20261014
+norandommap
+time_based
+group_reporting
+cpus_allowed=0,2,4,6
+cpus_allowed_policy=split
+lat_percentiles=1
+clat_percentiles=0
+percentile_list=50:99:99.9
+
+[ramp]
+runtime=30
+
+[measure]
+stonewall
+runtime=120
+exec_prerun=/bin/sh /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/raw/L_fio_perf_narrow_E2_try1_B1/gate.sh

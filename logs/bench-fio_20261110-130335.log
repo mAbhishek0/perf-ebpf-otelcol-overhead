@@ -1,0 +1,211 @@
+13:03:50 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+13:03:50 [run|quiesce] progress shown on tty8 (blanking off)
+13:03:50 [run|preflight] preflight
+13:03:50 [run|preflight]   [ok]   on AC power
+13:03:50 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+13:03:50 [run|preflight]   [ok]   TLP not active
+13:03:50 [run|preflight]   [ok]   unattended-upgrades not active
+13:03:50 [run|preflight]   [ok]   no noisy processes
+13:03:50 [run|preflight]   [ok]   no graphical session
+13:03:50 [run|preflight]   package 62 °C > 55 °C — waiting up to 900s to cool
+13:03:55 [run|preflight]   cooled for 5s, now 55 °C
+13:03:55 [run|preflight]   [ok]   package 55 °C
+13:03:55 [run|preflight]   [ok]   52347 MB free
+13:03:55 [run|preflight]   [ok]   BPF JIT on
+13:03:55 [run|preflight]   [ok]   docker reachable
+13:03:55 [run|preflight]   [ok]   fio-3.41
+13:03:55 [run|preflight]   [ok]   fio engine libaio
+13:03:55 [run|preflight]   [ok]   data file /var/tmp/bench-fio/fio.dat (17179869184 bytes, prepared 2026-11-09T21:41:06+05:30)
+13:03:55 [run|preflight]   [ok]   fio target on nvme0n1
+13:03:55 [run|preflight]   [ok]   nvme0n1 non-rotational
+13:03:55 [run|preflight]   [ok]   nvme0n1 temperature 33.9 °C (/sys/block/nvme0n1/device/hwmon3/temp1_input)
+13:03:55 [run|preflight]   [ok]   nvme0n1 scheduler none
+13:03:55 [run|preflight]   [ok]   no fio running
+13:03:55 [run|preflight]   [ok]   /usr/bin/python3 for fio_parse.py
+13:03:55 [run|preflight]   [ok]   fio 4 jobs x iodepth 32
+13:03:55 [run|preflight]   [ok]   every ladder / pilot / capacity rate divides by 4 jobs
+13:03:55 [run|preflight]   [ok]   perf version 7.0.14
+13:03:55 [run|preflight] preflight passed
+13:03:55 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+13:03:56 [run|host setup] clock floor requested at 2900000 kHz
+13:03:56 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+13:03:56 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+13:04:00 [run|host setup] clock under load: 2894497 kHz (ok)
+13:04:00 [run|host setup] host configured
+13:04:30 [run|host setup] idle package temp 37 C (min of 15 samples over 30 s)
+13:04:31 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/provenance/20261110-130430_perf.env
+13:04:31 [run|host setup] ### fio x perf: level order 2 3 1 4
+13:04:31 [run|host setup] === cell L_fio_perf_narrow_E2 try 1 ===
+13:05:32 [run|L_fio_perf_narrow_E2 try 1 prep] run L_fio_perf_narrow_E2_try1_W1 (rate 9000, traced=0)
+13:05:32 [run|L_fio_perf_narrow_E2_try1_W1 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+13:08:05 [run|L_fio_perf_narrow_E2_try1_W1 stop+parse] run L_fio_perf_narrow_E2_try1_A1 (rate 9000, traced=0)
+13:08:05 [run|L_fio_perf_narrow_E2_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:10:38 [run|L_fio_perf_narrow_E2_try1_A1 stop+parse] run L_fio_perf_narrow_E2_try1_B1 (rate 9000, traced=1)
+13:10:38 [run|L_fio_perf_narrow_E2_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:13:12 [run|L_fio_perf_narrow_E2_try1_B1 stop+parse] run L_fio_perf_narrow_E2_try1_B2 (rate 9000, traced=1)
+13:13:12 [run|L_fio_perf_narrow_E2_try1_B2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:15:47 [run|L_fio_perf_narrow_E2_try1_B2 stop+parse] run L_fio_perf_narrow_E2_try1_B3 (rate 9000, traced=1)
+13:15:47 [run|L_fio_perf_narrow_E2_try1_B3 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:18:21 [run|L_fio_perf_narrow_E2_try1_B3 stop+parse] run L_fio_perf_narrow_E2_try1_B4 (rate 9000, traced=1)
+13:18:21 [run|L_fio_perf_narrow_E2_try1_B4 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:20:55 [run|L_fio_perf_narrow_E2_try1_B4 stop+parse] run L_fio_perf_narrow_E2_try1_B5 (rate 9000, traced=1)
+13:20:55 [run|L_fio_perf_narrow_E2_try1_B5 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:23:29 [run|L_fio_perf_narrow_E2_try1_B5 stop+parse] run L_fio_perf_narrow_E2_try1_B6 (rate 9000, traced=1)
+13:23:29 [run|L_fio_perf_narrow_E2_try1_B6 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:26:04 [run|L_fio_perf_narrow_E2_try1_B6 stop+parse] run L_fio_perf_narrow_E2_try1_A2 (rate 9000, traced=0)
+13:26:04 [run|L_fio_perf_narrow_E2_try1_A2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+13:28:37 [run|L_fio_perf_narrow_E2_try1_A2 stop+parse] cell L_fio_perf_narrow_E2 try 1 ok (p50 0.0000% <= 5.0000%, cpu 11.8094% <= 17.9374%)
+13:28:40 [run|collect fio perf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+13:28:40 [run|collect fio perf] === cell L_fio_perf_wide_E2 try 1 ===
+13:29:41 [run|L_fio_perf_wide_E2 try 1 prep] run L_fio_perf_wide_E2_try1_W1 (rate 9000, traced=0)
+13:29:41 [run|L_fio_perf_wide_E2_try1_W1 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+13:32:14 [run|L_fio_perf_wide_E2_try1_W1 stop+parse] run L_fio_perf_wide_E2_try1_A1 (rate 9000, traced=0)
+13:32:14 [run|L_fio_perf_wide_E2_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:34:47 [run|L_fio_perf_wide_E2_try1_A1 stop+parse] run L_fio_perf_wide_E2_try1_B1 (rate 9000, traced=1)
+13:34:47 [run|L_fio_perf_wide_E2_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+13:37:22 [run|L_fio_perf_wide_E2_try1_B1 stop+parse] run L_fio_perf_wide_E2_try1_B2 (rate 9000, traced=1)
+13:37:22 [run|L_fio_perf_wide_E2_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+13:39:58 [run|L_fio_perf_wide_E2_try1_B2 stop+parse] run L_fio_perf_wide_E2_try1_B3 (rate 9000, traced=1)
+13:39:58 [run|L_fio_perf_wide_E2_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+13:42:33 [run|L_fio_perf_wide_E2_try1_B3 stop+parse] run L_fio_perf_wide_E2_try1_B4 (rate 9000, traced=1)
+13:42:33 [run|L_fio_perf_wide_E2_try1_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+13:45:09 [run|L_fio_perf_wide_E2_try1_B4 stop+parse] run L_fio_perf_wide_E2_try1_B5 (rate 9000, traced=1)
+13:45:09 [run|L_fio_perf_wide_E2_try1_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+13:47:44 [run|L_fio_perf_wide_E2_try1_B5 stop+parse] run L_fio_perf_wide_E2_try1_B6 (rate 9000, traced=1)
+13:47:44 [run|L_fio_perf_wide_E2_try1_B6 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+13:50:20 [run|L_fio_perf_wide_E2_try1_B6 stop+parse] run L_fio_perf_wide_E2_try1_A2 (rate 9000, traced=0)
+13:50:20 [run|L_fio_perf_wide_E2_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+13:52:53 [run|L_fio_perf_wide_E2_try1_A2 stop+parse] cell L_fio_perf_wide_E2 try 1 ok (p50 0.9009% <= 5.0000%, cpu 8.3219% <= 16.6681%)
+13:53:00 [run|collect fio perf] collect: 16 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+13:53:00 [run|collect fio perf] === cell L_fio_perf_narrow_E3 try 1 ===
+13:54:01 [run|L_fio_perf_narrow_E3 try 1 prep] run L_fio_perf_narrow_E3_try1_W1 (rate 18000, traced=0)
+13:54:01 [run|L_fio_perf_narrow_E3_try1_W1 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+13:56:34 [run|L_fio_perf_narrow_E3_try1_W1 stop+parse] run L_fio_perf_narrow_E3_try1_A1 (rate 18000, traced=0)
+13:56:34 [run|L_fio_perf_narrow_E3_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+13:59:07 [run|L_fio_perf_narrow_E3_try1_A1 stop+parse] run L_fio_perf_narrow_E3_try1_B1 (rate 18000, traced=1)
+13:59:07 [run|L_fio_perf_narrow_E3_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+14:01:42 [run|L_fio_perf_narrow_E3_try1_B1 stop+parse] run L_fio_perf_narrow_E3_try1_B2 (rate 18000, traced=1)
+14:01:42 [run|L_fio_perf_narrow_E3_try1_B2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:04:16 [run|L_fio_perf_narrow_E3_try1_B2 stop+parse] run L_fio_perf_narrow_E3_try1_B3 (rate 18000, traced=1)
+14:04:16 [run|L_fio_perf_narrow_E3_try1_B3 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:06:51 [run|L_fio_perf_narrow_E3_try1_B3 stop+parse] run L_fio_perf_narrow_E3_try1_B4 (rate 18000, traced=1)
+14:06:51 [run|L_fio_perf_narrow_E3_try1_B4 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:09:25 [run|L_fio_perf_narrow_E3_try1_B4 stop+parse] run L_fio_perf_narrow_E3_try1_B5 (rate 18000, traced=1)
+14:09:25 [run|L_fio_perf_narrow_E3_try1_B5 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:11:59 [run|L_fio_perf_narrow_E3_try1_B5 stop+parse] run L_fio_perf_narrow_E3_try1_B6 (rate 18000, traced=1)
+14:12:00 [run|L_fio_perf_narrow_E3_try1_B6 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:14:34 [run|L_fio_perf_narrow_E3_try1_B6 stop+parse] run L_fio_perf_narrow_E3_try1_A2 (rate 18000, traced=0)
+14:14:34 [run|L_fio_perf_narrow_E3_try1_A2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:17:07 [run|L_fio_perf_narrow_E3_try1_A2 stop+parse] cell L_fio_perf_narrow_E3 try 1 ok (p50 0.0000% <= 5.0000%, cpu 4.3684% <= 8.4140%)
+14:17:19 [run|collect fio perf] collect: 24 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+14:17:19 [run|collect fio perf] === cell L_fio_perf_wide_E3 try 1 ===
+14:18:19 [run|L_fio_perf_wide_E3 try 1 prep] run L_fio_perf_wide_E3_try1_W1 (rate 18000, traced=0)
+14:18:19 [run|L_fio_perf_wide_E3_try1_W1 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+14:20:52 [run|L_fio_perf_wide_E3_try1_W1 stop+parse] run L_fio_perf_wide_E3_try1_A1 (rate 18000, traced=0)
+14:20:52 [run|L_fio_perf_wide_E3_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+14:23:25 [run|L_fio_perf_wide_E3_try1_A1 stop+parse] run L_fio_perf_wide_E3_try1_B1 (rate 18000, traced=1)
+14:23:25 [run|L_fio_perf_wide_E3_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+14:26:01 [run|L_fio_perf_wide_E3_try1_B1 stop+parse] run L_fio_perf_wide_E3_try1_B2 (rate 18000, traced=1)
+14:26:01 [run|L_fio_perf_wide_E3_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+14:28:36 [run|L_fio_perf_wide_E3_try1_B2 stop+parse] run L_fio_perf_wide_E3_try1_B3 (rate 18000, traced=1)
+14:28:37 [run|L_fio_perf_wide_E3_try1_B3 cooldown] cooldown 1s -> start at 39 C (limit 42 C, idle 37 C)
+14:31:12 [run|L_fio_perf_wide_E3_try1_B3 stop+parse] run L_fio_perf_wide_E3_try1_B4 (rate 18000, traced=1)
+14:31:12 [run|L_fio_perf_wide_E3_try1_B4 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+14:33:47 [run|L_fio_perf_wide_E3_try1_B4 stop+parse] run L_fio_perf_wide_E3_try1_B5 (rate 18000, traced=1)
+14:33:48 [run|L_fio_perf_wide_E3_try1_B5 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+14:36:23 [run|L_fio_perf_wide_E3_try1_B5 stop+parse] run L_fio_perf_wide_E3_try1_B6 (rate 18000, traced=1)
+14:36:23 [run|L_fio_perf_wide_E3_try1_B6 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+14:38:59 [run|L_fio_perf_wide_E3_try1_B6 stop+parse] run L_fio_perf_wide_E3_try1_A2 (rate 18000, traced=0)
+14:38:59 [run|L_fio_perf_wide_E3_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+14:41:32 [run|L_fio_perf_wide_E3_try1_A2 stop+parse] cell L_fio_perf_wide_E3 try 1 ok (p50 0.0000% <= 5.0000%, cpu 3.9591% <= 8.3087%)
+14:41:47 [run|collect fio perf] collect: 32 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+14:41:47 [run|collect fio perf] === cell L_fio_perf_narrow_E1 try 1 ===
+14:42:47 [run|L_fio_perf_narrow_E1 try 1 prep] run L_fio_perf_narrow_E1_try1_W1 (rate 4500, traced=0)
+14:42:48 [run|L_fio_perf_narrow_E1_try1_W1 cooldown] cooldown 1s -> start at 35 C (limit 42 C, idle 37 C)
+14:45:21 [run|L_fio_perf_narrow_E1_try1_W1 stop+parse] run L_fio_perf_narrow_E1_try1_A1 (rate 4500, traced=0)
+14:45:21 [run|L_fio_perf_narrow_E1_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+14:47:54 [run|L_fio_perf_narrow_E1_try1_A1 stop+parse] run L_fio_perf_narrow_E1_try1_B1 (rate 4500, traced=1)
+14:47:54 [run|L_fio_perf_narrow_E1_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+14:50:29 [run|L_fio_perf_narrow_E1_try1_B1 stop+parse] run L_fio_perf_narrow_E1_try1_B2 (rate 4500, traced=1)
+14:50:29 [run|L_fio_perf_narrow_E1_try1_B2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:53:03 [run|L_fio_perf_narrow_E1_try1_B2 stop+parse] run L_fio_perf_narrow_E1_try1_B3 (rate 4500, traced=1)
+14:53:03 [run|L_fio_perf_narrow_E1_try1_B3 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:55:37 [run|L_fio_perf_narrow_E1_try1_B3 stop+parse] run L_fio_perf_narrow_E1_try1_B4 (rate 4500, traced=1)
+14:55:38 [run|L_fio_perf_narrow_E1_try1_B4 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+14:58:12 [run|L_fio_perf_narrow_E1_try1_B4 stop+parse] run L_fio_perf_narrow_E1_try1_B5 (rate 4500, traced=1)
+14:58:12 [run|L_fio_perf_narrow_E1_try1_B5 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+15:00:46 [run|L_fio_perf_narrow_E1_try1_B5 stop+parse] run L_fio_perf_narrow_E1_try1_B6 (rate 4500, traced=1)
+15:00:46 [run|L_fio_perf_narrow_E1_try1_B6 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+15:03:21 [run|L_fio_perf_narrow_E1_try1_B6 stop+parse] run L_fio_perf_narrow_E1_try1_A2 (rate 4500, traced=0)
+15:03:21 [run|L_fio_perf_narrow_E1_try1_A2 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+15:05:54 [run|L_fio_perf_narrow_E1_try1_A2 stop+parse] cell L_fio_perf_narrow_E1 try 1 ok (p50 0.0000% <= 5.0000%, cpu 31.9144% <= 41.4840%)
+15:06:13 [run|collect fio perf] collect: 40 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+15:06:13 [run|collect fio perf] === cell L_fio_perf_wide_E1 try 1 ===
+15:07:13 [run|L_fio_perf_wide_E1 try 1 prep] run L_fio_perf_wide_E1_try1_W1 (rate 4500, traced=0)
+15:07:14 [run|L_fio_perf_wide_E1_try1_W1 cooldown] cooldown 1s -> start at 35 C (limit 42 C, idle 37 C)
+15:09:47 [run|L_fio_perf_wide_E1_try1_W1 stop+parse] run L_fio_perf_wide_E1_try1_A1 (rate 4500, traced=0)
+15:09:47 [run|L_fio_perf_wide_E1_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:12:20 [run|L_fio_perf_wide_E1_try1_A1 stop+parse] run L_fio_perf_wide_E1_try1_B1 (rate 4500, traced=1)
+15:12:20 [run|L_fio_perf_wide_E1_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:14:56 [run|L_fio_perf_wide_E1_try1_B1 stop+parse] run L_fio_perf_wide_E1_try1_B2 (rate 4500, traced=1)
+15:14:56 [run|L_fio_perf_wide_E1_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+15:17:31 [run|L_fio_perf_wide_E1_try1_B2 stop+parse] run L_fio_perf_wide_E1_try1_B3 (rate 4500, traced=1)
+15:17:31 [run|L_fio_perf_wide_E1_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+15:20:07 [run|L_fio_perf_wide_E1_try1_B3 stop+parse] run L_fio_perf_wide_E1_try1_B4 (rate 4500, traced=1)
+15:20:07 [run|L_fio_perf_wide_E1_try1_B4 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+15:22:42 [run|L_fio_perf_wide_E1_try1_B4 stop+parse] run L_fio_perf_wide_E1_try1_B5 (rate 4500, traced=1)
+15:22:42 [run|L_fio_perf_wide_E1_try1_B5 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+15:25:18 [run|L_fio_perf_wide_E1_try1_B5 stop+parse] run L_fio_perf_wide_E1_try1_B6 (rate 4500, traced=1)
+15:25:18 [run|L_fio_perf_wide_E1_try1_B6 cooldown] cooldown 0s -> start at 39 C (limit 42 C, idle 37 C)
+15:27:53 [run|L_fio_perf_wide_E1_try1_B6 stop+parse] run L_fio_perf_wide_E1_try1_A2 (rate 4500, traced=0)
+15:27:53 [run|L_fio_perf_wide_E1_try1_A2 cooldown] cooldown 0s -> start at 40 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 187: echo: write error: Broken pipe
+15:30:27 [run|L_fio_perf_wide_E1_try1_A2 stop+parse] cell L_fio_perf_wide_E1 try 1 ok (p50 0.0000% <= 5.0000%, cpu 1.2189% <= 34.0944%)
+15:30:50 [run|collect fio perf] collect: 48 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+15:30:50 [run|collect fio perf] === cell L_fio_perf_narrow_E4 try 1 ===
+15:31:50 [run|L_fio_perf_narrow_E4 try 1 prep] run L_fio_perf_narrow_E4_try1_W1 (rate 36000, traced=0)
+15:31:51 [run|L_fio_perf_narrow_E4_try1_W1 cooldown] cooldown 1s -> start at 35 C (limit 42 C, idle 37 C)
+15:34:24 [run|L_fio_perf_narrow_E4_try1_W1 stop+parse] run L_fio_perf_narrow_E4_try1_A1 (rate 36000, traced=0)
+15:34:24 [run|L_fio_perf_narrow_E4_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+15:36:57 [run|L_fio_perf_narrow_E4_try1_A1 stop+parse] run L_fio_perf_narrow_E4_try1_B1 (rate 36000, traced=1)
+15:36:57 [run|L_fio_perf_narrow_E4_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+15:39:32 [run|L_fio_perf_narrow_E4_try1_B1 stop+parse] run L_fio_perf_narrow_E4_try1_B2 (rate 36000, traced=1)
+15:39:32 [run|L_fio_perf_narrow_E4_try1_B2 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:42:06 [run|L_fio_perf_narrow_E4_try1_B2 stop+parse] run L_fio_perf_narrow_E4_try1_B3 (rate 36000, traced=1)
+15:42:06 [run|L_fio_perf_narrow_E4_try1_B3 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:44:40 [run|L_fio_perf_narrow_E4_try1_B3 stop+parse] run L_fio_perf_narrow_E4_try1_B4 (rate 36000, traced=1)
+15:44:41 [run|L_fio_perf_narrow_E4_try1_B4 cooldown] cooldown 1s -> start at 37 C (limit 42 C, idle 37 C)
+15:47:15 [run|L_fio_perf_narrow_E4_try1_B4 stop+parse] run L_fio_perf_narrow_E4_try1_B5 (rate 36000, traced=1)
+15:47:15 [run|L_fio_perf_narrow_E4_try1_B5 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:49:49 [run|L_fio_perf_narrow_E4_try1_B5 stop+parse] run L_fio_perf_narrow_E4_try1_B6 (rate 36000, traced=1)
+15:49:49 [run|L_fio_perf_narrow_E4_try1_B6 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:52:24 [run|L_fio_perf_narrow_E4_try1_B6 stop+parse] run L_fio_perf_narrow_E4_try1_A2 (rate 36000, traced=0)
+15:52:24 [run|L_fio_perf_narrow_E4_try1_A2 cooldown] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+15:54:57 [run|L_fio_perf_narrow_E4_try1_A2 stop+parse] cell L_fio_perf_narrow_E4 try 1 ok (p50 2.3669% <= 5.0000%, cpu 0.5047% <= 8.9657%)
+15:55:24 [run|collect fio perf] collect: 56 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+15:55:24 [run|collect fio perf] === cell L_fio_perf_wide_E4 try 1 ===
+15:56:25 [run|L_fio_perf_wide_E4 try 1 prep] run L_fio_perf_wide_E4_try1_W1 (rate 36000, traced=0)
+15:56:25 [run|L_fio_perf_wide_E4_try1_W1 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+15:58:58 [run|L_fio_perf_wide_E4_try1_W1 stop+parse] run L_fio_perf_wide_E4_try1_A1 (rate 36000, traced=0)
+15:58:58 [run|L_fio_perf_wide_E4_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 187: echo: write error: Broken pipe
+16:01:32 [run|L_fio_perf_wide_E4_try1_A1 stop+parse] run L_fio_perf_wide_E4_try1_B1 (rate 36000, traced=1)
+16:01:32 [run|L_fio_perf_wide_E4_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+16:04:07 [run|L_fio_perf_wide_E4_try1_B1 stop+parse] run L_fio_perf_wide_E4_try1_B2 (rate 36000, traced=1)
+16:04:07 [run|L_fio_perf_wide_E4_try1_B2 cooldown] cooldown 0s -> start at 41 C (limit 42 C, idle 37 C)
+16:06:43 [run|L_fio_perf_wide_E4_try1_B2 stop+parse] run L_fio_perf_wide_E4_try1_B3 (rate 36000, traced=1)
+16:06:43 [run|L_fio_perf_wide_E4_try1_B3 cooldown] cooldown 0s -> start at 41 C (limit 42 C, idle 37 C)
+16:09:18 [run|L_fio_perf_wide_E4_try1_B3 stop+parse] run L_fio_perf_wide_E4_try1_B4 (rate 36000, traced=1)
+16:09:18 [run|L_fio_perf_wide_E4_try1_B4 cooldown] cooldown 0s -> start at 40 C (limit 42 C, idle 37 C)
+16:11:54 [run|L_fio_perf_wide_E4_try1_B4 stop+parse] run L_fio_perf_wide_E4_try1_B5 (rate 36000, traced=1)
+16:11:54 [run|L_fio_perf_wide_E4_try1_B5 cooldown] cooldown 0s -> start at 41 C (limit 42 C, idle 37 C)
+16:14:29 [run|L_fio_perf_wide_E4_try1_B5 stop+parse] run L_fio_perf_wide_E4_try1_B6 (rate 36000, traced=1)
+16:14:29 [run|L_fio_perf_wide_E4_try1_B6 cooldown] cooldown 0s -> start at 41 C (limit 42 C, idle 37 C)
+16:17:05 [run|L_fio_perf_wide_E4_try1_B6 stop+parse] run L_fio_perf_wide_E4_try1_A2 (rate 36000, traced=0)
+16:17:05 [run|L_fio_perf_wide_E4_try1_A2 cooldown] cooldown 0s -> start at 40 C (limit 42 C, idle 37 C)
+16:19:38 [run|L_fio_perf_wide_E4_try1_A2 stop+parse] cell L_fio_perf_wide_E4 try 1 ok (p50 2.4540% <= 5.0000%, cpu 1.9065% <= 9.0895%)
+16:20:10 [run|collect fio perf] collect: 64 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/fio/perf/results/fio_perf.csv
+16:20:10 [run|collect fio perf] no machine-state drift
+16:20:11 [run|host revert] host reverted
+16:20:42 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+16:20:42 [run|restore services] done
