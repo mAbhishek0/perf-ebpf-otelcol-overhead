@@ -35,6 +35,8 @@ source "$LAPTOP_ROOT/common/mech/collector.sh"
 # (the key is built here: "OTEL_" + upper-case receiver name + the suffix).
 # OTEL_NGINX_ACCEPTED_METRIC_POINTS is still written by the base, and is 0.
 eval "$(declare -f mech_stats | sed '1s/^mech_stats/_collector_base_mech_stats/')"
+# If the sed above ever failed to match, the wrapper below would call itself forever.
+declare -F _collector_base_mech_stats >/dev/null || die "could not wrap collector mech_stats"
 mech_stats() {
   local b=$1 racc
   _collector_base_mech_stats "$b" || return

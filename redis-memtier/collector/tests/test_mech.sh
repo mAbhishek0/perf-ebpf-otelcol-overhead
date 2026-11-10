@@ -26,6 +26,9 @@ source "$LAPTOP_ROOT/redis-memtier/collector/scripts/mech.sh"
 cdir="$LAPTOP_ROOT/redis-memtier/collector/scripts"
 ndir="$LAPTOP_ROOT/nginx-wrk2/collector/scripts"
 
+# --- the wrapped base function exists (the guard in mech.sh) ---
+t_ok "base mech_stats was renamed" declare -F _collector_base_mech_stats
+
 # --- want counts and endpoint ---
 t_eq "want narrow" "1 0" "$(collector_want narrow)"
 t_eq "want wide" "2 8" "$(collector_want wide)"
