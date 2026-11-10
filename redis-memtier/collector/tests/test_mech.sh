@@ -140,7 +140,7 @@ t_die "wrapper propagates base failure (never detached)" mech_stats "$ob"
 
 # --- precheck: redis-cli is a PATH stub ---
 mkdir -p "$T/bin"
-pc() { env PATH="$T/bin:$PATH" bash -c 'source "$1/common/config.env"; source "$1/common/lib.sh"; source "$1/redis-memtier/collector/scripts/mech.sh"; collector_precheck' _ "$LAPTOP_ROOT"; }
+pc() { env PATH="$T/bin:$PATH" bash -c 'LAPTOP_ROOT=$1; source "$1/common/config.env"; source "$1/common/lib.sh"; source "$1/redis-memtier/collector/scripts/mech.sh"; collector_precheck' _ "$LAPTOP_ROOT"; }
 printf '#!/bin/sh\nprintf "PONG\\r\\n"\n' > "$T/bin/redis-cli"; chmod +x "$T/bin/redis-cli"
 t_ok "precheck passes on PONG" pc
 printf '#!/bin/sh\nprintf "LOADING\\n"\n' > "$T/bin/redis-cli"
