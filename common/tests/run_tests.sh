@@ -488,5 +488,11 @@ if [[ -n $PY ]]; then
   "$PY" -I "$LAPTOP_ROOT/fio/tests/test_fio_parse.py" >/dev/null 2>&1 && ok || bad "fio/tests/test_fio_parse.py (run it alone for details)"
 fi
 
+# --- redis workload (own file and counters, for the same reason as fio's) ---
+bash "$LAPTOP_ROOT/redis-memtier/tests/test_redis.sh" >/dev/null 2>&1 && ok || bad "redis-memtier/tests/test_redis.sh (run it alone for details)"
+if [[ -n $PY ]]; then
+  "$PY" -I "$LAPTOP_ROOT/redis-memtier/tests/test_memtier_parse.py" >/dev/null 2>&1 && ok || bad "redis-memtier/tests/test_memtier_parse.py (run it alone for details)"
+fi
+
 printf '%s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))

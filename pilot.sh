@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # pilot.sh — rate calibration and the 60 s-vs-120 s gate. Entry point.
 #
-#   sudo bash pilot.sh nginx|fio [--rates a,b,c] [--set KNOB=N]... [--out pilot]
+#   sudo bash pilot.sh nginx|fio|redis [--rates a,b,c] [--set KNOB=N]... [--out pilot]
 #   nginx also takes --threads N / --conns N (= --set WRK2_THREADS=N / WRK2_CONNS=N).
 #   Knobs a workload accepts: WL_KNOBS in its workload.sh. Default rates: WL_PILOT_RATES.
 #   --out names the directory under <workload dir>/ (default pilot); it must not exist,
@@ -23,11 +23,12 @@ need_root
 # Same reason as run_workload.sh: transient service in bench.slice (lib.sh bench_detach).
 bench_detach "bench-pilot" "$0" "$@"
 
-WL=${1:?usage: pilot.sh nginx|fio [--rates a,b,c] [--set KNOB=N]... [--out DIR]}; shift
+WL=${1:?usage: pilot.sh nginx|fio|redis [--rates a,b,c] [--set KNOB=N]... [--out DIR]}; shift
 case $WL in
   nginx) WL_DIRNAME=nginx-wrk2 ;;
   fio)   WL_DIRNAME=fio ;;
-  *) die "pilot supports nginx and fio (got $WL)" ;;
+  redis) WL_DIRNAME=redis-memtier ;;
+  *) die "pilot supports nginx, fio and redis (got $WL)" ;;
 esac
 RATES="" OUT="pilot"
 declare -a SETS=()
@@ -171,10 +172,13 @@ REPORT="$PILOT_DIR/pilot_report.txt"
   done
   printf '\nHighest usable rate (p99 < 10x p99@%s=%s ms, errors 0, achieved >= 99%%): %s\n' "$low" "$base" "${best:-none}"
   if [[ -n $best ]]; then
-    ladder="" lv=0
+    # Round to the workload's rate step: wl_rate_step if it defines one (redis:
+    # threads x clients x 50, plan R16), else 1000, so nginx and fio are unchanged.
+    ladder="" lv=0 step=1000 minv=1
+    if declare -F wl_rate_step >/dev/null; then step=$(wl_rate_step); minv=$step; fi
     for q in 25 50 75 100; do
       lv=$(( lv + 1 ))
-      x=$(awk -v h="$best" -v q="$q" 'BEGIN{ v=int(h*q/100/1000+0.5)*1000; if (v<1) v=1; print v }')
+      x=$(awk -v h="$best" -v q="$q" -v s="$step" -v m="$minv" 'BEGIN{ v=int(h*q/100/s+0.5)*s; if (v<1) v=m; print v }')
       ladder+="${ladder:+ }$lv:$x"
     done
     printf 'Suggested (NOT written):\n  LADDER="%s"\n' "$ladder"; for k in $WL_KNOBS; do printf '  %s=%s\n' "$k" "${!k}"; done
@@ -182,8 +186,9 @@ REPORT="$PILOT_DIR/pilot_report.txt"
   else
     printf 'No rate qualified; lower --rates and repeat. Do not write pilot.env.\n'
   fi
-  # fio is its own generator (loadgen_cpu_cores = fio's CPU), so the check is nginx-only.
-  if [[ $WL == nginx ]]; then
+  # fio is its own generator (loadgen_cpu_cores = fio's CPU), so the check is for the
+  # workloads with a separate generator: nginx (wrk2) and redis (memtier).
+  if [[ $WL == nginx || $WL == redis ]]; then
     maxg=0
     for k in "${!LGEN[@]}"; do
       if gt "${LGEN[$k]}" "$maxg"; then maxg=${LGEN[$k]}; fi
