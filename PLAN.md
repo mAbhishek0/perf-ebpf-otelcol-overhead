@@ -124,6 +124,8 @@ Each workload gets its own family of 96 tests (3 mechanisms × 8 cells × 4 metr
 
 Two blocks of the same mechanism never run on the same night, so the blocks stay independent sessions. Daytime laptop runs can be used whenever the laptop is free, which pulls the schedule earlier.
 
+*Note 2026-11-10 (README timeline 43):* the fio matrices run in daytime sessions, one mechanism per session (perf block 1, then eBPF block 1 in a separate session), not perf and eBPF together on the night of Nov 12. Each block is about 4 h. The rule above still holds: two blocks of one mechanism never share a session.
+
 ---
 
 ## 5. What gets cut if time runs short
