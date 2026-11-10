@@ -110,6 +110,7 @@ pilot_point() {
   stage "pilot $key cooldown"; cooldown_wait "$b"
   stage "pilot $key start";    wl_start "$b"
   stage "pilot $key ramp";     wl_ramp "$rate" "$b"
+  if declare -F wl_pre_window >/dev/null; then stage "pilot $key pre-window"; wl_pre_window "$rate" "$b"; fi
   u0=$(cgroup_usec "$(cat "$b/cgroup_path")")
   stage "pilot $key measure"; sample_start "$b"
   t0=$(date +%s.%N)

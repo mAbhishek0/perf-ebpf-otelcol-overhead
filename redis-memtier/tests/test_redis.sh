@@ -176,31 +176,89 @@ chmod +x "$T/bin/taskset" "$T/bin/memtier_stub" "$T/bin/redis-cli"
   [[ "$(cat "$mb/ramp_end")" =~ ^[0-9]+\.[0-9]+$ ]] && ok || bad "ramp_end not written"
   _memtier_args 100000 1 "$mb/ramp.json"
   t_eq "ramp ran memtier with the shared arguments" "${MT_ARGS[*]}" "$(sed -n 1p "$T/memtier_calls")"
-  # window 1: attach "took" 0 s, so the 2.0 s floor makes it sleep ~1.5 s with a 0.5 s floor here
+  # wl_pre_window: attach "took" ~0 s, so the hook sleeps up to the floor, then INFO before
   REDIS_GAP_MIN_S=0.6
-  wl_measure 100000 "$mb"
+  wl_pre_window 100000 "$mb"
   g=$(cat "$mb/gap_s")
   gt "$g" 0.59 && ok || bad "gap $g shorter than the 0.6 s floor"
-  gt 2.0 "$g" && ok || bad "gap $g far above the floor (slept too long?)"
+  gt 5.0 "$g" && ok || bad "gap $g far above the floor (slept too long?)"
+  [[ -s $mb/info_before.txt && ! -e $mb/info_after.txt ]] && ok || bad "pre-window hook must write INFO before only"
+  t_eq "pre-window hook did not run memtier" 1 "$(wc -l < "$T/memtier_calls")"
+  wl_measure 100000 "$mb"
+  t_eq "wl_measure leaves gap_s alone" "$g" "$(cat "$mb/gap_s")"
   [[ ! -e $mb/pids.gen ]] && ok || bad "pids.gen not removed"
   _memtier_args 100000 1 "$mb/memtier.json"
   t_eq "window ran memtier with the shared arguments" "${MT_ARGS[*]}" "$(sed -n 2p "$T/memtier_calls")"
   t_eq "INFO before" 'total_commands_processed:1000' "$(tr -d '\r' < "$mb/info_before.txt" | sed -n 1p)"
   t_eq "INFO after" 'total_commands_processed:6000' "$(tr -d '\r' < "$mb/info_after.txt" | sed -n 1p)"
   # a slow attach already used up the gap: no extra sleep
+  # (floor 2.0 s: a wrong sleep would take >= 2 s, so the 1.0 s bound is loose)
   echo 1700000000.000000000 > "$mb/ramp_end"
-  t0=$(date +%s.%N); wl_measure 100000 "$mb"; t1=$(date +%s.%N)
-  gt 0.6 "$(calc "$t1-$t0")" && ok || bad "slept although the gap was already used up"
+  t0=$(date +%s.%N); REDIS_GAP_MIN_S=2.0 wl_pre_window 100000 "$mb"; t1=$(date +%s.%N)
+  gt 1.0 "$(calc "$t1-$t0")" && ok || bad "slept although the gap was already used up"
   gt "$(cat "$mb/gap_s")" 1000000 && ok || bad "gap of an old ramp_end not recorded as is"
   # memtier failure dies and still removes pids.gen
   t_die "memtier window failure dies" eval 'MEMTIER_STUB_RC=3 wl_measure 100000 "$mb"'
   ( MEMTIER_STUB_RC=3 wl_measure 100000 "$mb" ) >/dev/null 2>&1; [[ ! -e $mb/pids.gen ]] && ok || bad "pids.gen left after failure"
   t_die "memtier ramp failure dies" eval 'MEMTIER_STUB_RC=3 wl_ramp 100000 "$T/mb2"'
   t_die "wl_ramp refuses a bad rate" wl_ramp 1250 "$mb"
-  t_die "wl_measure without ramp_end" wl_measure 100000 "$T/nowhere"
+  t_die "wl_pre_window without ramp_end" wl_pre_window 100000 "$T/nowhere"
   echo "$NPASS $NFAIL" > "$T/count1"
 )
 read -r NPASS NFAIL < "$T/count1" 2>/dev/null || bad "wl_ramp/wl_measure block aborted (no count file)"
+
+# --- engine hook: run_one.sh and pilot.sh call wl_pre_window only when defined, after
+# --- the attach and before the baselines (u0, sample_start); nginx and fio do not define it
+ro="$LAPTOP_ROOT/common/run_one.sh"
+l_h=$(grep -n 'declare -F wl_pre_window' "$ro" | head -1 | cut -d: -f1)
+l_a=$(grep -n 'mech_attach "\$scope"' "$ro" | head -1 | cut -d: -f1)
+l_u=$(grep -n '^  u0=' "$ro" | head -1 | cut -d: -f1)
+l_s=$(grep -n 'sample_start' "$ro" | head -1 | cut -d: -f1)
+[[ -n $l_h && -n $l_a && -n $l_u && $l_a -lt $l_h && $l_h -lt $l_u && $l_u -lt $l_s ]] && ok || bad "run_one.sh: pre-window hook not between attach and u0/sample_start ($l_a $l_h $l_u $l_s)"
+grep -q 'declare -F wl_pre_window >/dev/null; then' "$ro" && ok || bad "run_one.sh hook is not guarded by declare -F"
+l_h=$(grep -n 'declare -F wl_pre_window' "$LAPTOP_ROOT/pilot.sh" | head -1 | cut -d: -f1)
+l_u=$(grep -n '^  u0=' "$LAPTOP_ROOT/pilot.sh" | head -1 | cut -d: -f1)
+[[ -n $l_h && -n $l_u && $l_h -lt $l_u ]] && ok || bad "pilot.sh: hook not before u0"
+grep -q 'wl_pre_window' "$LAPTOP_ROOT/nginx-wrk2/workload.sh" "$LAPTOP_ROOT/fio/workload.sh" && bad "nginx or fio defines wl_pre_window" || ok
+declare -F wl_pre_window >/dev/null && ok || bad "redis does not define wl_pre_window"
+
+# --- wl_start / wl_stop with a stub docker that records its arguments ---
+cat > "$T/bin/docker_rec" <<EOF
+#!/bin/sh
+echo "\$@" >> "$T/docker_calls"
+case "\$1" in
+  run) echo cid123 ;;
+  inspect) case "\$*" in *Running*) echo true ;; *State.Pid*) echo \${STUB_PID:-1} ;; esac ;;
+esac
+EOF
+cp "$T/bin/docker_rec" "$T/bin/docker"; chmod +x "$T/bin/docker"
+mkdir -p "$T/fakeproc/4242" "$T/fakeproc/5555" "$T/cg/docker-cid123.scope"
+echo redis-server > "$T/fakeproc/4242/comm"; echo nginx > "$T/fakeproc/5555/comm"
+: > "$T/cg/docker-cid123.scope/cpu.stat"
+# wl_start reads /proc/PID/comm and /sys/fs/cgroup, which a test cannot fake: in a
+# subshell, shell functions shadow cat (the comm read) and find (the cgroup lookup).
+(
+  PATH="$T/bin:$PATH"; GEN_CPUS=0; MEMTIER_BIN="$T/bin/memtier_stub"
+  cat() { if [[ ${1:-} == /proc/*/comm ]]; then command cat "$T/fakeproc/${1#/proc/}"; else command cat "$@"; fi; }
+  find() { echo "$T/cg/docker-cid123.scope"; }
+  wb="$T/wb"; mkdir -p "$wb"; : > "$T/docker_calls"
+  STUB_PID=4242 wl_start "$wb" >/dev/null 2>&1 && ok || bad "wl_start failed with stubs"
+  run_line=$(grep '^run ' "$T/docker_calls")
+  for want in "--network host" "--cgroup-parent bench.slice" "--cpuset-cpus 0,2,4,6" "redis:7.4 redis-server" "--appendonly no" "--protected-mode no"; do
+    [[ $run_line == *"$want"* ]] && ok || bad "docker run lacks '$want': $run_line"
+  done
+  [[ $run_line == *"--save  --appendonly no"* ]] && ok || bad "--save is not followed by an empty argument: $run_line"
+  t_eq "target_pids" 4242 "$(command cat "$wb/target_pids")"
+  t_eq "cgroup_path" "$T/cg/docker-cid123.scope" "$(command cat "$wb/cgroup_path")"
+  t_die "DBSIZE mismatch dies" eval 'DBSIZE_STUB=999 STUB_PID=4242 wl_start "$wb"'
+  t_die "non-redis-server comm dies" eval 'STUB_PID=5555 wl_start "$wb"'
+  : > "$T/docker_calls"; wl_stop; wl_stop
+  t_eq "wl_stop calls docker rm -f twice" 2 "$(grep -c '^rm -f bench-redis' "$T/docker_calls")"
+  printf '#!/bin/sh\nexit 1\n' > "$T/bin/docker"
+  wl_stop && ok || bad "wl_stop fails when docker fails"
+  echo "$NPASS $NFAIL" > "$T/count2"
+)
+read -r NPASS NFAIL < "$T/count2" 2>/dev/null || bad "wl_start block aborted (no count file)"
 
 # --- wl_preflight with stubs ---
 cat > "$T/bin/memtier_ok" <<'EOF'
@@ -276,5 +334,16 @@ t_die "gap column missing dies" _redis_bad '/^GAP_S=/d'
 t_die "cmds delta blank dies" _redis_bad "s/^REDIS_CMDS_DELTA=.*/REDIS_CMDS_DELTA=''/"
 t_die "ramp ops malformed dies" _redis_bad "s/^MEMTIER_RAMP_OPS_PER_SEC=.*/MEMTIER_RAMP_OPS_PER_SEC='fast'/"
 
+
+# --- pilot.sh ladder rounding: with the default step (nginx, fio) it is the old formula, byte for byte ---
+old_round() { awk -v h="$1" -v q="$2" 'BEGIN{ v=int(h*q/100/1000+0.5)*1000; if (v<1) v=1; print v }'; }
+new_round() { awk -v h="$1" -v q="$2" -v s=1000 -v m=1 'BEGIN{ v=int(h*q/100/s+0.5)*s; if (v<1) v=m; print v }'; }
+same=1
+for h in 1 7 499 500 1999 5000 12345 40000 44000 50000 99999 120000; do
+  for q in 25 50 75 100; do [[ "$(old_round $h $q)" == "$(new_round $h $q)" ]] || same=0; done
+done
+(( same )) && ok || bad "pilot ladder rounding changed for the default step"
+grep -q -- "-v s=\"\$step\" -v m=\"\$minv\" 'BEGIN{ v=int(h\*q/100/s+0.5)\*s; if (v<1) v=m; print v }'" "$LAPTOP_ROOT/pilot.sh" && ok || bad "test copy of the new rounding differs from pilot.sh"
+t_eq "redis step rounds to 2500" 25000 "$(awk -v h=100000 -v q=25 -v s=2500 -v m=2500 'BEGIN{ v=int(h*q/100/s+0.5)*s; if (v<1) v=m; print v }')"
 printf 'redis tests: %s passed, %s failed\n' "$NPASS" "$NFAIL"
 (( NFAIL == 0 ))

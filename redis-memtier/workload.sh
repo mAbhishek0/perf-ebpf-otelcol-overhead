@@ -203,19 +203,27 @@ wl_ramp() {
   date +%s.%N > "$b/ramp_end"     # the gap (R7) is measured from here
 }
 
-# The generator's PID goes to pids.gen as soon as it exists, so the sampler
-# can charge its CPU (loadgen_cpu_cores). taskset execs, so $! is memtier's.
-wl_measure() {
-  local rate=$1 b=$2 rc=0 re now s
+# wl_pre_window RATE BUNDLE (optional engine hook, run_one.sh and pilot.sh call it
+# after the attach and BEFORE the window's CPU and sampler baselines): the equal
+# idle gap (R7) and INFO before. Outside the window, so traced and untraced
+# windows are equally long (fio's in-window gate wait is not: fio block 1 window_s).
+wl_pre_window() {
+  local b=$2 re now s
   re=$(cat "$b/ramp_end") || die "no ramp_end in $b"
   [[ $re =~ ^[0-9]+\.[0-9]+$ ]] || die "bad ramp_end '$re' in $b"
-  _memtier_args "$rate" "$STEADY_S" "$b/memtier.json"
-  # R7: equal idle gap in every run. A slower attach already used it up, so no sleep then.
+  # A slower attach already used the gap up, so no sleep then.
   s=$(_redis_gap_sleep_s "$re" "$(date +%s.%N)" "$REDIS_GAP_MIN_S")
   if gt "$s" 0; then sleep "$s"; fi
   _redis_cli INFO stats > "$b/info_before.txt" || die "redis INFO stats failed before the window"
   now=$(date +%s.%N)
-  _redis_gap_s "$re" "$now" > "$b/gap_s"
+  _redis_gap_s "$re" "$now" > "$b/gap_s"   # idle time up to the INFO call; the window opens right after
+}
+
+# The generator's PID goes to pids.gen as soon as it exists, so the sampler
+# can charge its CPU (loadgen_cpu_cores). taskset execs, so $! is memtier's.
+wl_measure() {
+  local rate=$1 b=$2 rc=0
+  _memtier_args "$rate" "$STEADY_S" "$b/memtier.json"
   taskset -c "$GEN_CPUS" "$MEMTIER_BIN" "${MT_ARGS[@]}" > "$b/workload.out" 2>&1 &
   echo $! > "$b/pids.gen"
   wait $! || rc=$?

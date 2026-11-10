@@ -32,6 +32,10 @@ run_one() {
   stage "$id ramp";     wl_ramp "$rate" "$b"
   if (( traced )); then stage "$id attach"; mech_attach "$scope" "$b"; RUN_ATTACHED=1; fi
 
+  # Optional hook (redis): idle gap before the window opens, outside the
+  # measured window, so traced and untraced windows have the same length.
+  if declare -F wl_pre_window >/dev/null; then stage "$id pre-window"; wl_pre_window "$rate" "$b"; fi
+
   # --- measured window ---
   u0=$(cgroup_usec "$(cat "$b/cgroup_path")")
   net_snap > "$b/net_before.txt"
