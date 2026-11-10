@@ -125,7 +125,7 @@ All results, scripts and documents here feed a paper the user will submit for pe
 
 ## Syncing with the laptop
 
-`laptop/` is **its own git repository** (the GitHub repo; laptop-only history). The outer project repo ignores `laptop/` and is never pushed — it holds the server docs, which contain AMD-internal details. Commit laptop work inside `laptop/`. `bash sync.sh pull|push` in `laptop/` talks to the user's GitHub repo using a token in `.sync.env` (gitignored). **Never read, print, grep or edit `.sync.env`**, and never put a token in a URL, command line or git config — the token must not enter the transcript. The user creates and fills that file.
+`laptop/` is **its own git repository** (the GitHub repo; laptop-only history). The outer project repo ignores `laptop/` and is never pushed — it holds the server docs, which contain AMD-internal details. Commit laptop work inside `laptop/`. `bash sync.sh pull|push` in `laptop/` talks to the user's GitHub repo using a token in `.sync.env` (gitignored). **Never read, print, grep or edit `.sync.env`**, and never put a token in a URL, command line or git config — the token must not enter the transcript. The user creates and fills that file. **The GitHub repo is public** (https://github.com/mAbhishek0/perf-ebpf-otelcol-overhead). So cloning and pulling need no password or token. Pushing still needs the owner's credentials: on the laptop, plain `git push` works with the credentials already set up there, and `bash sync.sh push` is the fallback. Because the repo is public, everything committed in `laptop/` is published: never copy server details, AMD-internal material or tokens into it.
 
 ## Editing rules for this folder
 
