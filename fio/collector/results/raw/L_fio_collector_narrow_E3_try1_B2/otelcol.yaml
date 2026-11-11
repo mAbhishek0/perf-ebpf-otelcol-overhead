@@ -1,0 +1,43 @@
+# otelcol-contrib config, scraper mode, NARROW scope — fio, Platform L.
+# Rendered per run by common/mech/collector.sh (_otel_render) into
+# BUNDLE/otelcol.yaml. Placeholders: 15, 18888,
+# 512, 512 (values in common/mech/collector.env).
+#
+# fio has no metrics endpoint, so narrow is the host's disk metrics only
+# (PLAN.md decision 3.4); fio is the only process doing steady disk I/O in
+# a run. Everything from `processors:` down is the nginx templates' text
+# except the pipeline's receiver list (fio/tests/test_fio.sh checks it).
+# The pipeline receiver list must stay flow style ("receivers: [a, b]"):
+# collector.sh counts receivers from that one line.
+receivers:
+  hostmetrics:
+    collection_interval: 15s
+    scrapers:
+      disk:
+
+processors:
+  batch:
+    send_batch_size: 512
+
+exporters:
+  debug:
+    verbosity: basic
+    sending_queue:
+      enabled: true
+      queue_size: 512
+
+service:
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 127.0.0.1
+                port: 18888
+  pipelines:
+    metrics:
+      receivers: [hostmetrics]
+      processors: [batch]
+      exporters: [debug]
