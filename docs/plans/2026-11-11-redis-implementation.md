@@ -57,7 +57,7 @@ common/tests/run_tests.sh         + runs the redis suite as one test (as fio)
 ## 4. Hardware steps, in order (after fio block 2 is pushed; never while a matrix runs)
 
 1. `git pull`, `sudo bash install_build.sh` is not needed (memtier 2.5.2 and redis:7.4 are installed); confirm with `memtier_benchmark --version` and `docker image inspect --format '{{.Id}}' redis:7.4`.
-2. **Symbol check (R13):** by hand, before the pilot (`check.sh` needs the frozen ladder, and its eBPF preflight repeats the check later): `docker create --name t redis:7.4 && docker cp t:/usr/local/bin/redis-server /tmp/rs && docker rm t && readelf -sW /tmp/rs | awk '$4=="FUNC" && $8=="call"'`.
+2. **Symbol check (R13):** by hand, before the pilot (`check.sh` needs the frozen ladder, and its eBPF preflight repeats the check later): `docker create --name rs-sym redis:7.4 && docker cp rs-sym:/usr/local/bin/redis-server /tmp/rs && docker rm rs-sym && readelf -sW /tmp/rs | awk '$4=="FUNC" && $8=="call"'`.
 3. `sudo bash pilot.sh redis` (~1 h), read `redis-memtier/pilot/pilot_report.txt`, choose the ladder together, write `redis-memtier/pilot.env`.
 4. `sudo bash redis-memtier/check.sh` (~15 min): eBPF narrow events per command ≈ 1.0 (R13), misses 0 (R3/R10), collector points per scrape, drops at the top rate. Copy one real memtier JSON to `redis-memtier/tests/fixtures/memtier_L.json` with a test.
 5. `sudo bash run_workload.sh redis --mech perf --smoke`; warm-ups 2–3 match A1; drift rule holds (R11).
