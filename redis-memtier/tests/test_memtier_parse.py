@@ -1,6 +1,8 @@
 """Tests for memtier_parse.py. Run: python3 -I redis-memtier/tests/test_memtier_parse.py
-The fixture is synthetic (memtier 2.5.2's documented layout) until a real
-laptop memtier JSON replaces it (redis-memtier/check.sh)."""
+Two fixtures: memtier_synthetic.json (three-decimal percentile keys, as the
+plan assumed) and memtier_L.json, real memtier 2.5.2 output from the laptop
+pilot at 25000 req/s (2026-11-11, redis-memtier/pilot/raw/R25000/memtier.json),
+which writes two-decimal keys. Both must parse."""
 import copy
 import io
 import json
@@ -16,6 +18,7 @@ import memtier_parse  # noqa: E402
 FIXTURE = os.path.join(HERE, "fixtures", "memtier_synthetic.json")
 with open(FIXTURE) as fh:
     DOC = json.load(fh)
+REAL = os.path.join(HERE, "fixtures", "memtier_L.json")
 
 
 def run_main(argv):
@@ -39,6 +42,34 @@ class Parse(unittest.TestCase):
         self.assertEqual(got["ERRORS"], "0")
         self.assertEqual(got["MEMTIER_RUNTIME_MS"], "120000")
         self.assertEqual(got["MEMTIER_OPS"], "11999900")
+
+    def test_real_laptop_output(self):
+        with open(REAL) as fh:
+            got = dict(memtier_parse.parse(json.load(fh), 120))
+        self.assertEqual(got["THROUGHPUT"], "24999.87")
+        self.assertEqual((got["P50_MS"], got["P99_MS"], got["P999_MS"]), ("0.855000", "1.775000", "3.631000"))
+        self.assertEqual(got["MAX_MS"], "7.423000")
+        self.assertEqual(got["ERRORS"], "0")
+        self.assertEqual(got["MEMTIER_RUNTIME_MS"], "120003")
+        self.assertEqual(got["MEMTIER_OPS"], "3000050")
+
+    def test_percentile_key_spelling(self):
+        for spell in ("p99.9", "p99.90", "p99.900"):
+            d = copy.deepcopy(DOC)
+            pct = d["ALL STATS"]["Totals"]["Percentile Latencies"]
+            pct[spell] = pct.pop("p99.900")
+            self.assertEqual(dict(memtier_parse.parse(d, 120))["P999_MS"], "0.455000", spell)
+
+    def test_percentile_ambiguous_or_wrong(self):
+        d = copy.deepcopy(DOC)
+        d["ALL STATS"]["Totals"]["Percentile Latencies"]["p99.90"] = 9.0   # two keys for p99.9
+        with self.assertRaises(ValueError):
+            memtier_parse.parse(d, 120)
+        d = copy.deepcopy(DOC)
+        pct = d["ALL STATS"]["Totals"]["Percentile Latencies"]
+        pct["p99.99"] = pct.pop("p99.900")                                   # p99.99 is not p99.9
+        with self.assertRaises(ValueError):
+            memtier_parse.parse(d, 120)
 
     def test_ramp(self):
         self.assertEqual(memtier_parse.parse_ramp(DOC), [("MEMTIER_RAMP_OPS_PER_SEC", "99999.17")])
