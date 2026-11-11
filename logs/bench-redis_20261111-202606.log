@@ -1,0 +1,64 @@
+20:26:16 [run|-] smoke cell: E1 narrow with 3 warm-ups (gate: do warm-ups 2-3 match A1?)
+20:26:22 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+20:26:22 [run|quiesce] progress shown on tty8 (blanking off)
+20:26:22 [run|preflight] preflight
+20:26:22 [run|preflight]   [ok]   on AC power
+20:26:22 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+20:26:22 [run|preflight]   [ok]   TLP not active
+20:26:22 [run|preflight]   [ok]   unattended-upgrades not active
+20:26:22 [run|preflight]   [ok]   no noisy processes
+20:26:22 [run|preflight]   [ok]   no graphical session
+20:26:22 [run|preflight]   package 61 °C > 55 °C — waiting up to 900s to cool
+20:26:26 [run|preflight]   cooled for 4s, now 55 °C
+20:26:26 [run|preflight]   [ok]   package 55 °C
+20:26:26 [run|preflight]   [ok]   51014 MB free
+20:26:26 [run|preflight]   [ok]   BPF JIT on
+20:26:26 [run|preflight]   [ok]   docker reachable
+20:26:26 [run|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+20:26:26 [run|preflight]   [ok]   redis:7.4 id matches
+20:26:26 [run|preflight]   [ok]   port 6379 free
+20:26:26 [run|preflight]   [ok]   redis-cli present
+20:26:26 [run|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+20:26:26 [run|preflight]   [ok]   no leftover bench-redis
+20:26:26 [run|preflight]   [ok]   memtier 2 threads x 25 clients
+20:26:26 [run|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+20:26:26 [run|preflight]   [ok]   perf version 7.0.14
+20:26:26 [run|preflight] preflight passed
+20:26:26 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+20:26:27 [run|host setup] clock floor requested at 2900000 kHz
+20:26:27 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+20:26:27 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+20:26:31 [run|host setup] clock under load: 2894514 kHz (ok)
+20:26:31 [run|host setup] host configured
+20:27:01 [run|host setup] idle package temp 37 C (min of 15 samples over 30 s)
+20:27:02 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/smoke/provenance/20261111-202701_perf.env
+20:27:02 [run|host setup] ### redis x perf: level order 1
+20:27:02 [run|host setup] === cell L_redis_perf_narrow_E1 try 1 ===
+20:27:02 [run|host setup] run L_redis_perf_narrow_E1_try1_W1 (rate 2500, traced=0)
+20:27:02 [run|L_redis_perf_narrow_E1_try1_W1 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+20:29:55 [run|L_redis_perf_narrow_E1_try1_W1 stop+parse] run L_redis_perf_narrow_E1_try1_W2 (rate 2500, traced=0)
+20:29:55 [run|L_redis_perf_narrow_E1_try1_W2 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:32:48 [run|L_redis_perf_narrow_E1_try1_W2 stop+parse] run L_redis_perf_narrow_E1_try1_W3 (rate 2500, traced=0)
+20:32:48 [run|L_redis_perf_narrow_E1_try1_W3 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:35:41 [run|L_redis_perf_narrow_E1_try1_W3 stop+parse] run L_redis_perf_narrow_E1_try1_A1 (rate 2500, traced=0)
+20:35:41 [run|L_redis_perf_narrow_E1_try1_A1 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:38:33 [run|L_redis_perf_narrow_E1_try1_A1 stop+parse] run L_redis_perf_narrow_E1_try1_B1 (rate 2500, traced=1)
+20:38:33 [run|L_redis_perf_narrow_E1_try1_B1 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:41:26 [run|L_redis_perf_narrow_E1_try1_B1 stop+parse] run L_redis_perf_narrow_E1_try1_B2 (rate 2500, traced=1)
+20:41:26 [run|L_redis_perf_narrow_E1_try1_B2 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:44:19 [run|L_redis_perf_narrow_E1_try1_B2 stop+parse] run L_redis_perf_narrow_E1_try1_B3 (rate 2500, traced=1)
+20:44:19 [run|L_redis_perf_narrow_E1_try1_B3 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+20:47:12 [run|L_redis_perf_narrow_E1_try1_B3 stop+parse] run L_redis_perf_narrow_E1_try1_B4 (rate 2500, traced=1)
+20:47:13 [run|L_redis_perf_narrow_E1_try1_B4 cooldown] cooldown 1s -> start at 34 C (limit 42 C, idle 37 C)
+20:50:07 [run|L_redis_perf_narrow_E1_try1_B4 stop+parse] run L_redis_perf_narrow_E1_try1_B5 (rate 2500, traced=1)
+20:50:07 [run|L_redis_perf_narrow_E1_try1_B5 cooldown] cooldown 0s -> start at 35 C (limit 42 C, idle 37 C)
+20:53:00 [run|L_redis_perf_narrow_E1_try1_B5 stop+parse] run L_redis_perf_narrow_E1_try1_B6 (rate 2500, traced=1)
+20:53:00 [run|L_redis_perf_narrow_E1_try1_B6 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+20:55:53 [run|L_redis_perf_narrow_E1_try1_B6 stop+parse] run L_redis_perf_narrow_E1_try1_A2 (rate 2500, traced=0)
+20:55:53 [run|L_redis_perf_narrow_E1_try1_A2 cooldown] cooldown 0s -> start at 34 C (limit 42 C, idle 37 C)
+20:58:46 [run|L_redis_perf_narrow_E1_try1_A2 stop+parse] cell L_redis_perf_narrow_E1 try 1 ok (p99 0.0000% <= 5.0000%, cpu 0.2777% <= 5.0000%)
+20:58:49 [run|collect redis perf] collect: 8 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/smoke/redis_perf.csv
+20:58:49 [run|collect redis perf] no machine-state drift
+20:58:51 [run|host revert] host reverted
+20:59:21 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+20:59:22 [run|restore services] done
