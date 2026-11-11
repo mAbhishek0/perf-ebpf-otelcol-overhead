@@ -32,7 +32,7 @@ Not decided here (the user's call, after the pilot): the frozen ladder; whether 
 ## 2. Files
 
 ```
-config.env                        + REDIS_IMAGE, REDIS_IMAGE_ID (sha256:4fa24486…, README tools table), REDIS_PORT=6379, REDIS_CONTAINER=bench-redis, MEMTIER_BIN
+config.env                        + REDIS_IMAGE, REDIS_IMAGE_ID (sha256:4fa24486…, README tools table; repinned to sha256:2e3eb114… on 2026-11-11, timeline 51), REDIS_PORT=6379, REDIS_CONTAINER=bench-redis, MEMTIER_BIN
 redis-memtier/redis.env           constants of R2–R11 (`:=` defaults, as fio.env)
 redis-memtier/workload.sh         wl_* and the four hooks + wl_rate_step
 redis-memtier/memtier_parse.py    JSON -> KEY=value lines (THROUGHPUT, P50_MS, P99_MS, P999_MS, MAX_MS, ERRORS, MEMTIER_RUNTIME_MS, MEMTIER_OPS)

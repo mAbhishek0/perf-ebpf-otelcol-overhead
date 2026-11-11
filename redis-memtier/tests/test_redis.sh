@@ -103,7 +103,7 @@ mkdir -p "$T/s"
 LADDER="1:25000" _schema_freeze "$T/s" perf
 t_has "schema memtier line" "$T/s/schema.json" '  "memtier_ratio": "1:10", "memtier_key_pattern": "R:R", "redis_keys": 1000000, "memtier_data_size": 32, "memtier_pipeline": 1,'
 t_has "schema drift line" "$T/s/schema.json" '  "redis_gap_min_s": 2.0, "drift_lat_key": "P99_MS", "drift_cpu_floor_cores": 0,'
-grep -q '"redis_image_id": "sha256:4fa24486' "$T/s/schema.json" && ok || bad "schema lacks the image id"
+grep -q '"redis_image_id": "sha256:2e3eb114' "$T/s/schema.json" && ok || bad "schema lacks the image id"
 grep -q '"memtier_threads": 2, "memtier_clients": 25' "$T/s/schema.json" && ok || bad "schema lacks threads and clients"
 grep -q 'fio_' "$T/s/schema.json" && bad "fio keys in the redis schema" || ok
 if [[ -n $PY ]]; then
