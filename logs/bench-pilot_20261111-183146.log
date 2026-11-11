@@ -1,0 +1,87 @@
+18:32:01 [pilot|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+18:32:01 [pilot|preflight] preflight
+18:32:01 [pilot|preflight]   [ok]   on AC power
+18:32:01 [pilot|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+18:32:01 [pilot|preflight]   [ok]   TLP not active
+18:32:01 [pilot|preflight]   [ok]   unattended-upgrades not active
+18:32:01 [pilot|preflight]   [ok]   no noisy processes
+18:32:01 [pilot|preflight]   [ok]   no graphical session
+18:32:01 [pilot|preflight]   package 59 °C > 55 °C — waiting up to 900s to cool
+18:32:03 [pilot|preflight]   cooled for 2s, now 55 °C
+18:32:03 [pilot|preflight]   [ok]   package 55 °C
+18:32:03 [pilot|preflight]   [ok]   51035 MB free
+18:32:03 [pilot|preflight]   [ok]   BPF JIT on
+18:32:04 [pilot|preflight]   [ok]   docker reachable
+18:32:04 [pilot|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+18:32:04 [pilot|preflight]   [ok]   redis:7.4 id matches
+18:32:04 [pilot|preflight]   [ok]   port 6379 free
+18:32:04 [pilot|preflight]   [ok]   redis-cli present
+18:32:04 [pilot|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+18:32:04 [pilot|preflight]   [ok]   no leftover bench-redis
+18:32:04 [pilot|preflight]   [ok]   memtier 2 threads x 25 clients
+18:32:04 [pilot|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+18:32:04 [pilot|preflight] preflight passed
+18:32:04 [pilot|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+18:32:04 [pilot|host setup] clock floor requested at 2900000 kHz
+18:32:05 [pilot|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+18:32:05 [pilot|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+18:32:09 [pilot|host setup] clock under load: 2889729 kHz (ok)
+18:32:09 [pilot|host setup] host configured
+18:32:39 [pilot|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+18:32:39 [pilot|host setup] pilot 25000:120: rate 25000 for 120s
+18:32:39 [pilot|pilot 25000:120 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:35:31 [pilot|pilot 25000:120 measure] pilot 25000:60: rate 25000 for 60s
+18:35:31 [pilot|pilot 25000:60 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:37:24 [pilot|pilot 25000:60 measure] pilot 50000:120: rate 50000 for 120s
+18:37:24 [pilot|pilot 50000:120 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+18:40:17 [pilot|pilot 50000:120 measure] pilot 50000:60: rate 50000 for 60s
+18:40:17 [pilot|pilot 50000:60 cooldown] cooldown 0s -> start at 40 C (limit 44 C, idle 39 C)
+18:42:10 [pilot|pilot 50000:60 measure] pilot 100000:120: rate 100000 for 120s
+18:42:10 [pilot|pilot 100000:120 cooldown] cooldown 0s -> start at 40 C (limit 44 C, idle 39 C)
+18:45:03 [pilot|pilot 100000:120 measure] pilot 100000:60: rate 100000 for 60s
+18:45:03 [pilot|pilot 100000:60 cooldown] cooldown 0s -> start at 40 C (limit 44 C, idle 39 C)
+18:46:55 [pilot|pilot 100000:60 measure] pilot 150000:120: rate 150000 for 120s
+18:46:55 [pilot|pilot 150000:120 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:49:48 [pilot|pilot 150000:120 measure] pilot 150000:60: rate 150000 for 60s
+18:49:48 [pilot|pilot 150000:60 cooldown] cooldown 0s -> start at 40 C (limit 44 C, idle 39 C)
+18:51:41 [pilot|pilot 150000:60 measure] pilot 200000:120: rate 200000 for 120s
+18:51:41 [pilot|pilot 200000:120 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:54:34 [pilot|pilot 200000:120 measure] pilot 200000:60: rate 200000 for 60s
+18:54:34 [pilot|pilot 200000:60 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:56:27 [pilot|pilot 200000:60 measure] pilot 250000:120: rate 250000 for 120s
+18:56:27 [pilot|pilot 250000:120 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+18:59:19 [pilot|pilot 250000:120 measure] pilot 250000:60: rate 250000 for 60s
+18:59:19 [pilot|pilot 250000:60 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+pilot redis  MEMTIER_THREADS=2 MEMTIER_CLIENTS=25  ramp=30s  kernel=7.0.0-43-generic  2026-11-11T19:01:12+05:30
+
+120 s windows (untraced)
+    rate   achieved   p50_ms   p99_ms  p999_ms errors   wl_cpu  gen_cpu   busy%
+   25000   24999.75    0.751    1.671    3.647      0    0.508    0.600    12.8
+   50000   49908.47    0.863    3.135    3.775      0    0.943    1.150    23.8
+  100000   53860.53    0.887    3.279    3.743      0    0.999    1.261    25.3
+  150000   53843.71    0.887    3.279    3.743      0    0.999    1.260    25.3
+  200000   53750.76    0.887    3.279    3.759      0    0.999    1.260    25.2
+  250000   53916.42    0.879    3.279    3.743      0    0.998    1.264    25.2
+
+Gate 1: 60 s vs 120 s (p99 and throughput each within DRIFT_PCT=5%)
+    rate    p99_120     p99_60 p99_diff%  tp_diff%   tp_120    tp_60 verdict
+   25000      1.671      1.775    6.0360    0.0008 24999.75 24999.55 FAIL
+   50000      3.135      3.247    3.5099    0.0217 49908.47 49897.65 PASS
+  100000      3.279      3.279    0.0000    0.1536 53860.53 53777.84 PASS
+  150000      3.279      3.279    0.0000    0.3636 53843.71 53648.31 PASS
+  200000      3.279      3.279    0.0000    0.1767 53750.76 53845.81 PASS
+  250000      3.279      3.279    0.0000    0.0826 53916.42 53871.91 PASS
+Gate 1 overall: FAIL (judge it on the rates you intend to freeze; a saturated rate may fail for other reasons)
+
+Highest usable rate (p99 < 10x p99@25000=1.671000 ms, errors 0, achieved >= 99%): 50000
+Suggested (NOT written):
+  LADDER="1:12500 2:25000 3:37500 4:50000"
+  MEMTIER_THREADS=2
+  MEMTIER_CLIENTS=25
+Review the table, then write redis-memtier/pilot.env by hand: freezing the ladder is a human decision.
+Generator check: max loadgen CPU 1.2638 cores >= 0.6 — keep both GEN CPUs.
+19:01:12 [pilot|pilot 250000:60 measure] report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/pilot/pilot_report.txt
+19:01:12 [pilot|pilot 250000:60 measure] no machine-state drift
+19:01:13 [pilot|host revert] host reverted
+19:01:14 [pilot|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+19:01:14 [pilot|restore services] done
