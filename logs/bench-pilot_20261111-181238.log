@@ -1,0 +1,38 @@
+18:12:53 [pilot|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+18:12:53 [pilot|preflight] preflight
+18:12:53 [pilot|preflight]   [ok]   on AC power
+18:12:53 [pilot|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+18:12:53 [pilot|preflight]   [ok]   TLP not active
+18:12:53 [pilot|preflight]   [ok]   unattended-upgrades not active
+18:12:53 [pilot|preflight]   [ok]   no noisy processes
+18:12:53 [pilot|preflight]   [ok]   no graphical session
+18:12:53 [pilot|preflight]   package 73 °C > 55 °C — waiting up to 900s to cool
+18:13:05 [pilot|preflight]   cooled for 12s, now 55 °C
+18:13:05 [pilot|preflight]   [ok]   package 55 °C
+18:13:05 [pilot|preflight]   [ok]   51038 MB free
+18:13:05 [pilot|preflight]   [ok]   BPF JIT on
+18:13:05 [pilot|preflight]   [ok]   docker reachable
+18:13:05 [pilot|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+18:13:05 [pilot|preflight]   [ok]   redis:7.4 id matches
+18:13:05 [pilot|preflight]   [ok]   port 6379 free
+18:13:05 [pilot|preflight]   [ok]   redis-cli present
+18:13:05 [pilot|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+18:13:05 [pilot|preflight]   [ok]   no leftover bench-redis
+18:13:05 [pilot|preflight]   [ok]   memtier 2 threads x 25 clients
+18:13:05 [pilot|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+18:13:05 [pilot|preflight] preflight passed
+18:13:05 [pilot|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+18:13:06 [pilot|host setup] clock floor requested at 2900000 kHz
+18:13:06 [pilot|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+18:13:06 [pilot|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+18:13:10 [pilot|host setup] clock under load: 2894512 kHz (ok)
+18:13:10 [pilot|host setup] host configured
+18:13:40 [pilot|host setup] idle package temp 44 C (min of 15 samples over 30 s)
+18:13:40 [pilot|host setup] pilot 25000:120: rate 25000 for 120s
+18:13:40 [pilot|pilot 25000:120 cooldown] cooldown 0s -> start at 44 C (limit 49 C, idle 44 C)
+18:16:33 [pilot|pilot 25000:120 measure] FAIL: cannot parse /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/pilot/raw/R25000/memtier.json: memtier_parse: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/pilot/raw/R25000/memtier.json: missing Percentile Latencies/p50.000
+18:16:33 [pilot|pilot 25000:120 measure] crash report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/crash_20261111-181248.txt
+18:16:33 [pilot|pilot 25000:120 measure] no machine-state drift
+18:16:35 [pilot|host revert] host reverted
+18:16:35 [pilot|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+18:16:36 [pilot|restore services] exited with status 1 — host reverted
