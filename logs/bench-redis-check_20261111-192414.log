@@ -1,0 +1,89 @@
+19:24:14 [redis-check|preflight] preflight
+19:24:14 [redis-check|preflight]   [ok]   on AC power
+19:24:14 [redis-check|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+19:24:14 [redis-check|preflight]   [ok]   TLP not active
+19:24:14 [redis-check|preflight]   [ok]   unattended-upgrades not active
+19:24:14 [redis-check|preflight]   [ok]   no noisy processes
+19:24:14 [redis-check|preflight] WARN: graphical session running (ALLOW_GUI=1)
+19:24:14 [redis-check|preflight]   [ok]   package 46 °C
+19:24:14 [redis-check|preflight]   [ok]   51022 MB free
+19:24:14 [redis-check|preflight]   [ok]   BPF JIT on
+19:24:14 [redis-check|preflight]   [ok]   docker reachable
+19:24:14 [redis-check|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+19:24:14 [redis-check|preflight]   [ok]   redis:7.4 id matches
+19:24:14 [redis-check|preflight]   [ok]   port 6379 free
+19:24:14 [redis-check|preflight]   [ok]   redis-cli present
+19:24:14 [redis-check|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+19:24:14 [redis-check|preflight]   [ok]   no leftover bench-redis
+19:24:14 [redis-check|preflight]   [ok]   memtier 2 threads x 25 clients
+19:24:14 [redis-check|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+19:24:14 [redis-check|preflight]   [ok]   perf version 7.0.14
+19:24:14 [redis-check|preflight]   [ok]   BCC python bindings (0.35.0)
+19:24:15 [redis-check|preflight]   [ok]   uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+19:24:15 [redis-check|preflight]   [ok]   tracepoint raw_syscalls
+19:24:15 [redis-check|preflight]   [ok]   bpf_jit_enable=1
+19:24:15 [redis-check|preflight]   [ok]   bpf_jit_harden=0
+19:24:15 [redis-check|preflight]   [ok]   tracer sources present (redis_probes.c)
+19:24:15 [redis-check|preflight]   [ok]   otelcol: otelcol-contrib version 0.161.0
+19:24:15 [redis-check|preflight]   [ok]   collector mode scraper
+19:24:15 [redis-check|preflight]   [ok]   otelcol templates present
+19:24:15 [redis-check|preflight]   [ok]   port 18888 free
+19:24:15 [redis-check|preflight]   [ok]   no otelcol-contrib running
+19:24:15 [redis-check|preflight] preflight passed
+19:24:16 [redis-check|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+19:24:17 [redis-check|host setup] clock floor requested at 2900000 kHz
+19:24:17 [redis-check|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+19:24:17 [redis-check|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+19:24:21 [redis-check|host setup] clock under load: 2884700 kHz (ok)
+19:24:21 [redis-check|host setup] host configured
+19:24:21 [redis-check|host setup] === none base E1 (5000 ops/s) ===
+19:25:24 [redis-check|none base E1 load] === perf narrow E1 (5000 ops/s) ===
+19:26:28 [redis-check|perf narrow E1 detach] === perf wide E1 (5000 ops/s) ===
+19:27:33 [redis-check|perf wide E1 detach] === ebpf narrow E1 (5000 ops/s) ===
+19:28:37 [redis-check|ebpf narrow E1 detach] === ebpf wide E1 (5000 ops/s) ===
+19:29:42 [redis-check|ebpf wide E1 detach] === collector narrow E1 (5000 ops/s) ===
+19:30:46 [redis-check|collector narrow E1 detach] === collector wide E1 (5000 ops/s) ===
+19:31:50 [redis-check|collector wide E1 detach] === none base E4 (40000 ops/s) ===
+19:32:54 [redis-check|none base E4 load] === perf narrow E4 (40000 ops/s) ===
+19:33:59 [redis-check|perf narrow E4 detach] === perf wide E4 (40000 ops/s) ===
+19:35:02 [redis-check|perf wide E4 detach] WARN: perf wide E4: achieved 22926.18 ops/s is more than 1 % from target 40000 (R6; generator or redis saturated?)
+19:35:02 [redis-check|perf wide E4 detach] === ebpf narrow E4 (40000 ops/s) ===
+19:36:06 [redis-check|ebpf narrow E4 detach] === ebpf wide E4 (40000 ops/s) ===
+19:37:10 [redis-check|ebpf wide E4 detach] WARN: ebpf wide E4: achieved 31225.02 ops/s is more than 1 % from target 40000 (R6; generator or redis saturated?)
+19:37:10 [redis-check|ebpf wide E4 detach] === collector narrow E4 (40000 ops/s) ===
+19:38:14 [redis-check|collector narrow E4 detach] === collector wide E4 (40000 ops/s) ===
+# redis check 20261111-192414  kernel 7.0.0-43-generic  memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes  redis:7.4  threads 2  clients 25  keys 1000000
+# 10s ramp + 2.0s minimum gap + 30s load per row; not a measurement
+# preflight symbol line: uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+mech      scope  lvl    rate     ops_s   p50_ms   p99_ms  p999_ms errors memtier_ops   cmds_delta misses_dlt  gap_s  wl_cpu  tr_cpu gen_cpu    mech_ev mech_lost/drop
+none      base   E1     5000   5001.01 0.615000 1.559000 2.671000      0     150050       150051          0  2.022 0.137329      NA  0.1545         NA NA/NA
+perf      narrow E1     5000   5001.37 0.895000 2.039000 2.815000      0     150052       150053          0  2.023 0.136747  0.0003  0.1658        413 0/0.000000
+perf      wide   E1     5000   5001.15 1.991000 3.967000 4.863000      0     150050       150051          0  2.024 0.266903  0.1643  0.1673    1385218 0/0.000000
+ebpf      narrow E1     5000   5001.16 1.159000 2.415000 3.151000      0     150050       150051          0  2.228 0.162209  0.0609  0.1673     150052 0/0.000000
+ebpf      wide   E1     5000   5000.74 1.607000 3.103000 4.015000      0     150050       150051          0  2.226 0.217409  0.1828  0.1781     694872 0/0.000000
+collector narrow E1     5000   5001.19 0.839000 2.007000 2.863000      0     150050       150053          0  2.022 0.134630  0.0013  0.1638        102 0/0.000000
+collector wide   E1     5000   5001.31 0.815000 1.991000 2.831000      0     150050       150081          0  2.023 0.133053  0.0739  0.1622      15376 0/0.000000
+none      base   E4    40000  39994.58 0.855000 1.743000 3.855000      0    1200032      1200033          0  2.023 0.775956      NA  0.9278         NA NA/NA
+perf      narrow E4    40000  39953.55 0.855000 1.791000 4.159000      0    1198773      1198774          0  2.023 0.777622  0.0003  0.9318       2323 0/0.000000
+perf      wide   E4    40000  22926.18 2.143000 3.663000 5.151000      0     687866       687867          0  2.024 0.993895  0.5723  0.6036    5888970 0/0.000000
+ebpf      narrow E4    40000  39983.33 1.023000 1.927000 2.607000      0    1199611      1199612          0  2.232 0.899175  0.3748  0.9422    1199613 0/0.000000
+ebpf      wide   E4    40000  31225.02 1.551000 3.055000 3.679000      0     936818       936819          0  2.228 0.995470  0.9151  0.8686    4002189 0/0.000000
+collector narrow E4    40000  39995.53 0.847000 1.743000 3.951000      0    1200028      1200031          0  2.023 0.771377  0.0010  0.9281        102 0/0.000000
+collector wide   E4    40000  39994.82 0.847000 1.823000 3.999000      0    1200014      1200045          0  2.024 0.772664  0.0743  0.9288      15376 0/0.000000
+# ops_s: memtier ops/s in the window; errors: memtier connection errors; memtier_ops: requests memtier completed
+# cmds_delta, misses_dlt: redis INFO total_commands_processed and keyspace_misses over the window
+# gap_s: idle time from ramp end to window start; wl_cpu: redis cgroup cores; tr_cpu: tracer userspace cores (sampler)
+# gen_cpu: memtier cores; mech_ev: MECH_EVENTS; mech_lost/drop: MECH_LOST and MECH_DROP_RATE
+# derived lines and warnings (a warning is not a failure; read each one):
+ebpf narrow E1: eBPF narrow events per command = 1.000007 (150052 events / 150051 commands)
+collector narrow E1: redis receiver accepted 102 points in about 2 scrapes (every 15 s) = 51.000000 points per scrape (plan estimate 30-40)
+collector wide E1: redis receiver accepted 1088 points in about 31 scrapes (every 1 s) = 35.096774 points per scrape (plan estimate 30-40)
+WARN: perf wide E4: achieved 22926.18 ops/s is more than 1 % from target 40000 (R6; generator or redis saturated?)
+ebpf narrow E4: eBPF narrow events per command = 1.000001 (1199613 events / 1199612 commands)
+WARN: ebpf wide E4: achieved 31225.02 ops/s is more than 1 % from target 40000 (R6; generator or redis saturated?)
+collector narrow E4: redis receiver accepted 102 points in about 2 scrapes (every 15 s) = 51.000000 points per scrape (plan estimate 30-40)
+collector wide E4: redis receiver accepted 1088 points in about 31 scrapes (every 1 s) = 35.096774 points per scrape (plan estimate 30-40)
+# warnings: 2
+REMINDER: copy one real memtier.json from /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/redis-check/20261111-192414/ to redis-memtier/tests/fixtures/memtier_L.json and add a parse test (as fio did with fio_L.json).
+19:39:19 [redis-check|host revert] host reverted
+19:39:20 [redis-check|host revert] done — summary in /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/redis-check_20261111-192414.txt

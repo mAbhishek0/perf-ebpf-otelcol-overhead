@@ -1,0 +1,34 @@
+19:23:48 [redis-check|preflight] preflight
+19:23:48 [redis-check|preflight]   [ok]   on AC power
+19:23:48 [redis-check|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+19:23:48 [redis-check|preflight]   [ok]   TLP not active
+19:23:48 [redis-check|preflight]   [ok]   unattended-upgrades not active
+19:23:48 [redis-check|preflight]   [FAIL] noisy processes running: Telegram gnome-software 
+19:23:48 [redis-check|preflight] WARN: graphical session running (ALLOW_GUI=1)
+19:23:48 [redis-check|preflight]   package 61 °C > 55 °C — waiting up to 900s to cool
+19:23:51 [redis-check|preflight]   cooled for 3s, now 55 °C
+19:23:51 [redis-check|preflight]   [ok]   package 55 °C
+19:23:51 [redis-check|preflight]   [ok]   51022 MB free
+19:23:51 [redis-check|preflight]   [ok]   BPF JIT on
+19:23:51 [redis-check|preflight]   [ok]   docker reachable
+19:23:51 [redis-check|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+19:23:51 [redis-check|preflight]   [ok]   redis:7.4 id matches
+19:23:51 [redis-check|preflight]   [ok]   port 6379 free
+19:23:51 [redis-check|preflight]   [ok]   redis-cli present
+19:23:51 [redis-check|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+19:23:51 [redis-check|preflight]   [ok]   no leftover bench-redis
+19:23:51 [redis-check|preflight]   [ok]   memtier 2 threads x 25 clients
+19:23:51 [redis-check|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+19:23:51 [redis-check|preflight]   [ok]   perf version 7.0.14
+19:23:51 [redis-check|preflight]   [ok]   BCC python bindings (0.35.0)
+19:23:52 [redis-check|preflight]   [ok]   uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+19:23:52 [redis-check|preflight]   [ok]   tracepoint raw_syscalls
+19:23:52 [redis-check|preflight]   [ok]   bpf_jit_enable=1
+19:23:52 [redis-check|preflight]   [ok]   bpf_jit_harden=0
+19:23:52 [redis-check|preflight]   [ok]   tracer sources present (redis_probes.c)
+19:23:52 [redis-check|preflight]   [ok]   otelcol: otelcol-contrib version 0.161.0
+19:23:52 [redis-check|preflight]   [ok]   collector mode scraper
+19:23:52 [redis-check|preflight]   [ok]   otelcol templates present
+19:23:52 [redis-check|preflight]   [ok]   port 18888 free
+19:23:52 [redis-check|preflight]   [ok]   no otelcol-contrib running
+19:23:52 [redis-check|preflight] FAIL: preflight: 1 check(s) failed
