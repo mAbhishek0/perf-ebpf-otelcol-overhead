@@ -1,0 +1,2 @@
+kprobe:tcp_sendmsg /pid == $1/ { printf("%lld %d\n", nsecs, tid); }
+interval:s:2 { exit(); }
