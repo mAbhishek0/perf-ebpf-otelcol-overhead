@@ -95,7 +95,7 @@ t_eq "gap rounds to 3 decimals" 2.000 "$(_redis_gap_s 100.0 102.0004)"
 
 # --- wl_csv_columns: valid per collect's rule ---
 _csv_cols
-t_eq "six redis columns after the shared ones" "$(( ${#CSV_COLUMNS[@]} + 6 ))" "${#CSV_COLS[@]}"
+t_eq "eight redis columns after the shared ones" "$(( ${#CSV_COLUMNS[@]} + 8 ))" "${#CSV_COLS[@]}"
 t_eq "column units" "memtier_runtime_ms:ms memtier_ops:requests memtier_ramp_ops_per_sec:requests/s redis_cmds_delta:commands redis_misses_delta:misses gap_s:s redis_loop_cycles_delta:cycles redis_loop_us_delta:us" "${WL_COL_UNITS[*]}"
 
 # --- schema: valid JSON, redis constants frozen; nginx/fio keys absent ---
@@ -321,9 +321,9 @@ RD="$T/rcsv"; mkdir -p "$RD/raw"; _redis_bundle "$RD" A1
 _redis_collect "$RD" && ok || bad "redis collect failed"
 csv="$RD/redis_perf.csv"
 shared=""; for c in "${CSV_COLUMNS[@]}"; do shared+="${shared:+,}\"${c%%:*}\""; done
-t_eq "header = shared columns then the six redis columns" \
+t_eq "header = shared columns then the eight redis columns" \
   "$shared,\"memtier_runtime_ms\",\"memtier_ops\",\"memtier_ramp_ops_per_sec\",\"redis_cmds_delta\",\"redis_misses_delta\",\"gap_s\",\"redis_loop_cycles_delta\",\"redis_loop_us_delta\"" "$(head -1 "$csv")"
-t_eq "row values" '"120000","11999900","99999.17","11999500","0","2.437"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
+t_eq "row values" '"120000","11999900","99999.17","11999500","0","2.437","39240","30000000"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
 t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"memtier_runtime_ms": "ms", "memtier_ops": "requests", "memtier_ramp_ops_per_sec": "requests/s", "redis_cmds_delta": "commands", "redis_misses_delta": "misses", "gap_s": "s", "redis_loop_cycles_delta": "cycles", "redis_loop_us_delta": "us"},'
 _redis_bad() {
   local rd="$T/rbad$RANDOM" b
