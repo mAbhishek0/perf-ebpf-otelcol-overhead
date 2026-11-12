@@ -1,0 +1,48 @@
+08:36:27 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+08:36:27 [diag|preflight] preflight
+08:36:27 [diag|preflight]   [ok]   on AC power
+08:36:27 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+08:36:27 [diag|preflight]   [ok]   TLP not active
+08:36:27 [diag|preflight]   [ok]   unattended-upgrades not active
+08:36:27 [diag|preflight]   [ok]   no noisy processes
+08:36:27 [diag|preflight]   [ok]   no graphical session
+08:36:27 [diag|preflight]   package 63 °C > 55 °C — waiting up to 900s to cool
+08:36:32 [diag|preflight]   cooled for 5s, now 55 °C
+08:36:32 [diag|preflight]   [ok]   package 55 °C
+08:36:32 [diag|preflight]   [ok]   50888 MB free
+08:36:32 [diag|preflight]   [ok]   BPF JIT on
+08:36:32 [diag|preflight]   [ok]   docker reachable
+08:36:32 [diag|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+08:36:33 [diag|preflight]   [ok]   redis:7.4 id matches
+08:36:33 [diag|preflight]   [ok]   port 6379 free
+08:36:33 [diag|preflight]   [ok]   redis-cli present
+08:36:33 [diag|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+08:36:33 [diag|preflight]   [ok]   no leftover bench-redis
+08:36:33 [diag|preflight]   [ok]   memtier 2 threads x 25 clients
+08:36:33 [diag|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+08:36:33 [diag|preflight] preflight passed
+08:36:33 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+08:36:33 [diag|host setup] clock floor requested at 2900000 kHz
+08:36:33 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+08:36:34 [diag|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+08:36:38 [diag|host setup] clock under load: 2894499 kHz (ok)
+08:36:38 [diag|host setup] host configured
+08:37:08 [diag|host setup] idle package temp 37 C (min of 15 samples over 30 s)
+08:37:08 [diag|diag base r1] diag base rep 1: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+08:37:08 [diag|diag base r1] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+17:37:20 [diag|diag base r1] crash report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/crash_20261112-083617.txt
+17:37:22 [diag|diag base r1] no machine-state drift
+17:37:23 [diag|host revert] host reverted
+17:37:23 [diag|restore services] WARN: could not restart cups.socket
+17:37:23 [diag|restore services] WARN: could not restart cups.path
+17:37:23 [diag|restore services] WARN: could not restart cups
+17:37:23 [diag|restore services] WARN: could not restart cups-browsed
+17:37:23 [diag|restore services] WARN: could not restart snapd.socket
+17:37:23 [diag|restore services] WARN: could not restart snapd
+17:37:23 [diag|restore services] WARN: could not restart ModemManager
+17:37:23 [diag|restore services] WARN: could not restart bluetooth
+Failed to start gdm.service: Transaction for gdm.service/start is destructive (proc-sys-fs-binfmt_misc.automount has 'stop' job queued, but 'start' is included in transaction).
+See system logs and 'systemctl status gdm.service' for details.
+17:37:23 [diag|restore services] WARN: could not restart gdm
+17:37:23 [diag|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+17:37:24 [diag|restore services] exited with status 130 — host reverted

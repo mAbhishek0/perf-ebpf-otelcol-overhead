@@ -1,0 +1,158 @@
+CRASH REPORT  2026-11-12T17:37:19+05:30  exit=130  stage=diag base r1  unit=bench-diag
+run in flight: none (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+08:36:33 rc=1 stage=host setup cmd=[[ -w $d/pwm${n}_enable ]] stack=_fan_enable_state@host.sh:66 host_save_prior@host.sh:26 host_setup@host.sh:102 main@diag_redis_pacing.sh:111 
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-diag_20261112-083607.log'
+08:36:27 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+08:36:27 [diag|preflight] preflight
+08:36:27 [diag|preflight]   [ok]   on AC power
+08:36:27 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+08:36:27 [diag|preflight]   [ok]   TLP not active
+08:36:27 [diag|preflight]   [ok]   unattended-upgrades not active
+08:36:27 [diag|preflight]   [ok]   no noisy processes
+08:36:27 [diag|preflight]   [ok]   no graphical session
+08:36:27 [diag|preflight]   package 63 °C > 55 °C — waiting up to 900s to cool
+08:36:32 [diag|preflight]   cooled for 5s, now 55 °C
+08:36:32 [diag|preflight]   [ok]   package 55 °C
+08:36:32 [diag|preflight]   [ok]   50888 MB free
+08:36:32 [diag|preflight]   [ok]   BPF JIT on
+08:36:32 [diag|preflight]   [ok]   docker reachable
+08:36:32 [diag|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+08:36:33 [diag|preflight]   [ok]   redis:7.4 id matches
+08:36:33 [diag|preflight]   [ok]   port 6379 free
+08:36:33 [diag|preflight]   [ok]   redis-cli present
+08:36:33 [diag|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+08:36:33 [diag|preflight]   [ok]   no leftover bench-redis
+08:36:33 [diag|preflight]   [ok]   memtier 2 threads x 25 clients
+08:36:33 [diag|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+08:36:33 [diag|preflight] preflight passed
+08:36:33 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+08:36:33 [diag|host setup] clock floor requested at 2900000 kHz
+08:36:33 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+08:36:34 [diag|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+08:36:38 [diag|host setup] clock under load: 2894499 kHz (ok)
+08:36:38 [diag|host setup] host configured
+08:37:08 [diag|host setup] idle package temp 37 C (min of 15 samples over 30 s)
+08:37:08 [diag|diag base r1] diag base rep 1: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+08:37:08 [diag|diag base r1] cooldown 0s -> start at 37 C (limit 42 C, idle 37 C)
+
+##### docker ps -a
+error during connect: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.52/containers/json?all=1": read unix @->/run/docker.sock: read: connection reset by peer
+
+##### docker logs --tail 100 bench-nginx
+error during connect: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.52/containers/bench-nginx/json": read unix @->/run/docker.sock: read: connection reset by peer
+
+##### docker logs --tail 100 bench-redis
+error during connect: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.52/containers/bench-redis/json": read unix @->/run/docker.sock: read: connection reset by peer
+
+##### dmesg -T | tail -n 60
+[Thu Nov 12 08:02:07 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 08:02:07 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 08:02:07 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 08:02:13 2026] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224111243
+[Thu Nov 12 08:02:13 2026] Bluetooth: hci0: Device setup in 145148 usecs
+[Thu Nov 12 08:02:13 2026] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[Thu Nov 12 08:02:13 2026] Bluetooth: hci0: AOSP extensions version v1.00
+[Thu Nov 12 08:02:13 2026] Bluetooth: hci0: AOSP quality report is supported
+[Thu Nov 12 08:04:11 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 08:04:11 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 08:04:11 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 08:04:12 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 08:04:12 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 08:04:12 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 08:36:26 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.051:771): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69060 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.051:772): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69060 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.051:773): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69063 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.053:774): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69059 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.053:775): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69059 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.053:776): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69065 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.066:777): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=69072 comm="fusermount3" flags="rw, rprivate"
+[Thu Nov 12 08:36:26 2026] rfkill: input handler enabled
+[Thu Nov 12 08:36:26 2026] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224111243
+[Thu Nov 12 08:36:26 2026] Bluetooth: hci0: Device setup in 140197 usecs
+[Thu Nov 12 08:36:26 2026] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.282:778): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69192 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 08:36:26 2026] audit: type=1400 audit(1794452786.283:779): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69193 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:26 2026] Bluetooth: hci0: AOSP extensions version v1.00
+[Thu Nov 12 08:36:26 2026] Bluetooth: hci0: AOSP quality report is supported
+[Thu Nov 12 08:36:27 2026] audit: type=1400 audit(1794452787.445:780): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=69267 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 1 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 3 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 5 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 7 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 9 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 11 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 13 is now offline
+[Thu Nov 12 08:36:34 2026] smpboot: CPU 15 is now offline
+[Thu Nov 12 08:36:34 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Thu Nov 12 08:36:34 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+[Thu Nov 12 08:36:37 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Thu Nov 12 08:36:37 2026] audit: type=1400 audit(1794452797.501:786): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=70487 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 08:36:37 2026] audit: type=1400 audit(1794452797.501:787): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=70487 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:37 2026] audit: type=1400 audit(1794452797.501:788): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=70489 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 08:36:37 2026] audit: type=1400 audit(1794452797.512:789): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=70490 comm="fusermount3" flags="rw, rprivate"
+[Thu Nov 12 17:22:58 2026] audit: type=1400 audit(1794484378.737:790): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=317519 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Thu Nov 12 17:22:58 2026] audit: type=1400 audit(1794484378.742:791): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=317519 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Thu Nov 12 17:22:58 2026] audit: type=1400 audit(1794484378.757:792): apparmor="AUDIT" operation="userns_create" class="namespace" info="Userns create - transitioning profile" profile="unconfined" pid=317517 comm="(ubuntu-insigh)" requested="userns_create" target="unprivileged_userns" execpath="/usr/lib/systemd/systemd-executor"
+[Thu Nov 12 17:22:58 2026] audit: type=1400 audit(1794484378.759:793): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=317517 comm="(ubuntu-insigh)" capability=21  capname="sys_admin"
+[Thu Nov 12 17:22:58 2026] audit: type=1400 audit(1794484378.814:794): apparmor="DENIED" operation="getattr" class="file" info="Failed name lookup - disconnected path" error=-13 profile="unprivileged_userns" name="" pid=317563 comm="systemd-detect-" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+[Thu Nov 12 17:22:59 2026] audit: type=1400 audit(1794484379.272:795): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=317679 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 17:22:59 2026] audit: type=1400 audit(1794484379.272:796): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=317679 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 17:22:59 2026] audit: type=1400 audit(1794484379.272:797): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=317680 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 17:37:20 2026] audit: type=1107 audit(1794485239.962:798): pid=3350 uid=995 auid=4294967295 ses=4294967295 subj=unconfined msg='apparmor="DENIED" operation="dbus_method_call"  bus="system" path="/" interface="org.freedesktop.DBus.Peer" member="Ping" mask="send" name="org.freedesktop.Avahi" pid=4252 label="snap.cups.cupsd"
+                            exe="/usr/bin/dbus-daemon" sauid=995 hostname=? addr=? terminal=?'
+[Thu Nov 12 17:37:20 2026] audit: type=1400 audit(1794485240.280:799): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=318160 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 17:37:20 2026] audit: type=1400 audit(1794485240.280:800): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=318160 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 17:37:20 2026] audit: type=1400 audit(1794485240.280:801): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=318164 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 17:37:20 2026] audit: type=1400 audit(1794485240.313:802): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=318172 comm="fusermount3" flags="rw, rprivate"
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+0
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2894492
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2894500
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 33000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+  68977       1  12  0.0 Ss      09:01:03 bash
+  70970   68977  10  0.0 S       08:59:19 bash
+ 317288       1  12  0.0 S          43:24 sleep
+ 318351  318348  12  0.0 S          00:00 bash
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887        1380        8082          67        5816       13506
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   53G   50G  52% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=
