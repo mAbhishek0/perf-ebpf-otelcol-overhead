@@ -73,8 +73,8 @@ t_eq "server command (R2)" "redis-server --port 6379 --bind 127.0.0.1 --protecte
 t_eq "--save value is an empty argument" "" "${REDIS_CMD[8]}"
 
 # --- INFO parsing: lines end in \r\n ---
-printf '# Stats\r\ntotal_connections_received:51\r\ntotal_commands_processed:1000\r\nkeyspace_hits:900\r\nkeyspace_misses:7\r\n' > "$T/i0.txt"
-printf '# Stats\r\ntotal_connections_received:101\r\ntotal_commands_processed:12000500\r\nkeyspace_hits:10000000\r\nkeyspace_misses:7\r\n' > "$T/i1.txt"
+printf '# Stats\r\ntotal_connections_received:51\r\ntotal_commands_processed:1000\r\nkeyspace_hits:900\r\nkeyspace_misses:7\r\neventloop_cycles:5000\r\neventloop_duration_sum:900000\r\n' > "$T/i0.txt"
+printf '# Stats\r\ntotal_connections_received:101\r\ntotal_commands_processed:12000500\r\nkeyspace_hits:10000000\r\nkeyspace_misses:7\r\neventloop_cycles:44240\r\neventloop_duration_sum:30900000\r\n' > "$T/i1.txt"
 _redis_info_field "$T/i1.txt" total_commands_processed; t_eq "INFO field strips CR" 12000500 "$REPLY"
 _redis_info_delta "$T/i0.txt" "$T/i1.txt" total_commands_processed
 t_eq "commands delta value" 11999500 "$REPLY"
@@ -96,7 +96,7 @@ t_eq "gap rounds to 3 decimals" 2.000 "$(_redis_gap_s 100.0 102.0004)"
 # --- wl_csv_columns: valid per collect's rule ---
 _csv_cols
 t_eq "six redis columns after the shared ones" "$(( ${#CSV_COLUMNS[@]} + 6 ))" "${#CSV_COLS[@]}"
-t_eq "column units" "memtier_runtime_ms:ms memtier_ops:requests memtier_ramp_ops_per_sec:requests/s redis_cmds_delta:commands redis_misses_delta:misses gap_s:s" "${WL_COL_UNITS[*]}"
+t_eq "column units" "memtier_runtime_ms:ms memtier_ops:requests memtier_ramp_ops_per_sec:requests/s redis_cmds_delta:commands redis_misses_delta:misses gap_s:s redis_loop_cycles_delta:cycles redis_loop_us_delta:us" "${WL_COL_UNITS[*]}"
 
 # --- schema: valid JSON, redis constants frozen; nginx/fio keys absent ---
 mkdir -p "$T/s"
@@ -130,6 +130,8 @@ if [[ -n $PY ]]; then
   t_eq "parse ramp ops/s" 99999.17 "$(kv_get "$e" MEMTIER_RAMP_OPS_PER_SEC)"
   t_eq "parse cmds delta" 11999500 "$(kv_get "$e" REDIS_CMDS_DELTA)"
   t_eq "parse misses delta" 0 "$(kv_get "$e" REDIS_MISSES_DELTA)"
+  t_eq "parse loop cycles" 39240 "$(kv_get "$e" REDIS_LOOP_CYCLES_DELTA)"
+  t_eq "parse loop us" 30000000 "$(kv_get "$e" REDIS_LOOP_US_DELTA)"
   t_eq "parse gap" 2.437 "$(kv_get "$e" GAP_S)"
   [[ ! -e $e.partial ]] && ok || bad "wl_parse left wl.env.partial"
   rm -f "$b/wl.env"
@@ -163,7 +165,7 @@ cat > "$T/bin/redis-cli" <<EOF
 #!/bin/sh
 case "\$*" in
   *"INFO stats"*) n=\$(cat "$T/info_n" 2>/dev/null || echo 0); echo \$((n+1)) > "$T/info_n"
-                  printf 'total_commands_processed:%s\r\nkeyspace_misses:0\r\n' \$((1000 + n * 5000)) ;;
+                  printf 'total_commands_processed:%s\r\nkeyspace_misses:0\r\neventloop_cycles:%s\r\neventloop_duration_sum:%s\r\n' \$((1000 + n * 5000)) \$((10 + n * 40000)) \$((20 + n * 30000000)) ;;
   *DBSIZE*) echo "\${DBSIZE_STUB:-1000000}" ;;
   *PING*) echo PONG ;;
 esac
@@ -320,9 +322,9 @@ _redis_collect "$RD" && ok || bad "redis collect failed"
 csv="$RD/redis_perf.csv"
 shared=""; for c in "${CSV_COLUMNS[@]}"; do shared+="${shared:+,}\"${c%%:*}\""; done
 t_eq "header = shared columns then the six redis columns" \
-  "$shared,\"memtier_runtime_ms\",\"memtier_ops\",\"memtier_ramp_ops_per_sec\",\"redis_cmds_delta\",\"redis_misses_delta\",\"gap_s\"" "$(head -1 "$csv")"
+  "$shared,\"memtier_runtime_ms\",\"memtier_ops\",\"memtier_ramp_ops_per_sec\",\"redis_cmds_delta\",\"redis_misses_delta\",\"gap_s\",\"redis_loop_cycles_delta\",\"redis_loop_us_delta\"" "$(head -1 "$csv")"
 t_eq "row values" '"120000","11999900","99999.17","11999500","0","2.437"' "$(sed -n 2p "$csv" | cut -d, -f$(( ${#CSV_COLUMNS[@]} + 1 ))-)"
-t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"memtier_runtime_ms": "ms", "memtier_ops": "requests", "memtier_ramp_ops_per_sec": "requests/s", "redis_cmds_delta": "commands", "redis_misses_delta": "misses", "gap_s": "s"},'
+t_has "schema column units" "$RD/schema.json" '  "workload_column_units": {"memtier_runtime_ms": "ms", "memtier_ops": "requests", "memtier_ramp_ops_per_sec": "requests/s", "redis_cmds_delta": "commands", "redis_misses_delta": "misses", "gap_s": "s", "redis_loop_cycles_delta": "cycles", "redis_loop_us_delta": "us"},'
 _redis_bad() {
   local rd="$T/rbad$RANDOM" b
   mkdir -p "$rd/raw"; _redis_bundle "$rd" A1

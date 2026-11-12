@@ -245,6 +245,13 @@ wl_parse() {
   kv_put "$e.partial" REDIS_CMDS_DELTA "$REPLY"
   _redis_info_delta "$b/info_before.txt" "$b/info_after.txt" keyspace_misses
   kv_put "$e.partial" REDIS_MISSES_DELTA "$REPLY"
+  # redis's event-loop cycles and loop time over the window (R18). Untraced
+  # runs sit on one of two latency levels that differ in cycles per second
+  # (README timelines 57-61); these columns show which level each run is on.
+  _redis_info_delta "$b/info_before.txt" "$b/info_after.txt" eventloop_cycles
+  kv_put "$e.partial" REDIS_LOOP_CYCLES_DELTA "$REPLY"
+  _redis_info_delta "$b/info_before.txt" "$b/info_after.txt" eventloop_duration_sum
+  kv_put "$e.partial" REDIS_LOOP_US_DELTA "$REPLY"
   gs=$(cat "$b/gap_s" 2>/dev/null || true)
   [[ $gs =~ ^[0-9]+\.[0-9]+$ ]] || die "no gap in $b/gap_s (got '$gs')"
   kv_put "$e.partial" GAP_S "$gs"
@@ -271,6 +278,8 @@ wl_provenance() {
 #   redis_cmds_delta         commands redis executed during the window (INFO): memtier's plus the harness's INFO calls
 #   redis_misses_delta       GETs that missed during the window (should be 0, R3)
 #   gap_s                    idle time between the ramp's end and the window's start (R7)
+#   redis_loop_cycles_delta  event-loop cycles during the window (INFO eventloop_cycles; R18)
+#   redis_loop_us_delta      time inside the event loop during the window (INFO eventloop_duration_sum; R18)
 wl_csv_columns() {
   printf '%s\n' \
     'memtier_runtime_ms:MEMTIER_RUNTIME_MS:ms' \
@@ -278,7 +287,9 @@ wl_csv_columns() {
     'memtier_ramp_ops_per_sec:MEMTIER_RAMP_OPS_PER_SEC:requests/s' \
     'redis_cmds_delta:REDIS_CMDS_DELTA:commands' \
     'redis_misses_delta:REDIS_MISSES_DELTA:misses' \
-    'gap_s:GAP_S:s'
+    'gap_s:GAP_S:s' \
+    'redis_loop_cycles_delta:REDIS_LOOP_CYCLES_DELTA:cycles' \
+    'redis_loop_us_delta:REDIS_LOOP_US_DELTA:us'
 }
 
 wl_schema_json() {
