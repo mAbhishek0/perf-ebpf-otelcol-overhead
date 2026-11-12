@@ -1,0 +1,89 @@
+17:48:30 [diag|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+17:48:30 [diag|preflight] preflight
+17:48:30 [diag|preflight]   [ok]   on AC power
+17:48:30 [diag|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+17:48:30 [diag|preflight]   [ok]   TLP not active
+17:48:30 [diag|preflight]   [ok]   unattended-upgrades not active
+17:48:30 [diag|preflight]   [ok]   no noisy processes
+17:48:30 [diag|preflight]   [ok]   no graphical session
+17:48:30 [diag|preflight]   package 69 °C > 55 °C — waiting up to 900s to cool
+17:48:39 [diag|preflight]   cooled for 9s, now 55 °C
+17:48:39 [diag|preflight]   [ok]   package 55 °C
+17:48:39 [diag|preflight]   [ok]   50851 MB free
+17:48:39 [diag|preflight]   [ok]   BPF JIT on
+17:48:39 [diag|preflight]   [ok]   docker reachable
+17:48:39 [diag|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+17:48:39 [diag|preflight]   [ok]   redis:7.4 id matches
+17:48:39 [diag|preflight]   [ok]   port 6379 free
+17:48:39 [diag|preflight]   [ok]   redis-cli present
+17:48:39 [diag|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+17:48:39 [diag|preflight]   [ok]   no leftover bench-redis
+17:48:39 [diag|preflight]   [ok]   memtier 2 threads x 25 clients
+17:48:39 [diag|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+17:48:39 [diag|preflight] preflight passed
+17:48:39 [diag|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+17:48:40 [diag|host setup] clock floor requested at 2900000 kHz
+17:48:40 [diag|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+17:48:40 [diag|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+17:48:44 [diag|host setup] clock under load: 2894696 kHz (ok)
+17:48:44 [diag|host setup] host configured
+17:49:14 [diag|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+17:49:14 [diag|diag base r1] diag base rep 1: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+17:49:14 [diag|diag base r1] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+17:52:07 [diag|diag t1 r1] diag t1 rep 1: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+17:52:07 [diag|diag t1 r1] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+17:55:01 [diag|diag base r2] diag base rep 2: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+17:55:01 [diag|diag base r2] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+17:57:54 [diag|diag t1 r2] diag t1 rep 2: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+17:57:54 [diag|diag t1 r2] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:00:48 [diag|diag base r3] diag base rep 3: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:00:48 [diag|diag base r3] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:03:40 [diag|diag t1 r3] diag t1 rep 3: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:03:40 [diag|diag t1 r3] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:06:33 [diag|diag base r4] diag base rep 4: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:06:34 [diag|diag base r4] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:09:26 [diag|diag t1 r4] diag t1 rep 4: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:09:26 [diag|diag t1 r4] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:12:20 [diag|diag base r5] diag base rep 5: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:12:20 [diag|diag base r5] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:15:13 [diag|diag t1 r5] diag t1 rep 5: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:15:13 [diag|diag t1 r5] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:18:07 [diag|diag base r6] diag base rep 6: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:18:07 [diag|diag base r6] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:21:00 [diag|diag t1 r6] diag t1 rep 6: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:21:00 [diag|diag t1 r6] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:23:54 [diag|diag base r7] diag base rep 7: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:23:54 [diag|diag base r7] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:26:46 [diag|diag t1 r7] diag t1 rep 7: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:26:47 [diag|diag t1 r7] cooldown 1s -> start at 36 C (limit 44 C, idle 39 C)
+18:29:40 [diag|diag base r8] diag base rep 8: rate 20000, memtier 2 threads x 25 clients on 12,14, untraced
+18:29:40 [diag|diag base r8] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+18:32:33 [diag|diag t1 r8] diag t1 rep 8: rate 20000, memtier 1 threads x 50 clients on 12,14, untraced
+18:32:33 [diag|diag t1 r8] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+redis pacing diagnostic  rate=20000 req/s  window=120s  reps=8  untraced  2026-11-12T18:35:27+05:30
+loops_s = redis event-loop cycles per second over the window; req_loop = requests per cycle
+sends = memtier sends captured in 2s mid-window; thr = memtier threads seen sending
+offset_ms = distance between the two busiest threads' mean burst phases in the 20 ms period (0-10)
+r1 r2 r_all = burst concentration of thread 1, thread 2, all sends (1 = one instant, 0 = even)
+
+variant rep  p50_ms  p99_ms p999_ms   thr_rps  loops_s req_loop  gen_c |  sends thr offset_ms     r1     r2  r_all
+base    1 0.847000 1.847000 3.615000  19999.35      999   20.02 0.5087 |  39771   2      2.16  0.823  0.807  0.769
+base    2 0.839000 1.831000 3.583000  19999.69     1000   20.00 0.5074 |  39709   2      2.17  0.812  0.799  0.759
+base    3 0.847000 1.831000 3.583000  19999.87      997   20.05 0.5085 |  39600   2      2.18  0.818  0.798  0.761
+base    4 0.847000 1.831000 3.599000  19999.61      989   20.22 0.5081 |  39745   2      2.11  0.812  0.795  0.760
+base    5 0.679000 1.687000 3.583000  19999.79     1264   15.82 0.4922 |  39922   2      3.09  0.842  0.862  0.753
+base    6 0.671000 1.687000 3.583000  19999.81     1258   15.90 0.4916 |  39654   2      3.17  0.842  0.860  0.747
+base    7 0.847000 1.855000 3.631000  19999.66      998   20.04 0.5083 |  39671   2      2.22  0.801  0.825  0.764
+base    8 0.847000 1.847000 3.615000  19999.90      999   20.03 0.5085 |  39815   2      2.20  0.798  0.817  0.760
+t1      1 1.007000 2.127000 3.999000  19999.33     1371   14.59 0.4490 |  39642   1         -  0.664      -  0.664
+t1      2 1.007000 2.143000 3.919000  19999.28     1358   14.73 0.4498 |  39641   1         -  0.666      -  0.666
+t1      3 0.999000 2.111000 3.823000  19999.45     1389   14.40 0.4498 |  39600   1         -  0.666      -  0.666
+t1      4 1.007000 2.111000 3.903000  19999.41     1377   14.52 0.4493 |  39623   1         -  0.668      -  0.668
+t1      5 0.999000 2.095000 3.967000  19999.57     1384   14.45 0.4493 |  39600   1         -  0.668      -  0.668
+t1      6 1.007000 2.127000 3.903000  19999.28     1368   14.62 0.4505 |  39600   1         -  0.667      -  0.667
+t1      7 1.007000 2.143000 3.919000  19999.47     1371   14.59 0.4501 |  39600   1         -  0.670      -  0.670
+t1      8 1.007000 2.111000 3.871000  19999.46     1365   14.65 0.4497 |  39600   1         -  0.668      -  0.668
+18:35:29 [diag|report] no machine-state drift
+18:35:30 [diag|host revert] host reverted
+18:35:30 [diag|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+18:35:31 [diag|restore services] done — report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/diag/20261112-174819/report.txt
