@@ -62,6 +62,8 @@ redis adds six columns of its own. They come after all the shared columns, so th
 - `redis_cmds_delta` (`REDIS_CMDS_DELTA`): how many commands redis executed during the window, from `INFO` `total_commands_processed`. It is an independent count of the work. It also holds the harness's own `INFO` command and, for the collector, its scrapes (section 6).
 - `redis_misses_delta` (`REDIS_MISSES_DELTA`): how many `GET`s found no key, from `INFO` `keyspace_misses`. It should be 0.
 - `gap_s` (`GAP_S`): the idle time between the end of the ramp and the start of the window, in seconds. It is at least `REDIS_GAP_MIN_S`.
+- `redis_loop_cycles_delta` (`REDIS_LOOP_CYCLES_DELTA`): how many event-loop cycles redis ran during the window, from `INFO` `eventloop_cycles`. Divided by the window length it gives cycles per second, which shows which of the two latency levels the run sat on (plan R18).
+- `redis_loop_us_delta` (`REDIS_LOOP_US_DELTA`): microseconds redis spent inside its event loop during the window, from `INFO` `eventloop_duration_sum` (plan R18).
 
 ## 5. Hardware steps, in order
 
