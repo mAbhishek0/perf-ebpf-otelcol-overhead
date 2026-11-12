@@ -1,0 +1,300 @@
+CRASH REPORT  2026-11-12T03:47:41+05:30  exit=1  stage=L_redis_ebpf_wide_E4_try3_A2 stop+parse  unit=bench-redis
+run in flight: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2 (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+21:14:25 rc=1 stage=host setup cmd=[[ -w $d/pwm${n}_enable ]] stack=_fan_enable_state@host.sh:66 host_save_prior@host.sh:26 host_setup@host.sh:102 main@run_workload.sh:117 
+00:09:21 rc=1 stage=L_redis_perf_wide_E1_try1_B4 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:187 _sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+00:09:21 rc=1 stage=L_redis_perf_wide_E1_try1_B4 measure cmd=return stack=_sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+00:12:14 rc=1 stage=L_redis_perf_wide_E1_try1_B5 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:187 _sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+00:12:14 rc=1 stage=L_redis_perf_wide_E1_try1_B5 measure cmd=return stack=_sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+00:59:19 rc=1 stage=L_redis_perf_wide_E4_try1_B3 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:187 _sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+00:59:19 rc=1 stage=L_redis_perf_wide_E4_try1_B3 measure cmd=return stack=_sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+02:15:08 rc=1 stage=L_redis_ebpf_narrow_E4_try1_B2 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:187 _sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+02:15:08 rc=1 stage=L_redis_ebpf_narrow_E4_try1_B2 measure cmd=return stack=_sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+02:26:42 rc=1 stage=L_redis_ebpf_narrow_E4_try1_B6 measure cmd=echo $(( $(cat "$h/temp1_input") / 1000 )) stack=pkg_temp_c@lib.sh:187 _sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+02:26:42 rc=1 stage=L_redis_ebpf_narrow_E4_try1_B6 measure cmd=return stack=_sample_loop@sample.sh:92 sample_start@sample.sh:127 run_one@run_one.sh:42 _br_run@bracket.sh:28 bracket@bracket.sh:61 main@run_workload.sh:147 
+03:47:41 die stage=L_redis_ebpf_wide_E4_try3_A2 stop+parse: cell L_redis_ebpf_wide_E4 failed drift on all 3 tries (in bracket)
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-redis_20261111-211409.log'
+02:44:14 [run|L_redis_ebpf_wide_E4_try1_B3 stop+parse] run L_redis_ebpf_wide_E4_try1_B4 (rate 20000, traced=1)
+02:44:14 [run|L_redis_ebpf_wide_E4_try1_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+02:47:08 [run|L_redis_ebpf_wide_E4_try1_B4 stop+parse] run L_redis_ebpf_wide_E4_try1_B5 (rate 20000, traced=1)
+02:47:08 [run|L_redis_ebpf_wide_E4_try1_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+02:50:01 [run|L_redis_ebpf_wide_E4_try1_B5 stop+parse] run L_redis_ebpf_wide_E4_try1_B6 (rate 20000, traced=1)
+02:50:01 [run|L_redis_ebpf_wide_E4_try1_B6 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+02:52:54 [run|L_redis_ebpf_wide_E4_try1_B6 stop+parse] run L_redis_ebpf_wide_E4_try1_A2 (rate 20000, traced=0)
+02:52:55 [run|L_redis_ebpf_wide_E4_try1_A2 cooldown] cooldown 1s -> start at 38 C (limit 42 C, idle 37 C)
+02:55:48 [run|L_redis_ebpf_wide_E4_try1_A2 stop+parse] WARN: cell L_redis_ebpf_wide_E4 try 1: drift p99 8.3932% (limit 5.0000%, B spread 0.0000%) cpu 1.3511% (limit 5.0000%) — rerunning bracket
+02:55:48 [run|L_redis_ebpf_wide_E4_try1_A2 stop+parse] === cell L_redis_ebpf_wide_E4 try 2 ===
+02:55:48 [run|L_redis_ebpf_wide_E4_try1_A2 stop+parse] run L_redis_ebpf_wide_E4_try2_W1 (rate 20000, traced=0)
+02:55:48 [run|L_redis_ebpf_wide_E4_try2_W1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+02:58:41 [run|L_redis_ebpf_wide_E4_try2_W1 stop+parse] run L_redis_ebpf_wide_E4_try2_A1 (rate 20000, traced=0)
+02:58:41 [run|L_redis_ebpf_wide_E4_try2_A1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+03:01:33 [run|L_redis_ebpf_wide_E4_try2_A1 stop+parse] run L_redis_ebpf_wide_E4_try2_B1 (rate 20000, traced=1)
+03:01:33 [run|L_redis_ebpf_wide_E4_try2_B1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+03:04:26 [run|L_redis_ebpf_wide_E4_try2_B1 stop+parse] run L_redis_ebpf_wide_E4_try2_B2 (rate 20000, traced=1)
+03:04:26 [run|L_redis_ebpf_wide_E4_try2_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:07:20 [run|L_redis_ebpf_wide_E4_try2_B2 stop+parse] run L_redis_ebpf_wide_E4_try2_B3 (rate 20000, traced=1)
+03:07:20 [run|L_redis_ebpf_wide_E4_try2_B3 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:10:12 [run|L_redis_ebpf_wide_E4_try2_B3 stop+parse] run L_redis_ebpf_wide_E4_try2_B4 (rate 20000, traced=1)
+03:10:12 [run|L_redis_ebpf_wide_E4_try2_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:13:05 [run|L_redis_ebpf_wide_E4_try2_B4 stop+parse] run L_redis_ebpf_wide_E4_try2_B5 (rate 20000, traced=1)
+03:13:05 [run|L_redis_ebpf_wide_E4_try2_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:15:59 [run|L_redis_ebpf_wide_E4_try2_B5 stop+parse] run L_redis_ebpf_wide_E4_try2_B6 (rate 20000, traced=1)
+03:15:59 [run|L_redis_ebpf_wide_E4_try2_B6 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:18:51 [run|L_redis_ebpf_wide_E4_try2_B6 stop+parse] run L_redis_ebpf_wide_E4_try2_A2 (rate 20000, traced=0)
+03:18:51 [run|L_redis_ebpf_wide_E4_try2_A2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:21:44 [run|L_redis_ebpf_wide_E4_try2_A2 stop+parse] WARN: cell L_redis_ebpf_wide_E4 try 2: drift p99 7.5766% (limit 5.0000%, B spread 0.0000%) cpu 1.1189% (limit 5.0000%) — rerunning bracket
+03:21:44 [run|L_redis_ebpf_wide_E4_try2_A2 stop+parse] === cell L_redis_ebpf_wide_E4 try 3 ===
+03:21:44 [run|L_redis_ebpf_wide_E4_try2_A2 stop+parse] run L_redis_ebpf_wide_E4_try3_W1 (rate 20000, traced=0)
+03:21:44 [run|L_redis_ebpf_wide_E4_try3_W1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+03:24:36 [run|L_redis_ebpf_wide_E4_try3_W1 stop+parse] run L_redis_ebpf_wide_E4_try3_A1 (rate 20000, traced=0)
+03:24:36 [run|L_redis_ebpf_wide_E4_try3_A1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+03:27:29 [run|L_redis_ebpf_wide_E4_try3_A1 stop+parse] run L_redis_ebpf_wide_E4_try3_B1 (rate 20000, traced=1)
+03:27:29 [run|L_redis_ebpf_wide_E4_try3_B1 cooldown] cooldown 0s -> start at 36 C (limit 42 C, idle 37 C)
+03:30:23 [run|L_redis_ebpf_wide_E4_try3_B1 stop+parse] run L_redis_ebpf_wide_E4_try3_B2 (rate 20000, traced=1)
+03:30:23 [run|L_redis_ebpf_wide_E4_try3_B2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:33:16 [run|L_redis_ebpf_wide_E4_try3_B2 stop+parse] run L_redis_ebpf_wide_E4_try3_B3 (rate 20000, traced=1)
+03:33:16 [run|L_redis_ebpf_wide_E4_try3_B3 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:36:09 [run|L_redis_ebpf_wide_E4_try3_B3 stop+parse] run L_redis_ebpf_wide_E4_try3_B4 (rate 20000, traced=1)
+03:36:09 [run|L_redis_ebpf_wide_E4_try3_B4 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:39:02 [run|L_redis_ebpf_wide_E4_try3_B4 stop+parse] run L_redis_ebpf_wide_E4_try3_B5 (rate 20000, traced=1)
+03:39:02 [run|L_redis_ebpf_wide_E4_try3_B5 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:41:56 [run|L_redis_ebpf_wide_E4_try3_B5 stop+parse] run L_redis_ebpf_wide_E4_try3_B6 (rate 20000, traced=1)
+03:41:56 [run|L_redis_ebpf_wide_E4_try3_B6 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:44:48 [run|L_redis_ebpf_wide_E4_try3_B6 stop+parse] run L_redis_ebpf_wide_E4_try3_A2 (rate 20000, traced=0)
+03:44:48 [run|L_redis_ebpf_wide_E4_try3_A2 cooldown] cooldown 0s -> start at 38 C (limit 42 C, idle 37 C)
+03:47:41 [run|L_redis_ebpf_wide_E4_try3_A2 stop+parse] WARN: cell L_redis_ebpf_wide_E4 try 3: drift p99 7.9690% (limit 5.0000%, B spread 0.5799%) cpu 1.0103% (limit 5.0000%) — rerunning bracket
+03:47:41 [run|L_redis_ebpf_wide_E4_try3_A2 stop+parse] FAIL: cell L_redis_ebpf_wide_E4 failed drift on all 3 tries
+
+##### docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+##### docker logs --tail 100 bench-nginx
+Error response from daemon: No such container: bench-nginx
+
+##### docker logs --tail 100 bench-redis
+Error response from daemon: No such container: bench-redis
+
+##### dmesg -T | tail -n 60
+[Wed Nov 11 20:59:55 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 20:59:55 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 20:59:55 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 20:59:55 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 20:59:55 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 20:59:56 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 20:59:56 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 20:59:56 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 21:00:04 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Wed Nov 11 21:00:04 2026] audit: type=1400 audit(1794411004.517:684): apparmor="DENIED" operation="open" class="file" profile="snap.firmware-updater.firmware-notifier" name="/proc/sys/vm/max_map_count" pid=3503713 comm="firmware-notifi" requested_mask="r" denied_mask="r" fsuid=1000 ouid=0
+[Wed Nov 11 21:00:05 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 21:00:05 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 21:00:05 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 21:00:05 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 21:00:05 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 21:00:05 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.248:685): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/.config/" pid=3503904 comm="mkdir" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.255:686): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/.cache/" pid=3503907 comm="mkdir" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.283:687): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/.local/" pid=3503919 comm="mkdir" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.285:688): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/.cache/" pid=3503920 comm="mkdir" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.298:689): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/run/gdm3/home/gdm-greeter/" pid=3503923 comm="xdg-user-dirs-u" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.298:690): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/run/gdm3/home/gdm-greeter/" pid=3503923 comm="xdg-user-dirs-u" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.298:691): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/run/gdm3/home/gdm-greeter/" pid=3503923 comm="xdg-user-dirs-u" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.298:692): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/run/gdm3/home/gdm-greeter/" pid=3503923 comm="xdg-user-dirs-u" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:00:05 2026] audit: type=1400 audit(1794411005.298:693): apparmor="DENIED" operation="mkdir" class="file" profile="snap.firmware-updater.firmware-notifier" name="/run/gdm3/home/gdm-greeter/" pid=3503923 comm="xdg-user-dirs-u" requested_mask="c" denied_mask="c" fsuid=60578 ouid=60578
+[Wed Nov 11 21:13:39 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 21:13:39 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 21:13:39 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 21:13:39 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Wed Nov 11 21:13:39 2026] NVRM: No NVIDIA GPU found.
+[Wed Nov 11 21:13:39 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Wed Nov 11 21:14:22 2026] kauditd_printk_skb: 21 callbacks suppressed
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.696:715): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505695 comm="fusermount3" capability=1  capname="dac_override"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.696:716): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505695 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.696:717): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505700 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.697:718): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505698 comm="fusermount3" capability=1  capname="dac_override"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.697:719): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505698 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.697:720): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505701 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:22 2026] audit: type=1400 audit(1794411862.710:721): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=3505708 comm="fusermount3" flags="rw, rprivate"
+[Wed Nov 11 21:14:22 2026] rfkill: input handler enabled
+[Wed Nov 11 21:14:23 2026] audit: type=1400 audit(1794411862.922:722): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505819 comm="fusermount3" capability=1  capname="dac_override"
+[Wed Nov 11 21:14:23 2026] audit: type=1400 audit(1794411862.922:723): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505819 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:23 2026] audit: type=1400 audit(1794411862.923:724): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3505820 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 1 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 3 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 5 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 7 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 9 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 11 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 13 is now offline
+[Wed Nov 11 21:14:26 2026] smpboot: CPU 15 is now offline
+[Wed Nov 11 21:14:26 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Wed Nov 11 21:14:26 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+[Wed Nov 11 21:14:34 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Wed Nov 11 21:14:34 2026] audit: type=1400 audit(1794411874.505:730): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3506919 comm="fusermount3" capability=1  capname="dac_override"
+[Wed Nov 11 21:14:34 2026] audit: type=1400 audit(1794411874.505:731): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3506919 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:34 2026] audit: type=1400 audit(1794411874.505:732): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=3506920 comm="fusermount3" capability=7  capname="setuid"
+[Wed Nov 11 21:14:34 2026] audit: type=1400 audit(1794411874.517:733): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=3506921 comm="fusermount3" flags="rw, rprivate"
+[Thu Nov 12 00:50:38 2026] audit: type=1400 audit(1794424838.623:734): apparmor="DENIED" operation="open" class="file" profile="/usr/sbin/cupsd" name="/etc/paperspecs" pid=3930137 comm="cupsd" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
+[Thu Nov 12 00:50:38 2026] audit: type=1400 audit(1794424838.631:735): apparmor="DENIED" operation="capable" class="cap" profile="/usr/sbin/cupsd" pid=3930137 comm="cupsd" capability=12  capname="net_admin"
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+0
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2894339
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2894534
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2895333
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 36000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+  60614   60612  12  0.0 S          00:00 bash
+3505627       1  12  0.1 Ss      06:33:22 bash
+4166701    4280  14  0.0 S          53:45 sleep
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887        1397        8182          67        5699       13489
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   53G   50G  52% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=
+
+##### ls -la '/home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2'
+total 280
+drwxr-xr-x  3 root root   4096 Nov 12 03:47 .
+drwxr-xr-x 56 root root   4096 Nov 12 03:47 ..
+-rw-r--r--  1 root root      0 Nov 12 03:47 DONE
+-rw-r--r--  1 root root    105 Nov 12 03:45 cgroup_path
+-rw-r--r--  1 root root     65 Nov 12 03:44 container_id
+-rw-r--r--  1 root root     56 Nov 12 03:44 cooldown.env
+-rw-r--r--  1 root root      5 Nov 12 03:45 gap_s
+-rw-r--r--  1 root root   1759 Nov 12 03:47 info_after.txt
+-rw-r--r--  1 root root   1744 Nov 12 03:45 info_before.txt
+-rw-r--r--  1 root root      6 Nov 12 03:44 master_pid
+-rw-r--r--  1 root root 126878 Nov 12 03:47 memtier.json
+-rw-r--r--  1 root root      0 Nov 12 03:47 memtier_parse.err
+-rw-r--r--  1 root root   7503 Nov 12 03:47 net_after.txt
+-rw-r--r--  1 root root   7503 Nov 12 03:45 net_before.txt
+-rw-r--r--  1 root root      6 Nov 12 03:45 pids.sampler
+-rw-r--r--  1 root root     87 Nov 12 03:47 power.env
+-rw-r--r--  1 root root   4396 Nov 12 03:45 preload.out
+-rw-r--r--  1 root root  37483 Nov 12 03:45 ramp.json
+-rw-r--r--  1 root root   6201 Nov 12 03:45 ramp.out
+-rw-r--r--  1 root root     21 Nov 12 03:45 ramp_end
+-rw-r--r--  1 root root    569 Nov 12 03:47 run_meta.env
+drwxr-xr-x  2 root root   4096 Nov 12 03:47 samples
+-rw-r--r--  1 root root      0 Nov 12 03:44 started
+-rw-r--r--  1 root root      6 Nov 12 03:44 target_pids
+-rw-r--r--  1 root root    256 Nov 12 03:47 wl.env
+-rw-r--r--  1 root root  20149 Nov 12 03:47 workload.out
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/preload.out'
+Writing results to stdout
+[RUN #1] Preparing benchmark client...
+[RUN #1] Launching threads now...
+[RUN #1 5%,   1 secs]  2 threads 25 conns:       53511 ops,   53476 (avg:   53476) ops/sec, 3.97MB/sec (avg: 3.97MB/sec),  0.93 (avg:  0.93) msec latency[RUN #1 11%,   2 secs]  2 threads 25 conns:      106389 ops,   52868 (avg:   53172) ops/sec, 3.93MB/sec (avg: 3.95MB/sec),  0.94 (avg:  0.94) msec latency[RUN #1 16%,   3 secs]  2 threads 25 conns:      158348 ops,   51950 (avg:   52765) ops/sec, 3.86MB/sec (avg: 3.92MB/sec),  0.96 (avg:  0.95) msec latency[RUN #1 21%,   4 secs]  2 threads 25 conns:      211487 ops,   53130 (avg:   52856) ops/sec, 3.95MB/sec (avg: 3.93MB/sec),  0.94 (avg:  0.94) msec latency[RUN #1 26%,   5 secs]  2 threads 25 conns:      264291 ops,   52795 (avg:   52844) ops/sec, 3.92MB/sec (avg: 3.92MB/sec),  0.94 (avg:  0.94) msec latency[RUN #1 31%,   6 secs]  2 threads 25 conns:      314924 ops,   50624 (avg:   52474) ops/sec, 3.76MB/sec (avg: 3.90MB/sec),  0.99 (avg:  0.95) msec latency[RUN #1 37%,   7 secs]  2 threads 25 conns:      367661 ops,   52727 (avg:   52510) ops/sec, 3.92MB/sec (avg: 3.90MB/sec),  0.95 (avg:  0.95) msec latency[RUN #1 42%,   8 secs]  2 threads 25 conns:      420869 ops,   53198 (avg:   52596) ops/sec, 3.95MB/sec (avg: 3.91MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 47%,   9 secs]  2 threads 25 conns:      474019 ops,   53141 (avg:   52657) ops/sec, 3.95MB/sec (avg: 3.91MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 53%,  10 secs]  2 threads 25 conns:      526641 ops,   52577 (avg:   52649) ops/sec, 3.91MB/sec (avg: 3.91MB/sec),  0.95 (avg:  0.95) msec latency[RUN #1 58%,  11 secs]  2 threads 25 conns:      577063 ops,   50412 (avg:   52445) ops/sec, 3.75MB/sec (avg: 3.90MB/sec),  0.99 (avg:  0.95) msec latency[RUN #1 63%,  12 secs]  2 threads 25 conns:      627545 ops,   50472 (avg:   52281) ops/sec, 3.75MB/sec (avg: 3.88MB/sec),  0.99 (avg:  0.95) msec latency[RUN #1 68%,  13 secs]  2 threads 25 conns:      679326 ops,   51771 (avg:   52242) ops/sec, 3.85MB/sec (avg: 3.88MB/sec),  0.96 (avg:  0.96) msec latency[RUN #1 73%,  14 secs]  2 threads 25 conns:      732531 ops,   53195 (avg:   52310) ops/sec, 3.95MB/sec (avg: 3.89MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 79%,  15 secs]  2 threads 25 conns:      785717 ops,   53176 (avg:   52368) ops/sec, 3.95MB/sec (avg: 3.89MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 84%,  16 secs]  2 threads 25 conns:      838898 ops,   53157 (avg:   52417) ops/sec, 3.95MB/sec (avg: 3.89MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 89%,  17 secs]  2 threads 25 conns:      892040 ops,   53132 (avg:   52459) ops/sec, 3.95MB/sec (avg: 3.90MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 95%,  18 secs]  2 threads 25 conns:      945091 ops,   53041 (avg:   52491) ops/sec, 3.94MB/sec (avg: 3.90MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 100%,  19 secs]  2 threads 25 conns:      998118 ops,   53033 (avg:   52520) ops/sec, 3.94MB/sec (avg: 3.90MB/sec),  0.94 (avg:  0.95) msec latency[RUN #1 100%,  19 secs]  0 threads 25 conns:     1000000 ops,   53033 (avg:   52543) ops/sec, 3.94MB/sec (avg: 3.90MB/sec),  0.94 (avg:  0.95) msec latency
+
+
+CPU Utilization Summary
+  Total CPU time:   22.403s  (user 3.825s, sys 18.579s)
+  Wall time:        19.043s
+  Cores used:       1.176   (avg 58.8% across 2 worker threads)
+  Peak utilization: 119.3%
+setting requests to 20000
+2         Threads
+25        Connections per thread
+20000     Requests per client
+
+
+ALL STATS
+============================================================================================================================
+Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50 Latency     p99 Latency   p99.9 Latency       KB/sec 
+----------------------------------------------------------------------------------------------------------------------------
+Sets        52545.16          ---          ---         0.95009         0.91900         1.81500         2.35100      3996.76 
+Gets            0.00         0.00         0.00             ---             ---             ---             ---         0.00 
+Waits           0.00          ---          ---             ---             ---             ---             ---          --- 
+Totals      52545.16         0.00         0.00         0.95009         0.91900         1.81500         2.35100      3996.76 
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/ramp.out'
+Json file /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/ramp.json created...
+Writing results to stdout
+[RUN #1] Preparing benchmark client...
+[RUN #1] Launching threads now...
+[RUN #1 3%,   1 secs]  2 threads 25 conns:       20000 ops,   19980 (avg:   19980) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 7%,   2 secs]  2 threads 25 conns:       40010 ops,   19989 (avg:   19985) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 10%,   3 secs]  2 threads 25 conns:       60015 ops,   20001 (avg:   19990) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 13%,   4 secs]  2 threads 25 conns:       80005 ops,   19985 (avg:   19989) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 17%,   5 secs]  2 threads 25 conns:      100022 ops,   20012 (avg:   19993) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 20%,   6 secs]  2 threads 25 conns:      120016 ops,   19990 (avg:   19993) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 23%,   7 secs]  2 threads 25 conns:      140033 ops,   20013 (avg:   19996) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.01) msec latency[RUN #1 27%,   8 secs]  2 threads 25 conns:      160047 ops,   19990 (avg:   19995) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.02 (avg:  1.01) msec latency[RUN #1 30%,   9 secs]  2 threads 25 conns:      180065 ops,   20014 (avg:   19997) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.01) msec latency[RUN #1 33%,  10 secs]  2 threads 25 conns:      200098 ops,   20028 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.01) msec latency[RUN #1 37%,  11 secs]  2 threads 25 conns:      220126 ops,   20024 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.01) msec latency[RUN #1 40%,  12 secs]  2 threads 25 conns:      240117 ops,   19987 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.01) msec latency[RUN #1 43%,  13 secs]  2 threads 25 conns:      260143 ops,   20017 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.01) msec latency[RUN #1 47%,  14 secs]  2 threads 25 conns:      280127 ops,   19980 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.01) msec latency[RUN #1 50%,  15 secs]  2 threads 25 conns:      300159 ops,   20028 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.98 (avg:  1.01) msec latency[RUN #1 53%,  16 secs]  2 threads 25 conns:      320210 ops,   20041 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.98 (avg:  1.00) msec latency[RUN #1 57%,  17 secs]  2 threads 25 conns:      340189 ops,   19975 (avg:   20003) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 60%,  18 secs]  2 threads 25 conns:      360211 ops,   20018 (avg:   20004) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 63%,  19 secs]  2 threads 25 conns:      380251 ops,   20031 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 67%,  20 secs]  2 threads 25 conns:      400247 ops,   19992 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 70%,  21 secs]  2 threads 25 conns:      420250 ops,   19997 (avg:   20004) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 73%,  22 secs]  2 threads 25 conns:      440218 ops,   19964 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.02 (avg:  1.00) msec latency[RUN #1 77%,  23 secs]  2 threads 25 conns:      460309 ops,   20079 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 80%,  24 secs]  2 threads 25 conns:      480321 ops,   20008 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 83%,  25 secs]  2 threads 25 conns:      500366 ops,   20041 (avg:   20007) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 87%,  26 secs]  2 threads 25 conns:      520400 ops,   20029 (avg:   20008) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 90%,  27 secs]  2 threads 25 conns:      540400 ops,   19996 (avg:   20008) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 93%,  28 secs]  2 threads 25 conns:      560390 ops,   19986 (avg:   20007) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 97%,  29 secs]  2 threads 25 conns:      580386 ops,   19992 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 100%,  30 secs]  0 threads 25 conns:      600050 ops,   19992 (avg:   19999) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  1.01 (avg:  1.00) msec latency
+
+
+CPU Utilization Summary
+  Total CPU time:   16.451s  (user 2.638s, sys 13.813s)
+  Wall time:        30.006s
+  Cores used:       0.548   (avg 27.4% across 2 worker threads)
+  Peak utilization: 55.3%
+Saving JSON output file: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/ramp.json
+Json file closed.
+2         Threads
+25        Connections per thread
+30        Seconds
+
+
+ALL STATS
+============================================================================================================================
+Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50 Latency     p99 Latency   p99.9 Latency       KB/sec 
+----------------------------------------------------------------------------------------------------------------------------
+Sets         1818.15          ---          ---         1.01798         0.91100         2.02300         2.38300       138.29 
+Gets        18181.49     18181.49         0.00         1.00374         0.89500         1.99100         2.41500      1294.16 
+Waits           0.00          ---          ---             ---             ---             ---             ---          --- 
+Totals      19999.64     18181.49         0.00         1.00503         0.89500         1.99900         2.39900      1432.46 
+
+##### tail -n 30 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/workload.out'
+Json file /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/memtier.json created...
+Writing results to stdout
+[RUN #1] Preparing benchmark client...
+[RUN #1] Launching threads now...
+[RUN #1 1%,   1 secs]  2 threads 25 conns:       20037 ops,   19979 (avg:   19979) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 2%,   2 secs]  2 threads 25 conns:       40048 ops,   20006 (avg:   19993) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 3%,   3 secs]  2 threads 25 conns:       60035 ops,   19983 (avg:   19989) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 3%,   4 secs]  2 threads 25 conns:       80051 ops,   20012 (avg:   19995) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 4%,   5 secs]  2 threads 25 conns:      100064 ops,   20008 (avg:   19998) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 5%,   6 secs]  2 threads 25 conns:      120193 ops,   20086 (avg:   20012) ops/sec, 1.41MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 6%,   7 secs]  2 threads 25 conns:      140155 ops,   19958 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 7%,   8 secs]  2 threads 25 conns:      160237 ops,   20078 (avg:   20014) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 8%,   9 secs]  2 threads 25 conns:      180227 ops,   19986 (avg:   20011) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 8%,  10 secs]  2 threads 25 conns:      200389 ops,   20114 (avg:   20021) ops/sec, 1.41MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 9%,  11 secs]  2 threads 25 conns:      220324 ops,   19931 (avg:   20013) ops/sec, 1.39MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 10%,  12 secs]  2 threads 25 conns:      240352 ops,   20024 (avg:   20014) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 11%,  13 secs]  2 threads 25 conns:      260351 ops,   19995 (avg:   20012) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 12%,  14 secs]  2 threads 25 conns:      280386 ops,   20031 (avg:   20014) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.77 (avg:  0.75) msec latency[RUN #1 13%,  15 secs]  2 threads 25 conns:      300400 ops,   20010 (avg:   20013) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 13%,  16 secs]  2 threads 25 conns:      320375 ops,   19971 (avg:   20011) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 14%,  17 secs]  2 threads 25 conns:      340385 ops,   20006 (avg:   20011) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 15%,  18 secs]  2 threads 25 conns:      360400 ops,   20011 (avg:   20011) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 16%,  19 secs]  2 threads 25 conns:      380400 ops,   19996 (avg:   20010) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.72 (avg:  0.74) msec latency[RUN #1 17%,  20 secs]  2 threads 25 conns:      400400 ops,   19996 (avg:   20009) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.74) msec latency[RUN #1 18%,  21 secs]  2 threads 25 conns:      420362 ops,   19954 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.77 (avg:  0.74) msec latency[RUN #1 18%,  22 secs]  2 threads 25 conns:      440400 ops,   20034 (avg:   20008) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 19%,  23 secs]  2 threads 25 conns:      460400 ops,   19996 (avg:   20007) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 20%,  24 secs]  2 threads 25 conns:      480400 ops,   19996 (avg:   20007) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 21%,  25 secs]  2 threads 25 conns:      500400 ops,   19996 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 22%,  26 secs]  2 threads 25 conns:      520400 ops,   19996 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 23%,  27 secs]  2 threads 25 conns:      540400 ops,   19996 (avg:   20006) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 23%,  28 secs]  2 threads 25 conns:      560400 ops,   19996 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 24%,  29 secs]  2 threads 25 conns:      580400 ops,   19991 (avg:   20005) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 25%,  30 secs]  2 threads 25 conns:      600400 ops,   19995 (avg:   20004) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 26%,  31 secs]  2 threads 25 conns:      620400 ops,   19996 (avg:   20004) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 27%,  32 secs]  2 threads 25 conns:      640400 ops,   19992 (avg:   20004) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 28%,  33 secs]  2 threads 25 conns:      660400 ops,   19989 (avg:   20003) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.71 (avg:  0.75) msec latency[RUN #1 28%,  34 secs]  2 threads 25 conns:      680400 ops,   19995 (avg:   20003) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.72 (avg:  0.75) msec latency[RUN #1 29%,  35 secs]  2 threads 25 conns:      700400 ops,   19988 (avg:   20003) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 30%,  36 secs]  2 threads 25 conns:      720400 ops,   19989 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 31%,  37 secs]  2 threads 25 conns:      740400 ops,   19989 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 32%,  38 secs]  2 threads 25 conns:      760400 ops,   19989 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 33%,  39 secs]  2 threads 25 conns:      780400 ops,   19990 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 33%,  40 secs]  2 threads 25 conns:      800400 ops,   19987 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 34%,  41 secs]  2 threads 25 conns:      820400 ops,   19995 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 35%,  42 secs]  2 threads 25 conns:      840400 ops,   19995 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 36%,  43 secs]  2 threads 25 conns:      860400 ops,   19995 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 37%,  44 secs]  2 threads 25 conns:      880400 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 38%,  45 secs]  2 threads 25 conns:      900400 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 38%,  46 secs]  2 threads 25 conns:      920400 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 39%,  47 secs]  2 threads 25 conns:      940400 ops,   19994 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 40%,  48 secs]  2 threads 25 conns:      960400 ops,   19994 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.74) msec latency[RUN #1 41%,  49 secs]  2 threads 25 conns:      980400 ops,   19995 (avg:   19999) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 42%,  50 secs]  2 threads 25 conns:     1000412 ops,   20006 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 43%,  51 secs]  2 threads 25 conns:     1020434 ops,   20016 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 43%,  52 secs]  2 threads 25 conns:     1040471 ops,   20030 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.77 (avg:  0.75) msec latency[RUN #1 44%,  53 secs]  2 threads 25 conns:     1060450 ops,   19974 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 45%,  54 secs]  2 threads 25 conns:     1080455 ops,   20000 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 46%,  55 secs]  2 threads 25 conns:     1100439 ops,   19978 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 47%,  56 secs]  2 threads 25 conns:     1120467 ops,   20023 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 48%,  57 secs]  2 threads 25 conns:     1140528 ops,   20048 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 48%,  58 secs]  2 threads 25 conns:     1160535 ops,   20001 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 49%,  59 secs]  2 threads 25 conns:     1180515 ops,   19975 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.72 (avg:  0.75) msec latency[RUN #1 50%,  60 secs]  2 threads 25 conns:     1200529 ops,   20010 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 51%,  61 secs]  2 threads 25 conns:     1220513 ops,   19980 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 52%,  62 secs]  2 threads 25 conns:     1240584 ops,   20064 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 53%,  63 secs]  2 threads 25 conns:     1260547 ops,   19959 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 53%,  64 secs]  2 threads 25 conns:     1280557 ops,   20006 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 54%,  65 secs]  2 threads 25 conns:     1300608 ops,   20045 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 55%,  66 secs]  2 threads 25 conns:     1320620 ops,   19999 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 56%,  67 secs]  2 threads 25 conns:     1340629 ops,   20005 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 57%,  68 secs]  2 threads 25 conns:     1360660 ops,   20027 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 58%,  69 secs]  2 threads 25 conns:     1380665 ops,   20001 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 58%,  70 secs]  2 threads 25 conns:     1400699 ops,   20031 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 59%,  71 secs]  2 threads 25 conns:     1420677 ops,   19974 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 60%,  72 secs]  2 threads 25 conns:     1440719 ops,   20038 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 61%,  73 secs]  2 threads 25 conns:     1460698 ops,   19975 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 62%,  74 secs]  2 threads 25 conns:     1480662 ops,   19960 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.77 (avg:  0.75) msec latency[RUN #1 63%,  75 secs]  2 threads 25 conns:     1500691 ops,   20025 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 63%,  76 secs]  2 threads 25 conns:     1520732 ops,   20038 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 64%,  77 secs]  2 threads 25 conns:     1540743 ops,   20007 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 65%,  78 secs]  2 threads 25 conns:     1560724 ops,   19977 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 66%,  79 secs]  2 threads 25 conns:     1580748 ops,   20020 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 67%,  80 secs]  2 threads 25 conns:     1600748 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 68%,  81 secs]  2 threads 25 conns:     1620785 ops,   20033 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 68%,  82 secs]  2 threads 25 conns:     1640800 ops,   20011 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 69%,  83 secs]  2 threads 25 conns:     1660800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 70%,  84 secs]  2 threads 25 conns:     1680800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.71 (avg:  0.75) msec latency[RUN #1 71%,  85 secs]  2 threads 25 conns:     1700800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 72%,  86 secs]  2 threads 25 conns:     1720800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 73%,  87 secs]  2 threads 25 conns:     1740788 ops,   19984 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 73%,  88 secs]  2 threads 25 conns:     1760799 ops,   20007 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.77 (avg:  0.75) msec latency[RUN #1 74%,  89 secs]  2 threads 25 conns:     1780800 ops,   19997 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 75%,  90 secs]  2 threads 25 conns:     1800800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 76%,  91 secs]  2 threads 25 conns:     1820800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 77%,  92 secs]  2 threads 25 conns:     1840800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 78%,  93 secs]  2 threads 25 conns:     1860800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 78%,  94 secs]  2 threads 25 conns:     1880800 ops,   19991 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 79%,  95 secs]  2 threads 25 conns:     1900800 ops,   19996 (avg:   20002) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 80%,  96 secs]  2 threads 25 conns:     1920800 ops,   19996 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 81%,  97 secs]  2 threads 25 conns:     1940800 ops,   19996 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 82%,  98 secs]  2 threads 25 conns:     1960800 ops,   19996 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 83%,  99 secs]  2 threads 25 conns:     1980800 ops,   19996 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.74) msec latency[RUN #1 83%, 100 secs]  2 threads 25 conns:     2000800 ops,   19995 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 84%, 101 secs]  2 threads 25 conns:     2020800 ops,   19991 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 85%, 102 secs]  2 threads 25 conns:     2040800 ops,   19988 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 86%, 103 secs]  2 threads 25 conns:     2060800 ops,   19995 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.76 (avg:  0.75) msec latency[RUN #1 87%, 104 secs]  2 threads 25 conns:     2080800 ops,   19992 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 88%, 105 secs]  2 threads 25 conns:     2100800 ops,   19995 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 88%, 106 secs]  2 threads 25 conns:     2120800 ops,   19990 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.75) msec latency[RUN #1 89%, 107 secs]  2 threads 25 conns:     2140800 ops,   19990 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.75) msec latency[RUN #1 90%, 108 secs]  2 threads 25 conns:     2160800 ops,   19989 (avg:   20001) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.75) msec latency[RUN #1 91%, 109 secs]  2 threads 25 conns:     2180800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 92%, 110 secs]  2 threads 25 conns:     2200800 ops,   19989 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.72 (avg:  0.74) msec latency[RUN #1 93%, 111 secs]  2 threads 25 conns:     2220800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 93%, 112 secs]  2 threads 25 conns:     2240800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 94%, 113 secs]  2 threads 25 conns:     2260800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 95%, 114 secs]  2 threads 25 conns:     2280800 ops,   19995 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 96%, 115 secs]  2 threads 25 conns:     2300800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 97%, 116 secs]  2 threads 25 conns:     2320800 ops,   19989 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.74 (avg:  0.74) msec latency[RUN #1 98%, 117 secs]  2 threads 25 conns:     2340800 ops,   19989 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.73 (avg:  0.74) msec latency[RUN #1 98%, 118 secs]  2 threads 25 conns:     2360800 ops,   19990 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 99%, 119 secs]  2 threads 25 conns:     2380800 ops,   19995 (avg:   20000) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency[RUN #1 100%, 120 secs]  0 threads 25 conns:     2400050 ops,   19995 (avg:   19999) ops/sec, 1.40MB/sec (avg: 1.40MB/sec),  0.75 (avg:  0.74) msec latency
+
+
+CPU Utilization Summary
+  Total CPU time:   59.875s  (user 9.864s, sys 50.011s)
+  Wall time:        120.007s
+  Cores used:       0.499   (avg 24.9% across 2 worker threads)
+  Peak utilization: 51.0%
+Saving JSON output file: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/results/raw/L_redis_ebpf_wide_E4_try3_A2/memtier.json
+Json file closed.
+2         Threads
+25        Connections per thread
+120       Seconds
+
+
+ALL STATS
+============================================================================================================================
+Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50 Latency     p99 Latency   p99.9 Latency       KB/sec 
+----------------------------------------------------------------------------------------------------------------------------
+Sets         1818.27          ---          ---         0.75080         0.71100         1.72700         3.59900       138.30 
+Gets        18181.50     18181.50         0.00         0.74400         0.70300         1.73500         3.64700      1294.17 
+Waits           0.00          ---          ---             ---             ---             ---             ---          --- 
+Totals      19999.77     18181.50         0.00         0.74462         0.70300         1.73500         3.64700      1432.47 
