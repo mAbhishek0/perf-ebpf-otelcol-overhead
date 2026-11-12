@@ -73,10 +73,15 @@ mkdir -p "$D/raw"
 
 # sends.bt PID — one line per tcp_sendmsg by any thread of PID: "nsecs tid".
 # memtier sends with pipeline 1, so this is one line per request.
-cat > "$D/sends.bt" <<'EOF'
-kprobe:tcp_sendmsg /pid == $1/ { printf("%lld %d\n", nsecs, tid); }
+# The script ends itself after CAP_S seconds with exit(). It must not rely on
+# SIGINT: a background job of a non-interactive bash starts with SIGINT
+# ignored, so the first run's `kill -INT` left bpftrace running and the run
+# waited on it for 9 h (2026-11-12, raw/base_r1: 56 s of sends, then idle).
+cat > "$D/sends.bt" <<EOF
+kprobe:tcp_sendmsg /pid == \$1/ { printf("%lld %d\n", nsecs, tid); }
+interval:s:${CAP_S} { exit(); }
 EOF
-timeout -s INT 5 bpftrace -q -o /dev/null "$D/sends.bt" $$ 2> "$D/bt_check.err" || true
+timeout -s KILL $(( CAP_S + 30 )) bpftrace -q -o /dev/null "$D/sends.bt" $$ 2> "$D/bt_check.err" || true
 grep -qi error "$D/bt_check.err" && die "sends.bt does not load: $(head -n 3 "$D/bt_check.err")"
 
 QUIESCED=0
@@ -93,7 +98,7 @@ on_exit() {
   trap - ERR
   (( rc != 0 )) && crash_report "$rc"
   [[ -n $CAP_PID ]] && kill "$CAP_PID" 2>/dev/null
-  [[ -f $DIAG_BUNDLE/pids.bpf ]] && kill -INT "$(cat "$DIAG_BUNDLE/pids.bpf")" 2>/dev/null
+  [[ -f $DIAG_BUNDLE/pids.bpf ]] && kill -TERM "$(cat "$DIAG_BUNDLE/pids.bpf")" 2>/dev/null
   if (( DIAG_ACTIVE )); then
     [[ -f $DIAG_BUNDLE/pids.sampler ]] && kill "$(cat "$DIAG_BUNDLE/pids.sampler")" 2>/dev/null
     [[ -f $DIAG_BUNDLE/pids.gen ]] && kill "$(cat "$DIAG_BUNDLE/pids.gen")" 2>/dev/null
@@ -120,10 +125,10 @@ capture() {
   for (( i=0; i<100; i++ )); do [[ -s $b/pids.gen ]] && { pid=$(cat "$b/pids.gen"); break; }; sleep 0.05; done
   [[ -n $pid ]] || { echo "no memtier pid within 5 s" > "$b/capture.err"; return 0; }
   sleep $(( STEADY_S / 2 - CAP_S / 2 ))
-  bpftrace -q -o "$b/sends.txt" "$D/sends.bt" "$pid" 2> "$b/bpftrace.err" & bt=$!
+  # sends.bt exits by itself after CAP_S s; timeout -s KILL is a backstop only.
+  timeout -s KILL $(( CAP_S + 30 )) bpftrace -q -o "$b/sends.txt" "$D/sends.bt" "$pid" 2> "$b/bpftrace.err" & bt=$!
   echo "$bt" > "$b/pids.bpf"
-  sleep "$CAP_S"
-  kill -INT "$bt" 2>/dev/null; wait "$bt" 2>/dev/null || true
+  wait "$bt" 2>/dev/null || true
   rm -f "$b/pids.bpf"
 }
 
