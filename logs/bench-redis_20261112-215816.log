@@ -1,0 +1,51 @@
+21:58:32 [run|quiesce] quiesced: stopped [fwupd fwupd-refresh.timer cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+21:58:32 [run|quiesce] progress shown on tty8 (blanking off)
+21:58:32 [run|preflight] preflight
+21:58:32 [run|preflight]   [ok]   on AC power
+21:58:32 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+21:58:32 [run|preflight]   [ok]   TLP not active
+21:58:32 [run|preflight]   [ok]   unattended-upgrades not active
+21:58:32 [run|preflight]   [ok]   no noisy processes
+21:58:32 [run|preflight]   [ok]   no graphical session
+21:58:32 [run|preflight]   package 71 °C > 55 °C — waiting up to 900s to cool
+21:58:42 [run|preflight]   cooled for 10s, now 55 °C
+21:58:42 [run|preflight]   [ok]   package 55 °C
+21:58:42 [run|preflight]   [ok]   50796 MB free
+21:58:42 [run|preflight]   [ok]   BPF JIT on
+21:58:42 [run|preflight]   [ok]   docker reachable
+21:58:42 [run|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+21:58:42 [run|preflight]   [ok]   redis:7.4 id matches
+21:58:42 [run|preflight]   [ok]   port 6379 free
+21:58:42 [run|preflight]   [ok]   redis-cli present
+21:58:42 [run|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+21:58:42 [run|preflight]   [ok]   no leftover bench-redis
+21:58:42 [run|preflight]   [ok]   memtier 1 threads x 50 clients
+21:58:42 [run|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+21:58:42 [run|preflight]   [ok]   perf version 7.0.14
+21:58:42 [run|preflight]   [ok]   BCC python bindings (0.35.0)
+21:58:43 [run|preflight]   [ok]   uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+21:58:43 [run|preflight]   [ok]   tracepoint raw_syscalls
+21:58:43 [run|preflight]   [ok]   bpf_jit_enable=1
+21:58:43 [run|preflight]   [ok]   bpf_jit_harden=0
+21:58:43 [run|preflight]   [ok]   tracer sources present (redis_probes.c)
+21:58:43 [run|preflight]   [ok]   otelcol: otelcol-contrib version 0.161.0
+21:58:43 [run|preflight]   [ok]   collector mode scraper
+21:58:43 [run|preflight]   [ok]   otelcol templates present
+21:58:43 [run|preflight]   [ok]   port 18888 free
+21:58:43 [run|preflight]   [ok]   no otelcol-contrib running
+21:58:43 [run|preflight] preflight passed
+21:58:43 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+21:58:44 [run|host setup] clock floor requested at 2900000 kHz
+21:58:44 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+21:58:44 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+21:58:48 [run|host setup] clock under load: 2894671 kHz (ok)
+21:58:48 [run|host setup] host configured
+21:59:18 [run|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+21:59:19 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/provenance/20261112-215918_perf.env
+21:59:19 [run|host setup] ### redis x perf: level order 2 3 1 4
+21:59:19 [run|host setup] FAIL: stale run dirs /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/raw/L_redis_perf_narrow_E2_try1_* have no 'started' marker — left over from moving a results tree through git (only gitignored files remain); delete them and rerun
+21:59:19 [run|host setup] crash report: /home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/crash_20261112-215826.txt
+21:59:19 [run|host setup] no machine-state drift
+21:59:21 [run|host revert] host reverted
+21:59:52 [run|restore services] restored services: fwupd fwupd-refresh.timer cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+21:59:52 [run|restore services] exited with status 1 — host reverted; partial runs are marked INCOMPLETE

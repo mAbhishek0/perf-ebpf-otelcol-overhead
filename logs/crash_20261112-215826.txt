@@ -1,0 +1,172 @@
+CRASH REPORT  2026-11-12T21:59:19+05:30  exit=1  stage=host setup  unit=bench-redis
+run in flight: none (active=0)
+
+##### errors in order — "die" lines and the last entries are the cause; ERR lines can include failures a caller then handled
+21:58:43 rc=1 stage=host setup cmd=[[ -w $d/pwm${n}_enable ]] stack=_fan_enable_state@host.sh:66 host_save_prior@host.sh:26 host_setup@host.sh:102 main@run_workload.sh:117 
+21:59:19 die stage=host setup: stale run dirs /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/raw/L_redis_perf_narrow_E2_try1_* have no 'started' marker — left over from moving a results tree through git (only gitignored files remain); delete them and rerun (in bracket)
+
+##### tail -n 50 '/home/ab/Downloads/perf-ebpf-otelcol-overhead/logs/bench-redis_20261112-215816.log'
+21:58:32 [run|quiesce] quiesced: stopped [fwupd fwupd-refresh.timer cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+21:58:32 [run|quiesce] progress shown on tty8 (blanking off)
+21:58:32 [run|preflight] preflight
+21:58:32 [run|preflight]   [ok]   on AC power
+21:58:32 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+21:58:32 [run|preflight]   [ok]   TLP not active
+21:58:32 [run|preflight]   [ok]   unattended-upgrades not active
+21:58:32 [run|preflight]   [ok]   no noisy processes
+21:58:32 [run|preflight]   [ok]   no graphical session
+21:58:32 [run|preflight]   package 71 °C > 55 °C — waiting up to 900s to cool
+21:58:42 [run|preflight]   cooled for 10s, now 55 °C
+21:58:42 [run|preflight]   [ok]   package 55 °C
+21:58:42 [run|preflight]   [ok]   50796 MB free
+21:58:42 [run|preflight]   [ok]   BPF JIT on
+21:58:42 [run|preflight]   [ok]   docker reachable
+21:58:42 [run|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+21:58:42 [run|preflight]   [ok]   redis:7.4 id matches
+21:58:42 [run|preflight]   [ok]   port 6379 free
+21:58:42 [run|preflight]   [ok]   redis-cli present
+21:58:42 [run|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+21:58:42 [run|preflight]   [ok]   no leftover bench-redis
+21:58:42 [run|preflight]   [ok]   memtier 1 threads x 50 clients
+21:58:42 [run|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+21:58:42 [run|preflight]   [ok]   perf version 7.0.14
+21:58:42 [run|preflight]   [ok]   BCC python bindings (0.35.0)
+21:58:43 [run|preflight]   [ok]   uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+21:58:43 [run|preflight]   [ok]   tracepoint raw_syscalls
+21:58:43 [run|preflight]   [ok]   bpf_jit_enable=1
+21:58:43 [run|preflight]   [ok]   bpf_jit_harden=0
+21:58:43 [run|preflight]   [ok]   tracer sources present (redis_probes.c)
+21:58:43 [run|preflight]   [ok]   otelcol: otelcol-contrib version 0.161.0
+21:58:43 [run|preflight]   [ok]   collector mode scraper
+21:58:43 [run|preflight]   [ok]   otelcol templates present
+21:58:43 [run|preflight]   [ok]   port 18888 free
+21:58:43 [run|preflight]   [ok]   no otelcol-contrib running
+21:58:43 [run|preflight] preflight passed
+21:58:43 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+21:58:44 [run|host setup] clock floor requested at 2900000 kHz
+21:58:44 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+21:58:44 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+21:58:48 [run|host setup] clock under load: 2894671 kHz (ok)
+21:58:48 [run|host setup] host configured
+21:59:18 [run|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+21:59:19 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/provenance/20261112-215918_perf.env
+21:59:19 [run|host setup] ### redis x perf: level order 2 3 1 4
+21:59:19 [run|host setup] FAIL: stale run dirs /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/results/raw/L_redis_perf_narrow_E2_try1_* have no 'started' marker — left over from moving a results tree through git (only gitignored files remain); delete them and rerun
+
+##### docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+##### docker logs --tail 100 bench-nginx
+Error response from daemon: No such container: bench-nginx
+
+##### docker logs --tail 100 bench-redis
+Error response from daemon: No such container: bench-redis
+
+##### dmesg -T | tail -n 60
+[Thu Nov 12 21:48:03 2026] LVT offset 0 assigned for vector 0x400
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] Spectre V2 : Update user space SMT mitigation: STIBP always-on
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 3 APIC 0x3
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 5 APIC 0x5
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 7 APIC 0x7
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 9 APIC 0x9
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 11 APIC 0xb
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 13 APIC 0xd
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:48:03 2026] smpboot: Booting Node 0 Processor 15 APIC 0xf
+[Thu Nov 12 21:48:03 2026] ACPI: FW issue: working around C-state latencies out of order
+[Thu Nov 12 21:56:29 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 21:56:29 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 21:56:29 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 21:56:29 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 21:56:29 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 21:56:29 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 21:57:16 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 21:57:16 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 21:57:16 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 21:57:16 2026] nvidia-nvlink: Nvlink Core is being initialized, major device number 509
+[Thu Nov 12 21:57:16 2026] NVRM: No NVIDIA GPU found.
+[Thu Nov 12 21:57:16 2026] nvidia-nvlink: Unregistered Nvlink Core, major device number 509
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.988:536): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290099 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.988:537): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290099 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.988:538): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290101 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.990:539): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290102 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.990:540): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290102 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:29 2026] audit: type=1400 audit(1794500909.990:541): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290103 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:30 2026] audit: type=1400 audit(1794500910.013:542): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=290122 comm="fusermount3" flags="rw, rprivate"
+[Thu Nov 12 21:58:30 2026] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224111243
+[Thu Nov 12 21:58:30 2026] rfkill: input handler enabled
+[Thu Nov 12 21:58:30 2026] Bluetooth: hci0: Device setup in 143872 usecs
+[Thu Nov 12 21:58:30 2026] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[Thu Nov 12 21:58:30 2026] Bluetooth: hci0: AOSP extensions version v1.00
+[Thu Nov 12 21:58:30 2026] Bluetooth: hci0: AOSP quality report is supported
+[Thu Nov 12 21:58:30 2026] audit: type=1400 audit(1794500910.256:543): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290221 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 21:58:30 2026] audit: type=1400 audit(1794500910.256:544): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290222 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:32 2026] audit: type=1400 audit(1794500912.065:545): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=290294 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 21:58:42 2026] kauditd_printk_skb: 5 callbacks suppressed
+[Thu Nov 12 21:58:42 2026] audit: type=1400 audit(1794500922.174:551): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=291345 comm="fusermount3" capability=1  capname="dac_override"
+[Thu Nov 12 21:58:42 2026] audit: type=1400 audit(1794500922.174:552): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=291345 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:42 2026] audit: type=1400 audit(1794500922.174:553): apparmor="DENIED" operation="capable" class="cap" profile="fusermount3" pid=291348 comm="fusermount3" capability=7  capname="setuid"
+[Thu Nov 12 21:58:42 2026] audit: type=1400 audit(1794500922.179:554): apparmor="DENIED" operation="mount" class="mount" info="failed mntpnt match" error=-13 profile="fusermount3" name="/" pid=291349 comm="fusermount3" flags="rw, rprivate"
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 1 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 3 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 5 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 7 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 9 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 11 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 13 is now offline
+[Thu Nov 12 21:58:44 2026] smpboot: CPU 15 is now offline
+[Thu Nov 12 21:58:44 2026] Spectre V2 : Update user space SMT mitigation: STIBP off
+[Thu Nov 12 21:58:44 2026] perf: Dynamic interrupt throttling disabled, can hang your system!
+
+##### cat /sys/devices/system/cpu/online; cat /sys/devices/system/cpu/smt/control; cat /sys/devices/system/cpu/cpufreq/boost
+0,2,4,6,8,10,12,14
+off
+0
+
+##### grep . /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu10/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu11/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu12/cpufreq/scaling_cur_freq:2895803
+grep: /sys/devices/system/cpu/cpu13/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu14/cpufreq/scaling_cur_freq:2894701
+grep: /sys/devices/system/cpu/cpu15/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq: Device or resource busy
+/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq:2900000
+grep: /sys/devices/system/cpu/cpu9/cpufreq/scaling_cur_freq: Device or resource busy
+
+##### for z in /sys/class/thermal/thermal_zone*; do echo $(cat $z/type) $(cat $z/temp); done
+acpitz 39000
+
+##### ps -eo pid,ppid,psr,pcpu,stat,etime,comm | grep -E 'perf|wrk2|nginx|python|otelcol|bash|sleep' | grep -v grep
+ 272210    4124  14  0.0 S          21:27 sleep
+ 290027       1  14  0.4 Ss         00:53 bash
+ 292621  292619  14  0.0 S          00:00 bash
+
+##### free -m; df -h '/home/ab/Downloads/perf-ebpf-otelcol-overhead'
+               total        used        free      shared  buff/cache   available
+Mem:           14887        1076       11013          51        3173       13811
+Swap:           4095           0        4095
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p6  108G   53G   50G  52% /
+
+##### systemctl show -p AllowedCPUs system.slice user.slice init.scope bench.slice
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=12 14
+
+AllowedCPUs=
