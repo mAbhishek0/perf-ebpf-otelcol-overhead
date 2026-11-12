@@ -12,7 +12,7 @@ Here redis runs in a Docker container (`redis:7.4`, pinned by image id). It uses
 
 redis does not save anything to disk (`--save "" --appendonly no`, R2). A background save would start in some runs and not in others. That would make the baselines drift.
 
-The load comes from `memtier_benchmark` 2.5.2 (called memtier below). memtier opens 50 connections (2 threads times 25 clients) and sends commands at a fixed total rate. The mix is 1 `SET` to 10 `GET`. Keys are chosen at random from 1,000,000 keys. Each value is 32 bytes (R3, R4, R5).
+The load comes from `memtier_benchmark` 2.5.2 (called memtier below). memtier opens 50 connections (1 thread times 50 clients; 2 threads times 25 until 2026-11-12, see plan R17) and sends commands at a fixed total rate. The mix is 1 `SET` to 10 `GET`. Keys are chosen at random from 1,000,000 keys. Each value is 32 bytes (R3, R4, R5).
 
 ## 2. How one run works
 
