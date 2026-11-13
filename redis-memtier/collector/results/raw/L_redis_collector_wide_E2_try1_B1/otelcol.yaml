@@ -1,0 +1,57 @@
+# otelcol-contrib config, scraper mode, WIDE scope — Platform L (laptop), redis pair.
+# Rendered per run by common/mech/collector.sh (_otel_render) into BUNDLE/otelcol.yaml.
+# Placeholders: 1, 127.0.0.1:6379, 18888,
+# 512, 512 (values in collector.env).
+# 127.0.0.1:6379 is the shared renderer's one endpoint placeholder (its
+# name is historical); here mech.sh fills it with redis's host:port, not a URL.
+#
+# Plan R14 (docs/plans/2026-11-11-redis-implementation.md). Copy of the nginx
+# pair's template with ONE change: receiver `nginx` (stub_status) became
+# receiver `redis` (INFO over plain TCP; redisreceiver in otelcol-contrib
+# 0.161.0 defaults to no TLS, so there is no tls block). Every other
+# non-comment line is byte-identical (tests/test_mech.sh checks it).
+# The pipeline receiver list must stay flow style ("receivers: [a, b]"):
+# common/mech/collector.sh counts receivers from that one line.
+receivers:
+  redis:
+    endpoint: 127.0.0.1:6379
+    collection_interval: 1s
+
+  hostmetrics:
+    collection_interval: 1s
+    scrapers:
+      cpu:
+      memory:
+      disk:
+      network:
+      load:
+      filesystem:
+      paging:
+      processes:
+
+processors:
+  batch:
+    send_batch_size: 512
+
+exporters:
+  debug:
+    verbosity: basic
+    sending_queue:
+      enabled: true
+      queue_size: 512
+
+service:
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 127.0.0.1
+                port: 18888
+  pipelines:
+    metrics:
+      receivers: [redis, hostmetrics]
+      processors: [batch]
+      exporters: [debug]

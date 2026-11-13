@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.1.0",
+  "platform": "L",
+  "workload_cpus": "0,2,4,6", "tracer_cpus": "8,10", "gen_cpus": "12,14", "os_cpus": "12,14",
+  "ramp_s": 30, "steady_s": 120, "warmup_reps": 1, "measured_reps": 6, "drift_pct": 5, "drift_k": 2,
+  "perf_freq_narrow": 99, "perf_freq_wide": 999, "perf_mmap_pages": 512, "perf_trace_mmap_pages": 512,
+  "ebpf_perf_buffer_pages": 512,
+  "redis_image": "redis:7.4", "redis_image_id": "sha256:2e3eb11462c4e3759e6972678dd051d150ff54b1e60714b3c33b701260172a90", "memtier_threads": 1, "memtier_clients": 50,
+  "memtier_ratio": "1:10", "memtier_key_pattern": "R:R", "redis_keys": 1000000, "memtier_data_size": 32, "memtier_pipeline": 1,
+  "redis_gap_min_s": 2.0, "drift_lat_key": "P99_MS", "drift_cpu_floor_cores": 0,
+  "workload_column_units": {"memtier_runtime_ms": "ms", "memtier_ops": "requests", "memtier_ramp_ops_per_sec": "requests/s", "redis_cmds_delta": "commands", "redis_misses_delta": "misses", "gap_s": "s", "redis_loop_cycles_delta": "cycles", "redis_loop_us_delta": "us"},
+  "ladder": "1:2500 2:5000 3:10000 4:20000",
+  "columns": ["run_id", "platform", "workload", "mechanism", "scope", "level", "rate_target", "try", "role", "traced", "t_start", "window_s", "steady_s", "workload_cpus", "tracer_cpus", "gen_cpus", "throughput", "p50_ms", "p99_ms", "p999_ms", "max_ms", "errors", "tcp_retrans", "tcp_timeouts", "tcp_syn_retrans", "listen_drops", "workload_cpu_usec", "workload_cpu_cores", "tracer_cpu_cores", "loadgen_cpu_cores", "busy_pct_workload", "freq_min_khz", "freq_max_khz", "pkg_watts_mean", "temp_start_c", "temp_max_c", "irq_workload_delta", "irq_dev_delta", "irq_timer_delta", "irq_ipi_delta", "irq_nmi_delta", "irq_pmi_delta", "irq_other_delta", "softirq_net_rx_delta", "softirq_net_tx_delta", "n_samples", "cooldown_s", "cooldown_timed_out", "freq_verdict", "clock_check", "perf_rate_end", "kernel", "bench_trace", "power_source", "mech_events", "mech_lost", "mech_drop_rate", "mech_notes", "memtier_runtime_ms", "memtier_ops", "memtier_ramp_ops_per_sec", "redis_cmds_delta", "redis_misses_delta", "gap_s", "redis_loop_cycles_delta", "redis_loop_us_delta"]
+}
