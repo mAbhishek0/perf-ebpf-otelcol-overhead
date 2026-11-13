@@ -248,10 +248,12 @@ def load(inputs=None):
 
 
 def _cell_arrangements(a, b, theta):
-    """log(mean(B)/mean(A)) for all 28 ways to label 2 of the 8 runs as A,
-    with B divided by exp(theta). Index 0 is the observed labelling."""
+    """log(mean(B)/mean(A)) for all C(len(a)+len(b), len(a)) ways to label
+    len(a) of the runs as A (28 for 2 A + 6 B), with B divided by exp(theta).
+    Index 0 is the observed labelling. len(a) may be 1 (a sensitivity check
+    that drops one baseline, analysis/twoblock_stats.py)."""
     vals = list(a) + [x / math.exp(theta) for x in b]
-    obs = (0, 1)
+    obs = tuple(range(len(a)))
     pairs = [obs] + [c for c in itertools.combinations(range(len(vals)), len(a)) if c != obs]
     out = []
     for c in pairs:
