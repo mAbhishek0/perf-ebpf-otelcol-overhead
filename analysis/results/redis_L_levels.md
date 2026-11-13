@@ -5,8 +5,8 @@ reason for the threshold are in the script's docstring. Threshold 0.94,
 borderline band 0.93–0.96 (ratio of a run's event-loop cycles per
 second to the median of comparable runs).
 
-Runs analysed: 192 (warm-ups excluded). On the second level: 6.
-Borderline: 4.
+Runs analysed: 384 (warm-ups excluded). On the second level: 12.
+Borderline: 9.
 
 ## Second-level runs per cell
 
@@ -36,17 +36,47 @@ Borderline: 4.
 | 1 | collector | wide | 5000 | 0/2 | 0/6 |
 | 1 | collector | wide | 10000 | 0/2 | 0/6 |
 | 1 | collector | wide | 20000 | 0/2 | 0/6 |
+| 2 | perf | narrow | 2500 | 0/2 | 0/6 |
+| 2 | perf | narrow | 5000 | 0/2 | 0/6 |
+| 2 | perf | narrow | 10000 | 0/2 | 1/6 |
+| 2 | perf | narrow | 20000 | 0/2 | 0/6 |
+| 2 | perf | wide | 2500 | 0/2 | 0/6 |
+| 2 | perf | wide | 5000 | 0/2 | 0/6 |
+| 2 | perf | wide | 10000 | 0/2 | 0/6 |
+| 2 | perf | wide | 20000 | 0/2 | 0/6 |
+| 2 | ebpf | narrow | 2500 | 0/2 | 0/6 |
+| 2 | ebpf | narrow | 5000 | 0/2 | 0/6 |
+| 2 | ebpf | narrow | 10000 | 0/2 | 0/6 |
+| 2 | ebpf | narrow | 20000 | 0/2 | 0/6 |
+| 2 | ebpf | wide | 2500 | 0/2 | 0/6 |
+| 2 | ebpf | wide | 5000 | 0/2 | 0/6 |
+| 2 | ebpf | wide | 10000 | 1/2 | 0/6 |
+| 2 | ebpf | wide | 20000 | 0/2 | 0/6 |
+| 2 | collector | narrow | 2500 | 0/2 | 0/6 |
+| 2 | collector | narrow | 5000 | 0/2 | 1/6 |
+| 2 | collector | narrow | 10000 | 0/2 | 0/6 |
+| 2 | collector | narrow | 20000 | 0/2 | 0/6 |
+| 2 | collector | wide | 2500 | 0/2 | 0/6 |
+| 2 | collector | wide | 5000 | 0/2 | 1/6 |
+| 2 | collector | wide | 10000 | 1/2 | 1/6 |
+| 2 | collector | wide | 20000 | 0/2 | 0/6 |
 
 ## Second-level runs
 
 | run | cycles/s | reference | ratio | level | p99 (ms) |
 |---|---|---|---|---|---|
 | L_redis_perf_narrow_E2_try1_B4 (block 1) | 277.87 | 305.68 | 0.9090 | second | 3.087000 |
+| L_b2_redis_perf_narrow_E3_try1_B3 (block 2) | 521.76 | 569.10 | 0.9168 | second | 2.287000 |
+| L_b2_redis_ebpf_wide_E3_try2_A1 (block 2) | 536.84 | 588.98 | 0.9115 | second | 2.319000 |
 | L_redis_collector_narrow_E1_try1_B6 (block 1) | 177.29 | 194.18 | 0.9130 | second | 2.879000 |
 | L_redis_collector_narrow_E2_try1_B2 (block 1) | 288.18 | 314.36 | 0.9167 | second | 3.039000 |
 | L_redis_collector_narrow_E2_try1_B6 (block 1) | 282.57 | 314.36 | 0.8989 | second | 3.023000 |
 | L_redis_collector_narrow_E3_try1_B3 (block 1) | 562.56 | 603.88 | 0.9316 | second | 2.479000 |
 | L_redis_collector_wide_E1_try1_B3 (block 1) | 185.97 | 200.39 | 0.9281 | second | 2.911000 |
+| L_b2_redis_collector_narrow_E2_try1_B5 (block 2) | 285.66 | 313.62 | 0.9108 | second | 3.039000 |
+| L_b2_redis_collector_wide_E2_try1_B1 (block 2) | 287.18 | 326.24 | 0.8803 | second | 3.055000 |
+| L_b2_redis_collector_wide_E3_try1_A2 (block 2) | 544.71 | 588.98 | 0.9248 | second | 2.335000 |
+| L_b2_redis_collector_wide_E3_try1_B1 (block 2) | 557.35 | 612.46 | 0.9100 | second | 2.319000 |
 
 ## Borderline runs
 
@@ -54,5 +84,10 @@ Borderline: 4.
 |---|---|---|---|---|---|
 | L_redis_perf_narrow_E4_try1_B3 (block 1) | 1179.66 | 1238.27 | 0.9527 | main | 2.191000 |
 | L_redis_ebpf_narrow_E1_try1_B3 (block 1) | 163.26 | 172.16 | 0.9483 | main | 3.039000 |
+| L_b2_redis_ebpf_narrow_E1_try1_B6 (block 2) | 163.30 | 172.74 | 0.9454 | main | 3.007000 |
+| L_b2_redis_ebpf_narrow_E2_try1_B5 (block 2) | 267.89 | 279.70 | 0.9578 | main | 2.927000 |
 | L_redis_collector_narrow_E1_try1_B4 (block 1) | 183.44 | 194.18 | 0.9447 | main | 2.911000 |
 | L_redis_collector_narrow_E3_try1_B3 (block 1) | 562.56 | 603.88 | 0.9316 | second | 2.479000 |
+| L_b2_redis_collector_narrow_E1_try1_B1 (block 2) | 183.57 | 193.99 | 0.9463 | main | 2.927000 |
+| L_b2_redis_collector_narrow_E4_try1_B6 (block 2) | 1227.53 | 1286.90 | 0.9539 | main | 2.207000 |
+| L_b2_redis_collector_wide_E4_try1_B4 (block 2) | 1262.68 | 1322.92 | 0.9545 | main | 2.207000 |
