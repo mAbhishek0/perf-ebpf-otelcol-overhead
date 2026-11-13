@@ -319,7 +319,7 @@ Checklist, rewritten 2026-11-13 from the State section and the timeline. Tick an
 - [x] Two-block test for fio, with fio's own CPU as a cross-check (`analysis/twoblock_stats.py --workload fio`; timeline 67)
 - [x] Two-block test for redis, with sensitivity checks without second-level runs at 0.94 and 0.95 (`analysis/twoblock_stats.py --workload redis`; timeline 67)
 - [x] Drift-verdict table: every bracket try, failed ones included, across nginx, fio and redis; test whether signed A2 − A1 drift depends on the mechanism or workload (`analysis/drift_table.py`; timeline 69: no shift, smallest q 0.46)
-- [ ] Throughput loss and drop rate for fio and redis (decision 2 of timeline 28). Report and rates ready (timeline 70); run pending. Only nginx has a capacity test. redis `check.sh` showed wide tracing cutting capacity by about 40–57 % (one 30 s run per cell, timeline 54). Check first whether fio's ladder reached saturation.
+- [ ] Throughput loss and drop rate for fio and redis (decision 2 of timeline 28). Report and rates ready (timeline 70); run started 2026-11-13 night (redis then fio). Only nginx has a capacity test. redis `check.sh` showed wide tracing cutting capacity by about 40–57 % (one 30 s run per cell, timeline 54). Check first whether fio's ladder reached saturation.
 - [ ] SMT-on arm (planned last; harness option not written)
 
 **Open questions for the paper**
