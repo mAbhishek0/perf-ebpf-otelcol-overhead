@@ -1,0 +1,198 @@
+21:48:46 [run|quiesce] quiesced: stopped [cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm ], apps closed
+21:48:46 [run|quiesce] progress shown on tty8 (blanking off)
+21:48:46 [run|preflight] preflight
+21:48:46 [run|preflight]   [ok]   on AC power
+21:48:46 [run|preflight]   [ok]   platform profile 'balanced' (host setup sets performance)
+21:48:46 [run|preflight]   [ok]   TLP not active
+21:48:46 [run|preflight]   [ok]   unattended-upgrades not active
+21:48:46 [run|preflight]   [ok]   no noisy processes
+21:48:46 [run|preflight]   [ok]   no graphical session
+21:48:46 [run|preflight]   package 62 °C > 55 °C — waiting up to 900s to cool
+21:48:51 [run|preflight]   cooled for 5s, now 55 °C
+21:48:51 [run|preflight]   [ok]   package 55 °C
+21:48:51 [run|preflight]   [ok]   50478 MB free
+21:48:51 [run|preflight]   [ok]   BPF JIT on
+21:48:51 [run|preflight]   [ok]   docker reachable
+21:48:51 [run|preflight]   [ok]   memtier: memtier_benchmark v=2.5.2 sha=f3ff1793:0 bits=64 libevent=2.1.12-stable openssl=OpenSSL 3.5.5 27 Jan 2026 prometheus=yes
+21:48:51 [run|preflight]   [ok]   redis:7.4 id matches
+21:48:51 [run|preflight]   [ok]   port 6379 free
+21:48:51 [run|preflight]   [ok]   redis-cli present
+21:48:51 [run|preflight]   [ok]   /usr/bin/python3 for memtier_parse.py
+21:48:51 [run|preflight]   [ok]   no leftover bench-redis
+21:48:51 [run|preflight]   [ok]   memtier 1 threads x 50 clients
+21:48:51 [run|preflight]   [ok]   every ladder / pilot / capacity rate is a multiple of 2500 req/s (R6)
+21:48:51 [run|preflight]   [ok]   perf version 7.0.14
+21:48:51 [run|preflight]   [ok]   BCC python bindings (0.35.0)
+21:48:51 [run|preflight]   [ok]   uprobe target call: FUNC at 0x00000000000a5290 size 2136 in redis:7.4
+21:48:51 [run|preflight]   [ok]   tracepoint raw_syscalls
+21:48:51 [run|preflight]   [ok]   bpf_jit_enable=1
+21:48:51 [run|preflight]   [ok]   bpf_jit_harden=0
+21:48:51 [run|preflight]   [ok]   tracer sources present (redis_probes.c)
+21:48:51 [run|preflight] preflight passed
+21:48:51 [run|host setup] prior state saved to /home/ab/Downloads/perf-ebpf-otelcol-overhead/state/prior.env
+21:48:52 [run|host setup] clock floor requested at 2900000 kHz
+21:48:52 [run|host setup] fans at full speed: flat 255 curve on /sys/class/hwmon/hwmon7 (1 2 )
+21:48:52 [run|host setup] IRQs moved to 12,14: 30 (unmovable, e.g. per-CPU timers: 11)
+21:48:56 [run|host setup] clock under load: 2894682 kHz (ok)
+21:48:56 [run|host setup] host configured
+21:49:26 [run|host setup] idle package temp 39 C (min of 15 samples over 30 s)
+21:49:27 [run|host setup] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/provenance/20261113-214926_perf.env
+21:49:27 [run|host setup] ### redis x perf: level order R20000 R40000 R30000 R25000 R50000
+21:49:27 [run|host setup] === cell L_cap_redis_perf_wide_ER20000 try 1 ===
+21:49:27 [run|host setup] run L_cap_redis_perf_wide_ER20000_try1_W1 (rate 20000, traced=0)
+21:49:27 [run|L_cap_redis_perf_wide_ER20000_try1_W1 cooldown] cooldown 0s -> start at 40 C (limit 44 C, idle 39 C)
+21:52:21 [run|L_cap_redis_perf_wide_ER20000_try1_W1 stop+parse] run L_cap_redis_perf_wide_ER20000_try1_A1 (rate 20000, traced=0)
+21:52:21 [run|L_cap_redis_perf_wide_ER20000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+21:55:15 [run|L_cap_redis_perf_wide_ER20000_try1_A1 stop+parse] run L_cap_redis_perf_wide_ER20000_try1_B1 (rate 20000, traced=1)
+21:55:15 [run|L_cap_redis_perf_wide_ER20000_try1_B1 cooldown] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+21:58:10 [run|L_cap_redis_perf_wide_ER20000_try1_B1 stop+parse] run L_cap_redis_perf_wide_ER20000_try1_B2 (rate 20000, traced=1)
+21:58:10 [run|L_cap_redis_perf_wide_ER20000_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:01:06 [run|L_cap_redis_perf_wide_ER20000_try1_B2 stop+parse] run L_cap_redis_perf_wide_ER20000_try1_B3 (rate 20000, traced=1)
+22:01:06 [run|L_cap_redis_perf_wide_ER20000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:04:01 [run|L_cap_redis_perf_wide_ER20000_try1_B3 stop+parse] run L_cap_redis_perf_wide_ER20000_try1_A2 (rate 20000, traced=0)
+22:04:01 [run|L_cap_redis_perf_wide_ER20000_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:06:55 [run|L_cap_redis_perf_wide_ER20000_try1_A2 stop+parse] cell L_cap_redis_perf_wide_ER20000 try 1 ok (p99 0.0000% <= 6.7982%, cpu 0.0755% <= 5.0000%)
+22:06:57 [run|collect redis perf] collect: 5 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/redis_perf.csv
+22:06:57 [run|collect redis perf] === cell L_cap_redis_perf_wide_ER40000 try 1 ===
+22:06:57 [run|collect redis perf] run L_cap_redis_perf_wide_ER40000_try1_W1 (rate 40000, traced=0)
+22:06:57 [run|L_cap_redis_perf_wide_ER40000_try1_W1 cooldown] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+22:09:51 [run|L_cap_redis_perf_wide_ER40000_try1_W1 stop+parse] run L_cap_redis_perf_wide_ER40000_try1_A1 (rate 40000, traced=0)
+22:09:51 [run|L_cap_redis_perf_wide_ER40000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:12:45 [run|L_cap_redis_perf_wide_ER40000_try1_A1 stop+parse] run L_cap_redis_perf_wide_ER40000_try1_B1 (rate 40000, traced=1)
+22:12:45 [run|L_cap_redis_perf_wide_ER40000_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:15:41 [run|L_cap_redis_perf_wide_ER40000_try1_B1 stop+parse] run L_cap_redis_perf_wide_ER40000_try1_B2 (rate 40000, traced=1)
+22:15:41 [run|L_cap_redis_perf_wide_ER40000_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:18:37 [run|L_cap_redis_perf_wide_ER40000_try1_B2 stop+parse] run L_cap_redis_perf_wide_ER40000_try1_B3 (rate 40000, traced=1)
+22:18:37 [run|L_cap_redis_perf_wide_ER40000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:21:32 [run|L_cap_redis_perf_wide_ER40000_try1_B3 stop+parse] run L_cap_redis_perf_wide_ER40000_try1_A2 (rate 40000, traced=0)
+22:21:32 [run|L_cap_redis_perf_wide_ER40000_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:24:26 [run|L_cap_redis_perf_wide_ER40000_try1_A2 stop+parse] cell L_cap_redis_perf_wide_ER40000 try 1 ok (p99 0.0000% <= 5.4560%, cpu 0.2805% <= 5.0000%)
+22:24:31 [run|collect redis perf] collect: 10 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/redis_perf.csv
+22:24:31 [run|collect redis perf] === cell L_cap_redis_perf_wide_ER30000 try 1 ===
+22:24:31 [run|collect redis perf] run L_cap_redis_perf_wide_ER30000_try1_W1 (rate 30000, traced=0)
+22:24:31 [run|L_cap_redis_perf_wide_ER30000_try1_W1 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:27:25 [run|L_cap_redis_perf_wide_ER30000_try1_W1 stop+parse] run L_cap_redis_perf_wide_ER30000_try1_A1 (rate 30000, traced=0)
+22:27:25 [run|L_cap_redis_perf_wide_ER30000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:30:19 [run|L_cap_redis_perf_wide_ER30000_try1_A1 stop+parse] run L_cap_redis_perf_wide_ER30000_try1_B1 (rate 30000, traced=1)
+22:30:19 [run|L_cap_redis_perf_wide_ER30000_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/lib.sh: line 187: echo: write error: Broken pipe
+22:33:15 [run|L_cap_redis_perf_wide_ER30000_try1_B1 stop+parse] run L_cap_redis_perf_wide_ER30000_try1_B2 (rate 30000, traced=1)
+22:33:15 [run|L_cap_redis_perf_wide_ER30000_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:36:11 [run|L_cap_redis_perf_wide_ER30000_try1_B2 stop+parse] run L_cap_redis_perf_wide_ER30000_try1_B3 (rate 30000, traced=1)
+22:36:11 [run|L_cap_redis_perf_wide_ER30000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+/home/ab/Downloads/perf-ebpf-otelcol-overhead/common/sample.sh: line 41: printf: write error: Broken pipe
+22:39:07 [run|L_cap_redis_perf_wide_ER30000_try1_B3 stop+parse] run L_cap_redis_perf_wide_ER30000_try1_A2 (rate 30000, traced=0)
+22:39:07 [run|L_cap_redis_perf_wide_ER30000_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:42:01 [run|L_cap_redis_perf_wide_ER30000_try1_A2 stop+parse] cell L_cap_redis_perf_wide_ER30000 try 1 ok (p99 0.8235% <= 5.0000%, cpu 0.2574% <= 5.0000%)
+22:42:08 [run|collect redis perf] collect: 15 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/redis_perf.csv
+22:42:08 [run|collect redis perf] === cell L_cap_redis_perf_wide_ER25000 try 1 ===
+22:42:08 [run|collect redis perf] run L_cap_redis_perf_wide_ER25000_try1_W1 (rate 25000, traced=0)
+22:42:08 [run|L_cap_redis_perf_wide_ER25000_try1_W1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:45:02 [run|L_cap_redis_perf_wide_ER25000_try1_W1 stop+parse] run L_cap_redis_perf_wide_ER25000_try1_A1 (rate 25000, traced=0)
+22:45:02 [run|L_cap_redis_perf_wide_ER25000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:47:56 [run|L_cap_redis_perf_wide_ER25000_try1_A1 stop+parse] run L_cap_redis_perf_wide_ER25000_try1_B1 (rate 25000, traced=1)
+22:47:56 [run|L_cap_redis_perf_wide_ER25000_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+22:50:52 [run|L_cap_redis_perf_wide_ER25000_try1_B1 stop+parse] run L_cap_redis_perf_wide_ER25000_try1_B2 (rate 25000, traced=1)
+22:50:52 [run|L_cap_redis_perf_wide_ER25000_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:53:48 [run|L_cap_redis_perf_wide_ER25000_try1_B2 stop+parse] run L_cap_redis_perf_wide_ER25000_try1_B3 (rate 25000, traced=1)
+22:53:48 [run|L_cap_redis_perf_wide_ER25000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+22:56:43 [run|L_cap_redis_perf_wide_ER25000_try1_B3 stop+parse] run L_cap_redis_perf_wide_ER25000_try1_A2 (rate 25000, traced=0)
+22:56:43 [run|L_cap_redis_perf_wide_ER25000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+22:59:37 [run|L_cap_redis_perf_wide_ER25000_try1_A2 stop+parse] cell L_cap_redis_perf_wide_ER25000 try 1 ok (p99 3.0784% <= 14.0886%, cpu 0.3560% <= 5.0000%)
+22:59:47 [run|collect redis perf] collect: 20 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/redis_perf.csv
+22:59:47 [run|collect redis perf] === cell L_cap_redis_perf_wide_ER50000 try 1 ===
+22:59:47 [run|collect redis perf] run L_cap_redis_perf_wide_ER50000_try1_W1 (rate 50000, traced=0)
+22:59:47 [run|L_cap_redis_perf_wide_ER50000_try1_W1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+23:02:41 [run|L_cap_redis_perf_wide_ER50000_try1_W1 stop+parse] run L_cap_redis_perf_wide_ER50000_try1_A1 (rate 50000, traced=0)
+23:02:41 [run|L_cap_redis_perf_wide_ER50000_try1_A1 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:05:35 [run|L_cap_redis_perf_wide_ER50000_try1_A1 stop+parse] run L_cap_redis_perf_wide_ER50000_try1_B1 (rate 50000, traced=1)
+23:05:35 [run|L_cap_redis_perf_wide_ER50000_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+23:08:31 [run|L_cap_redis_perf_wide_ER50000_try1_B1 stop+parse] run L_cap_redis_perf_wide_ER50000_try1_B2 (rate 50000, traced=1)
+23:08:31 [run|L_cap_redis_perf_wide_ER50000_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:11:27 [run|L_cap_redis_perf_wide_ER50000_try1_B2 stop+parse] run L_cap_redis_perf_wide_ER50000_try1_B3 (rate 50000, traced=1)
+23:11:27 [run|L_cap_redis_perf_wide_ER50000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+23:14:22 [run|L_cap_redis_perf_wide_ER50000_try1_B3 stop+parse] run L_cap_redis_perf_wide_ER50000_try1_A2 (rate 50000, traced=0)
+23:14:23 [run|L_cap_redis_perf_wide_ER50000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:17:17 [run|L_cap_redis_perf_wide_ER50000_try1_A2 stop+parse] cell L_cap_redis_perf_wide_ER50000 try 1 ok (p99 0.0000% <= 15.6728%, cpu 0.0385% <= 5.0000%)
+23:17:29 [run|collect redis perf] collect: 25 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/perf/capacity/redis_perf.csv
+23:17:30 [run|collect redis perf] provenance: /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/provenance/20261113-231729_ebpf.env
+23:17:30 [run|collect redis perf] ### redis x ebpf: level order R50000 R25000 R40000 R20000 R30000
+23:17:30 [run|collect redis perf] === cell L_cap_redis_ebpf_wide_ER50000 try 1 ===
+23:17:30 [run|collect redis perf] run L_cap_redis_ebpf_wide_ER50000_try1_W1 (rate 50000, traced=0)
+23:17:30 [run|L_cap_redis_ebpf_wide_ER50000_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:20:24 [run|L_cap_redis_ebpf_wide_ER50000_try1_W1 stop+parse] run L_cap_redis_ebpf_wide_ER50000_try1_A1 (rate 50000, traced=0)
+23:20:24 [run|L_cap_redis_ebpf_wide_ER50000_try1_A1 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:23:18 [run|L_cap_redis_ebpf_wide_ER50000_try1_A1 stop+parse] run L_cap_redis_ebpf_wide_ER50000_try1_B1 (rate 50000, traced=1)
+23:23:18 [run|L_cap_redis_ebpf_wide_ER50000_try1_B1 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:26:13 [run|L_cap_redis_ebpf_wide_ER50000_try1_B1 stop+parse] run L_cap_redis_ebpf_wide_ER50000_try1_B2 (rate 50000, traced=1)
+23:26:13 [run|L_cap_redis_ebpf_wide_ER50000_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:29:07 [run|L_cap_redis_ebpf_wide_ER50000_try1_B2 stop+parse] run L_cap_redis_ebpf_wide_ER50000_try1_B3 (rate 50000, traced=1)
+23:29:07 [run|L_cap_redis_ebpf_wide_ER50000_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:32:01 [run|L_cap_redis_ebpf_wide_ER50000_try1_B3 stop+parse] run L_cap_redis_ebpf_wide_ER50000_try1_A2 (rate 50000, traced=0)
+23:32:01 [run|L_cap_redis_ebpf_wide_ER50000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:34:55 [run|L_cap_redis_ebpf_wide_ER50000_try1_A2 stop+parse] cell L_cap_redis_ebpf_wide_ER50000 try 1 ok (p99 0.5606% <= 5.0976%, cpu 0.5791% <= 5.0000%)
+23:34:58 [run|collect redis ebpf] collect: 5 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/redis_ebpf.csv
+23:34:58 [run|collect redis ebpf] === cell L_cap_redis_ebpf_wide_ER25000 try 1 ===
+23:34:58 [run|collect redis ebpf] run L_cap_redis_ebpf_wide_ER25000_try1_W1 (rate 25000, traced=0)
+23:34:58 [run|L_cap_redis_ebpf_wide_ER25000_try1_W1 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:37:52 [run|L_cap_redis_ebpf_wide_ER25000_try1_W1 stop+parse] run L_cap_redis_ebpf_wide_ER25000_try1_A1 (rate 25000, traced=0)
+23:37:52 [run|L_cap_redis_ebpf_wide_ER25000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+23:40:46 [run|L_cap_redis_ebpf_wide_ER25000_try1_A1 stop+parse] run L_cap_redis_ebpf_wide_ER25000_try1_B1 (rate 25000, traced=1)
+23:40:46 [run|L_cap_redis_ebpf_wide_ER25000_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+23:43:40 [run|L_cap_redis_ebpf_wide_ER25000_try1_B1 stop+parse] run L_cap_redis_ebpf_wide_ER25000_try1_B2 (rate 25000, traced=1)
+23:43:41 [run|L_cap_redis_ebpf_wide_ER25000_try1_B2 cooldown] cooldown 1s -> start at 38 C (limit 44 C, idle 39 C)
+23:46:35 [run|L_cap_redis_ebpf_wide_ER25000_try1_B2 stop+parse] run L_cap_redis_ebpf_wide_ER25000_try1_B3 (rate 25000, traced=1)
+23:46:35 [run|L_cap_redis_ebpf_wide_ER25000_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:49:30 [run|L_cap_redis_ebpf_wide_ER25000_try1_B3 stop+parse] run L_cap_redis_ebpf_wide_ER25000_try1_A2 (rate 25000, traced=0)
+23:49:30 [run|L_cap_redis_ebpf_wide_ER25000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+23:52:24 [run|L_cap_redis_ebpf_wide_ER25000_try1_A2 stop+parse] cell L_cap_redis_ebpf_wide_ER25000 try 1 ok (p99 0.0000% <= 5.0000%, cpu 0.2428% <= 5.0000%)
+23:52:29 [run|collect redis ebpf] collect: 10 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/redis_ebpf.csv
+23:52:29 [run|collect redis ebpf] === cell L_cap_redis_ebpf_wide_ER40000 try 1 ===
+23:52:29 [run|collect redis ebpf] run L_cap_redis_ebpf_wide_ER40000_try1_W1 (rate 40000, traced=0)
+23:52:30 [run|L_cap_redis_ebpf_wide_ER40000_try1_W1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+23:55:23 [run|L_cap_redis_ebpf_wide_ER40000_try1_W1 stop+parse] run L_cap_redis_ebpf_wide_ER40000_try1_A1 (rate 40000, traced=0)
+23:55:24 [run|L_cap_redis_ebpf_wide_ER40000_try1_A1 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+23:58:18 [run|L_cap_redis_ebpf_wide_ER40000_try1_A1 stop+parse] run L_cap_redis_ebpf_wide_ER40000_try1_B1 (rate 40000, traced=1)
+23:58:18 [run|L_cap_redis_ebpf_wide_ER40000_try1_B1 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+00:01:12 [run|L_cap_redis_ebpf_wide_ER40000_try1_B1 stop+parse] run L_cap_redis_ebpf_wide_ER40000_try1_B2 (rate 40000, traced=1)
+00:01:12 [run|L_cap_redis_ebpf_wide_ER40000_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:04:06 [run|L_cap_redis_ebpf_wide_ER40000_try1_B2 stop+parse] run L_cap_redis_ebpf_wide_ER40000_try1_B3 (rate 40000, traced=1)
+00:04:06 [run|L_cap_redis_ebpf_wide_ER40000_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:07:00 [run|L_cap_redis_ebpf_wide_ER40000_try1_B3 stop+parse] run L_cap_redis_ebpf_wide_ER40000_try1_A2 (rate 40000, traced=0)
+00:07:01 [run|L_cap_redis_ebpf_wide_ER40000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:09:55 [run|L_cap_redis_ebpf_wide_ER40000_try1_A2 stop+parse] cell L_cap_redis_ebpf_wide_ER40000 try 1 ok (p99 2.1704% <= 5.0000%, cpu 0.1127% <= 5.0000%)
+00:10:02 [run|collect redis ebpf] collect: 15 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/redis_ebpf.csv
+00:10:02 [run|collect redis ebpf] === cell L_cap_redis_ebpf_wide_ER20000 try 1 ===
+00:10:02 [run|collect redis ebpf] run L_cap_redis_ebpf_wide_ER20000_try1_W1 (rate 20000, traced=0)
+00:10:03 [run|L_cap_redis_ebpf_wide_ER20000_try1_W1 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+00:12:56 [run|L_cap_redis_ebpf_wide_ER20000_try1_W1 stop+parse] run L_cap_redis_ebpf_wide_ER20000_try1_A1 (rate 20000, traced=0)
+00:12:57 [run|L_cap_redis_ebpf_wide_ER20000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+00:15:51 [run|L_cap_redis_ebpf_wide_ER20000_try1_A1 stop+parse] run L_cap_redis_ebpf_wide_ER20000_try1_B1 (rate 20000, traced=1)
+00:15:51 [run|L_cap_redis_ebpf_wide_ER20000_try1_B1 cooldown] cooldown 0s -> start at 36 C (limit 44 C, idle 39 C)
+00:18:45 [run|L_cap_redis_ebpf_wide_ER20000_try1_B1 stop+parse] run L_cap_redis_ebpf_wide_ER20000_try1_B2 (rate 20000, traced=1)
+00:18:45 [run|L_cap_redis_ebpf_wide_ER20000_try1_B2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+00:21:39 [run|L_cap_redis_ebpf_wide_ER20000_try1_B2 stop+parse] run L_cap_redis_ebpf_wide_ER20000_try1_B3 (rate 20000, traced=1)
+00:21:39 [run|L_cap_redis_ebpf_wide_ER20000_try1_B3 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+00:24:34 [run|L_cap_redis_ebpf_wide_ER20000_try1_B3 stop+parse] run L_cap_redis_ebpf_wide_ER20000_try1_A2 (rate 20000, traced=0)
+00:24:34 [run|L_cap_redis_ebpf_wide_ER20000_try1_A2 cooldown] cooldown 0s -> start at 38 C (limit 44 C, idle 39 C)
+00:27:28 [run|L_cap_redis_ebpf_wide_ER20000_try1_A2 stop+parse] cell L_cap_redis_ebpf_wide_ER20000 try 1 ok (p99 0.0000% <= 5.0000%, cpu 0.0897% <= 5.0000%)
+00:27:38 [run|collect redis ebpf] collect: 20 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/redis_ebpf.csv
+00:27:38 [run|collect redis ebpf] === cell L_cap_redis_ebpf_wide_ER30000 try 1 ===
+00:27:38 [run|collect redis ebpf] run L_cap_redis_ebpf_wide_ER30000_try1_W1 (rate 30000, traced=0)
+00:27:38 [run|L_cap_redis_ebpf_wide_ER30000_try1_W1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+00:30:32 [run|L_cap_redis_ebpf_wide_ER30000_try1_W1 stop+parse] run L_cap_redis_ebpf_wide_ER30000_try1_A1 (rate 30000, traced=0)
+00:30:32 [run|L_cap_redis_ebpf_wide_ER30000_try1_A1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+00:33:26 [run|L_cap_redis_ebpf_wide_ER30000_try1_A1 stop+parse] run L_cap_redis_ebpf_wide_ER30000_try1_B1 (rate 30000, traced=1)
+00:33:26 [run|L_cap_redis_ebpf_wide_ER30000_try1_B1 cooldown] cooldown 0s -> start at 37 C (limit 44 C, idle 39 C)
+00:36:20 [run|L_cap_redis_ebpf_wide_ER30000_try1_B1 stop+parse] run L_cap_redis_ebpf_wide_ER30000_try1_B2 (rate 30000, traced=1)
+00:36:21 [run|L_cap_redis_ebpf_wide_ER30000_try1_B2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:39:15 [run|L_cap_redis_ebpf_wide_ER30000_try1_B2 stop+parse] run L_cap_redis_ebpf_wide_ER30000_try1_B3 (rate 30000, traced=1)
+00:39:15 [run|L_cap_redis_ebpf_wide_ER30000_try1_B3 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:42:09 [run|L_cap_redis_ebpf_wide_ER30000_try1_B3 stop+parse] run L_cap_redis_ebpf_wide_ER30000_try1_A2 (rate 30000, traced=0)
+00:42:09 [run|L_cap_redis_ebpf_wide_ER30000_try1_A2 cooldown] cooldown 0s -> start at 39 C (limit 44 C, idle 39 C)
+00:45:03 [run|L_cap_redis_ebpf_wide_ER30000_try1_A2 stop+parse] cell L_cap_redis_ebpf_wide_ER30000 try 1 ok (p99 0.4178% <= 5.0000%, cpu 0.0312% <= 5.0000%)
+00:45:16 [run|collect redis ebpf] collect: 25 rows -> /home/ab/Downloads/perf-ebpf-otelcol-overhead/redis-memtier/ebpf/capacity/redis_ebpf.csv
+00:45:16 [run|collect redis ebpf] no machine-state drift
+00:45:18 [run|host revert] host reverted
+00:45:48 [run|restore services] restored services: cups.socket cups.path cups cups-browsed snapd.socket snapd ModemManager bluetooth gdm 
+00:45:49 [run|restore services] done

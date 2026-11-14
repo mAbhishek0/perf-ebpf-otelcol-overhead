@@ -1,0 +1,28 @@
+Writing results to stdout
+[RUN #1] Preparing benchmark client...
+[RUN #1] Launching threads now...
+[RUN #1 5%,   0 secs]  1 threads 50 conns:       50333 ops,   50352 (avg:   50352) ops/sec, 3.74MB/sec (avg: 3.74MB/sec),  0.99 (avg:  0.99) msec latency
+warning: high CPU on thread 0: 99.8% of a core (threshold 95.0%) - results may be unreliable
+[RUN #1 10%,   2 secs]  1 threads 50 conns:      100336 ops,   49983 (avg:   50167) ops/sec, 3.71MB/sec (avg: 3.73MB/sec),  1.00 (avg:  0.99) msec latency[RUN #1 15%,   3 secs]  1 threads 50 conns:      150226 ops,   49880 (avg:   50072) ops/sec, 3.70MB/sec (avg: 3.72MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 20%,   4 secs]  1 threads 50 conns:      200354 ops,   50118 (avg:   50083) ops/sec, 3.72MB/sec (avg: 3.72MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 25%,   5 secs]  1 threads 50 conns:      250509 ops,   50145 (avg:   50096) ops/sec, 3.72MB/sec (avg: 3.72MB/sec),  0.99 (avg:  1.00) msec latency[RUN #1 30%,   6 secs]  1 threads 50 conns:      300059 ops,   49531 (avg:   50002) ops/sec, 3.68MB/sec (avg: 3.71MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 35%,   7 secs]  1 threads 50 conns:      350057 ops,   49988 (avg:   50000) ops/sec, 3.71MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 40%,   8 secs]  1 threads 50 conns:      400257 ops,   50190 (avg:   50023) ops/sec, 3.73MB/sec (avg: 3.72MB/sec),  0.99 (avg:  1.00) msec latency[RUN #1 45%,   9 secs]  1 threads 50 conns:      450423 ops,   50155 (avg:   50038) ops/sec, 3.73MB/sec (avg: 3.72MB/sec),  0.99 (avg:  1.00) msec latency[RUN #1 50%,  10 secs]  1 threads 50 conns:      500682 ops,   50249 (avg:   50059) ops/sec, 3.73MB/sec (avg: 3.72MB/sec),  0.99 (avg:  1.00) msec latency[RUN #1 55%,  11 secs]  1 threads 50 conns:      550186 ops,   49484 (avg:   50007) ops/sec, 3.68MB/sec (avg: 3.71MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 60%,  12 secs]  1 threads 50 conns:      599735 ops,   49540 (avg:   49968) ops/sec, 3.68MB/sec (avg: 3.71MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 65%,  13 secs]  1 threads 50 conns:      649201 ops,   49456 (avg:   49929) ops/sec, 3.67MB/sec (avg: 3.71MB/sec),  1.01 (avg:  1.00) msec latency[RUN #1 70%,  14 secs]  1 threads 50 conns:      699290 ops,   50079 (avg:   49939) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 75%,  15 secs]  1 threads 50 conns:      749313 ops,   50013 (avg:   49944) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 80%,  16 secs]  1 threads 50 conns:      799412 ops,   50089 (avg:   49953) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 85%,  17 secs]  1 threads 50 conns:      849496 ops,   50074 (avg:   49960) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 90%,  18 secs]  1 threads 50 conns:      899595 ops,   50088 (avg:   49967) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 95%,  19 secs]  1 threads 50 conns:      949633 ops,   50028 (avg:   49971) ops/sec, 3.72MB/sec (avg: 3.71MB/sec),  1.00 (avg:  1.00) msec latency[RUN #1 100%,  19 secs]  1 threads 50 conns:      999615 ops,   50934 (avg:   50018) ops/sec, 3.78MB/sec (avg: 3.72MB/sec),  0.98 (avg:  1.00) msec latency[RUN #1 100%,  19 secs]  0 threads 50 conns:     1000000 ops,   50934 (avg:   50033) ops/sec, 3.78MB/sec (avg: 3.72MB/sec),  0.98 (avg:  1.00) msec latency
+
+
+CPU Utilization Summary
+  Total CPU time:   19.957s  (user 3.062s, sys 16.895s)
+  Wall time:        20.016s
+  Cores used:       0.997   (avg 99.7% across 1 worker threads)
+  Peak utilization: 100.0%
+warning: thread 0 averaged 99.7% of a core over the run (threshold 95.0%) - memtier may be the bottleneck; results may be unreliable
+setting requests to 20000
+1         Threads
+50        Connections per thread
+20000     Requests per client
+
+
+ALL STATS
+============================================================================================================================
+Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50 Latency     p99 Latency   p99.9 Latency       KB/sec 
+----------------------------------------------------------------------------------------------------------------------------
+Sets        50033.02          ---          ---         0.99792         1.03900         1.43900         3.32700      3805.68 
+Gets            0.00         0.00         0.00             ---             ---             ---             ---         0.00 
+Waits           0.00          ---          ---             ---             ---             ---             ---          --- 
+Totals      50033.02         0.00         0.00         0.99792         1.03900         1.43900         3.32700      3805.68 
