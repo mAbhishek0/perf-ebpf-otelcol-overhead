@@ -35,7 +35,8 @@ The brief asks: **at what point does eBPF's low-overhead claim stop holding, com
 2. **Absolute values beside ratios**: untraced CPU (cores) and p99 (ms) per cell.
 3. **Sample counts behind each percentile**: requests or I/Os per window.
 4. **Setup table** generated from the provenance files: kernel, tool versions, CPU layout, buffer sizes.
-5. **Literature**: about 12–15 papers for the course version (the 8 found on 2026-11-14, the 3 anchor papers, and the methodology papers), in `paper/references.bib` with DOIs. Cite the original papers, never the markdown conversions.
+5. **The pre-registered Wilcoxon analysis, for every block and workload.** The planned per-cell test was the exact Wilcoxon signed-rank test (6 traced runs against the mean of the block's 2 untraced runs) with Benjamini-Hochberg over 96 tests. It was run on nginx block 1 only (README timeline 27) and is null by construction: its smallest p is 1/32, and the correction needs at least 60 of 96 tests at that minimum. It is now run per block, on block 1 and block 2 separately, for nginx, fio and redis, with the same method and no change to it. Pooling both blocks into one Wilcoxon test is not done: it would be a new test chosen after the data. The results go in appendix B; the two-block permutation test stays the primary per-cell test, named in Methodology as a deviation from the plan, with the reason.
+6. **Literature**: about 12–15 papers for the course version (the 8 found on 2026-11-14, the 3 anchor papers, and the methodology papers), in `paper/references.bib` with DOIs. Cite the original papers, never the markdown conversions.
 
 ## 5. Section structure
 
