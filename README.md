@@ -341,5 +341,6 @@ Checklist, rewritten 2026-11-13 from the State section and the timeline. Tick an
 - [ ] Cross-platform comparison with Platform S (side notes only; S is on hold)
 - [x] Paper, step 1: one summary table across workloads (`analysis/results/L_summary.md`; timeline 72)
 - [x] Paper, step 2: figures (overhead against rate per workload; capacity curves), from committed outputs by a committed script (`analysis/figures.py`; timeline 73)
-- [ ] Paper, step 3: outline and results section text, built on `L_summary.md` and the three figures
+- [x] Paper, step 3: design and plan agreed 2026-11-14 ([design](docs/plans/2026-11-14-paper-design.md), [plan](docs/plans/2026-11-14-paper-plan.md); course deadline 2026-11-30)
+- [ ] Paper, step 4: execute the plan's 16 tasks (analysis, LaTeX, sections, review, tag `course-v1`)
 - [ ] Paper
